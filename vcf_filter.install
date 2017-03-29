@@ -1,0 +1,49 @@
+<?php
+/**
+ * @file
+ * Installation of this module.
+ */
+
+/** 
+ * Implements hook_schema().
+ */
+function vcf_filter_schema() {
+  $schema = array();
+
+  $schema['vcf_files'] = array(
+    'description' => 'Keeps track of VCF files for use with VCF Filter module.',
+    'fields' => array(
+      'vcf_file_id' => array(
+        'description' => 'Primary Key',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'file_path' => array(
+        'description' => 'Absolute path to an existing VCF file.',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'Human-readable name for the VCF file.',
+        'type' => 'varchar',
+        'length' => 200,
+      ),
+      'num_snps' => array(
+        'description' => 'The number of SNPs in this VCF file.',
+        'type' => 'int',
+      ),
+      'backbone' => array(
+        'description' => 'The name of the sequence the SNPs are called on.',
+        'type' => 'varchar',
+        'length' => 200,
+      ),
+      'description' => array(
+        'description' => 'Free text description of the VCF file.',
+        'type' => 'text',
+      ),
+    ),
+    'primary key' => array('vcf_file_id'),
+  );
+
+  return $schema;
+}
