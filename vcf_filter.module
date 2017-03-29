@@ -1,0 +1,61 @@
+<?php
+/**
+ * @file
+ * Basic hook implementations for this module.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function vcf_filter_menu() {
+  $items = array();
+
+  $items['filter_vcf'] = array(
+    'title' => 'Filter VCF', 
+    'description' => 'Form interface so users can custom filter existing VCF files and export in a variety of formats.',
+    'page callback' => 'drupal_get_form', 
+    'page arguments' => array('vcf_filter_form'), 
+    'access callback' => TRUE,
+    'file' => 'includes/vcf_filter.form.inc',
+  );
+
+  // ADMINISTRATION.
+  // List VCF Files.
+  $items['admin/tripal/extension/vcf_filter'] = array(
+    'title' => 'VCF Filter',
+    'description' => 'Provides a form so users can custom filter existing VCF files and export in a variety of formats.',
+    'page callback' => 'vcf_filter_admin_list',
+    'page arguments' => array(),
+    'access arguments' => array('administer tripal'),
+    'file' => 'includes/vcf_filter.admin.inc',
+  );
+
+  $items['admin/tripal/extension/vcf_filter/add'] = array(
+    'title' => 'Add VCF File',
+    'description' => 'Make a VCF file available to be filtered.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('vcf_filter_admin_vcf_file_form', 'add'),
+    'access arguments' => array('administer tripal'),
+    'file' => 'includes/vcf_filter.admin.inc',
+  );
+
+  $items['admin/tripal/extension/vcf_filter/edit'] = array(
+    'title' => 'Edit VCF File',
+    'description' => 'Edit an existing VCF file.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('vcf_filter_admin_vcf_file_form', 'edit'),
+    'access arguments' => array('administer tripal'),
+    'file' => 'includes/vcf_filter.admin.inc',
+  );
+
+  $items['admin/tripal/extension/vcf_filter/delete'] = array(
+    'title' => 'Delete VCF File',
+    'description' => 'Delete an existing VCF file.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('vcf_filter_admin_vcf_file_form', 'delete'),
+    'access arguments' => array('administer tripal'),
+    'file' => 'includes/vcf_filter.admin.inc',
+  );
+
+  return $items;
+}
