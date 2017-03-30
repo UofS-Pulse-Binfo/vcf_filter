@@ -5,6 +5,7 @@
  */
 
 require_once('api/vcf_filter.api.inc');
+require_once('includes/vcf_filter.trpdownload.inc');
 
 /**
  * Implements hook_menu().
@@ -13,12 +14,37 @@ function vcf_filter_menu() {
   $items = array();
 
   $items['filter_vcf'] = array(
-    'title' => 'Filter VCF', 
+    'title' => 'Filter VCF',
     'description' => 'Form interface so users can custom filter existing VCF files and export in a variety of formats.',
-    'page callback' => 'drupal_get_form', 
-    'page arguments' => array('vcf_filter_form'), 
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('vcf_filter_form'),
     'access callback' => TRUE,
     'file' => 'includes/vcf_filter.form.inc',
+  );
+
+  // TRIPAL DOWNLOAD PAGES.
+  $items['filter_vcf/ABH'] = array(
+    'title' => 'Download Filtered VCF: A/B Biparental Format',
+    'page callback' => 'trpdownload_download_page',
+    'page arguments' => array('vcf_filter_abh'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['filter_vcf/SNP-Matrix'] = array(
+    'title' => 'Download Filtered VCF: SNP Matrix Format',
+    'page callback' => 'trpdownload_download_page',
+    'page arguments' => array('vcf_filter_matrix'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['filter_vcf/VCF'] = array(
+    'title' => 'Download Filtered VCF',
+    'page callback' => 'trpdownload_download_page',
+    'page arguments' => array('vcf_filter_VCF'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
   );
 
   // ADMINISTRATION.
