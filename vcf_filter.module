@@ -4,6 +4,8 @@
  * Basic hook implementations for this module.
  */
 
+require_once('api/vcf_filter.api.inc');
+
 /**
  * Implements hook_menu().
  */
