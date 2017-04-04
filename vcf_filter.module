@@ -39,6 +39,14 @@ function vcf_filter_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['filter_vcf/Quality-Matrix'] = array(
+    'title' => 'Download Filtered VCF: Quality Matrix Format',
+    'page callback' => 'trpdownload_download_page',
+    'page arguments' => array('vcf_filter_qual_matrix'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
   $items['filter_vcf/VCF'] = array(
     'title' => 'Download Filtered VCF',
     'page callback' => 'trpdownload_download_page',

@@ -9,6 +9,8 @@
 require_once('vcf_filter.trpdownload.abh.inc');
 // SNP Matrix.
 require_once('vcf_filter.trpdownload.matrix.inc');
+// Quality Matrix.
+require_once('vcf_filter.trpdownload.qual_matrix.inc');
 // Basic VCF.
 require_once('vcf_filter.trpdownload.vcf.inc');
 
@@ -32,6 +34,14 @@ function vcf_filter_register_trpdownload_type() {
     'format' => 'SNP Matrix Format',
     'functions' => array(
       'generate_file' => 'vcf_filter_matrix_generate_file',
+    ),
+  );
+
+  $types['vcf_filter_qual_matrix'] = array(
+    'type_name' => 'VCF Filter',
+    'format' => 'Quality Matrix Format',
+    'functions' => array(
+      'generate_file' => 'vcf_filter_qual_matrix_generate_file',
     ),
   );
 

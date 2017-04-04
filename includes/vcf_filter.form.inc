@@ -236,6 +236,7 @@ function vcf_filter_form_submit($form, &$form_state) {
   $url = array(
     'abh' => '/filter_vcf/ABH',
     'matrix' => '/filter_vcf/SNP-Matrix',
+    'qual_matrix' => '/filter_vcf/Quality-Matrix',
     'vcf' => '/filter_vcf/VCF'
   );
   $form_state['redirect'] = array(
