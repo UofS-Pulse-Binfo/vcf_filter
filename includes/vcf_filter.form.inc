@@ -197,7 +197,7 @@ function vcf_filter_form_validate($form, &$form_state) {
       form_set_error('s2][minor_allele_freq', 'The <em>Minor Allele Frequency</em> represent a percent and thus should be between 0 and 100 (e.g. "25" for 25%).');
     }
   }
-  else {
+  elseif (!empty($form_state['values']['s2']['minor_allele_freq'])) {
     form_set_error('s2][minor_allele_freq', 'The <em>Minor Allele Frequency</em> should be a positive whole number (e.g. "25" for 25%).');
   }
 
@@ -214,7 +214,7 @@ function vcf_filter_form_validate($form, &$form_state) {
       form_set_error('s2][max_missing_freq', 'The <em>Maximum Missing Frequency</em> represent a percent and thus should be between 0 and 100 (e.g. "25" for 25%).');
     }
   }
-  else {
+  elseif (!empty($form_state['values']['s2']['max_missing_freq'])) {
     form_set_error('s2][max_missing_freq', 'The <em>Maximum Missing Frequency</em> should be a positive whole number (e.g. "25" for 25%).');
   }
 }

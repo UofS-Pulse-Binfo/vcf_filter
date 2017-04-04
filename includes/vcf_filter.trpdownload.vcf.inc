@@ -24,7 +24,6 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL) {
   // Create the file and ready it for writting to.
   $filepath = variable_get('trpdownload_fullpath', '') . $variables['filename'];
   drush_print("File: " . $filepath);
-  $FILE = fopen($filepath, 'w') or die ('Unable to create file to write to');
 
   // Get the VCF file details.
   $vcf_file = vcf_filter_get_vcf_file($variables['q']['vcf_file_id']);
@@ -38,13 +37,9 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL) {
 
   drush_print("\nFiltering the Original VCF");
   $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q']);
-  $INFILE = fopen($filtered_vcf, 'r') or die ('Unable to read filtered VCF file.');
 
-  drush_print("\nConversion from VCF to A/B Biparental Format.");
-  fputs($FILE, implode("\t", array('test','test','test')));
-  drush_log('Not yet implemented so simply printed a test line to the file.','warning');
+  drush_print("\nMove VCF file to the name we expect.");
+  shell_exec("mv $filtered_vcf $filepath");
 
-
-  fclose($FILE);
 }
 

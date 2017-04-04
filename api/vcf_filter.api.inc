@@ -45,9 +45,48 @@ function vcf_filter_get_vcf_file($vcf_file_id) {
  *   The full patch of the filtered VCF file.
  */
 function vcf_filter_filter_file($file_path, $filter_criteria) {
-  $new_file = '';
+  $new_file = variable_get('file_temporary_path') . '/' . uniqid();
 
-  drush_log('Not yet implemented.','warning');
+  drush_log('NOTE: We are not using the PL at this point to specify the genotypes.', 'warning');
 
-  return $new_file;
+  $command = 'vcftools --vcf ' . $file_path . ' --recode --out ' . $new_file;
+
+  // Bi-allelic:
+  if ($filter_criteria['bi-allelic'] == 1) {
+    $command .= ' --min-alleles 2 --max-alleles 2';
+  }
+
+  // Minimum SNP Call Read Depth:
+  if (!empty($filter_criteria['call_read_depth'])) {
+    $command .= ' --minDP ' . escapeshellarg($filter_criteria['call_read_depth']);
+  }
+
+  // Minor Allele Frequency:
+  if (!empty($filter_criteria['minor_allele_freq'])) {
+    // NOTE: We allow the user to provide the frequency as an integer 0-100;
+    // however, vcftools expects a float between 0-1.
+    $minor_allele_freq = $filter_criteria['minor_allele_freq'] / 100;
+    $command .= ' --maf ' . escapeshellarg($minor_allele_freq);
+  }
+
+  // Maximum Missing Count:
+  if (!empty($filter_criteria['max_missing_count'])) {
+    $command .= ' --max-missing-count ' . escapeshellarg($filter_criteria['max_missing_count']);
+  }
+
+  // Maximum Missing Count:
+  if (!empty($filter_criteria['max_missing_freq'])) {
+    // NOTE: We allow the user to provide the frequency as an integer 0-100;
+    // however, vcftools expects a float between 0-1.
+    $max_missing_freq = 1 - ($filter_criteria['max_missing_freq'] / 100);
+    $command .= ' --max-missing ' . escapeshellarg($max_missing_freq);
+  }
+
+  // Execute the command.
+  drush_print('Filter results will be in: '.$new_file . '.recode.vcf');
+  drush_print(str_repeat('-', 60));
+  drush_print(shell_exec($command));
+  drush_print(str_repeat('-', 60));
+
+  return $new_file . '.recode.vcf';
 }
