@@ -60,6 +60,32 @@ function vcf_filter_form($form, &$form_state) {
     '#options' => $files,
     '#empty' => t('No VCF Files available.'),
     '#multiple' => FALSE,
+    '#ajax' => array(
+      'callback' => 'ajax_vcf_filter_show_description_callback',
+      'wrapper' => 'vcf-description',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  if (isset($_GET['vcf_file_id']) AND is_numeric($_GET['vcf_file_id'])) {
+    $form['s1']['vcf_file_id']['#default_value'] = $_GET['vcf_file_id'];
+  }
+  if (isset($form_state['values']['vcf_file_id'])) {
+    $form['s1']['vcf_file_id']['#default_value'] = $form_state['values']['vcf_file_id'];
+  }
+
+  $descrip_markup = '';
+  if (!empty($form['s1']['vcf_file_id']['#default_value'])) {
+    $curr_file = $files[  $form['s1']['vcf_file_id']['#default_value']  ];
+    if (!empty($curr_file['description'])) {
+      $descrip_markup = '<br /><p><strong>More information on <em>'.$curr_file['name'].'</em>:</strong> ' . $curr_file['description'] . '</p>';
+    }
+  }
+  $form['s1']['file_description'] = array(
+    '#type' => 'markup',
+    '#prefix' => '<span id="vcf-description">',
+    '#suffix' => '</span>',
+    '#markup' => $descrip_markup,
   );
 
   $form['s2'] = array(
@@ -138,11 +164,13 @@ function vcf_filter_form($form, &$form_state) {
       'description' => 'Alleles are coded as A/B based on the parents. This format is only suitable for biparental crosses',
     ),
     */
+    /*
     'matrix' => array(
       'name' => 'SNP Matrix',
       'has_quality' => 'No',
       'description' => 'Variant by Germplasm matrix of SNP calls.',
     ),
+    */
     'qual_matrix' => array(
       'name' => 'Quality Matrix',
       'has_quality' => 'Yes',
@@ -247,3 +275,9 @@ function vcf_filter_form_submit($form, &$form_state) {
   );
 }
 
+/**
+ * AJAX Callback: Update the description of the VCF file.
+ */
+function ajax_vcf_filter_show_description_callback($form, $form_state) {
+  return $form['s1']['file_description'];
+}
