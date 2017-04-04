@@ -9,6 +9,23 @@
  */
 function vcf_filter_form($form, &$form_state) {
 
+  $form['#attached']['css'][] = array(
+    'data' => '
+      .form-type-checkbox label {
+        font-weight: bold;
+        position: relative;
+        top: 2px;
+      }
+      table caption {
+        font-weight: bold;
+        margin-top: 5px;
+        padding-top: 15px;
+        border-top: 1px solid #d0d0d0;
+      }
+    ',
+    'type' => 'inline',
+  );
+
   $form['intro'] = array(
     '#type' => 'item',
     '#markup' => 'With the increasing size of datasets, it becomes necessary for researchers to take advantage of command-line tools. This form provides an interface to VCF Tools, to facillitate custom filtering of VCF files and exporting of these files in common formats.',
@@ -39,7 +56,6 @@ function vcf_filter_form($form, &$form_state) {
   );
   $form['s1']['vcf_file_id'] = array(
     '#type' => 'tableselect',
-    '#required' => TRUE,
     '#header' => $header,
     '#options' => $files,
     '#empty' => t('No VCF Files available.'),
@@ -52,17 +68,61 @@ function vcf_filter_form($form, &$form_state) {
     '#tree' => TRUE,
   );
 
-  $form['s2']['read_depth'] = array(
+  $form['s2']['bi-allelic'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Only include Bi-allelic SNPs',
+    '#description' => 'If you check this checkbox the only SNPs with 2 alleles will be kept. For example, in the example data below, SNP Chr3p34567 would be removed.',
+  );
+
+  $form['s2']['call_read_depth'] = array(
     '#type' => 'textfield',
-    '#title' => 'Minimum Read Depth',
-    '#description' => 'Remove all SNPs with a combined read depth below that specified here.',
-    '#default_value' => '5',
+    '#title' => 'Minimum SNP Call Read Depth',
+    '#description' => 'Only include SNP calls that have at least the specified number of reads to support the call. For example, if you specify 5 for this filter then for SNP Chr2p25678 in the example table below, only the call for Germplasm4 will be set to missing data.',
+    '#default_value' => '',
+  );
+
+  $form['s2']['minor_allele_freq'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Minor Allele Frequency',
+    '#description' => 'Only include SNP positions with a minor allele frequency greater than or equal to this value. Allele frequency is defined as the number of times an allele appears over all individuals at that site, divided by the total number of non-missing alleles at that site. For example, consider Chr1p12344 in the example table below: the minor allele frequency for A is 2/5=40%, thus if you enter 50% this SNP position will be removed.',
+    '#default_value' => '',
+  );
+
+  $form['s2']['max_missing_count'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Maximum Missing Count',
+    '#description' => 'Exclude SNPs with more than this number of missing genotypes over all individuals/germplasm. For example, if you enter 1 for this filter then for the example data below, only SNP Chr4p48765 would be removed.',
+    '#default_value' => '',
+  );
+
+  $form['s2']['max_missing_freq'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Maximum Missing Frequency',
+    '#description' => 'Exclude SNPs based on the proportion of missing data. For example, if you enter 25% for this filter then for the example data below, only SNP Chr4p48765 would be removed since it has a missing data frequency of 2/6=33%.',
+    '#default_value' => '',
+  );
+
+  $example_table = array(
+    'caption' => 'Example Table: Example Data for Filter Explanation.',
+    'header' => array('SNP Name', 'SNP Backbone', 'SNP Position', 'Germ1', 'Germ2', 'Germ3', 'Germ4', 'Germ5', 'Germ6'),
+    'rows' => array(
+      array('Chr1p12344', 'Chr1', '12344', 'AA:5', 'TT:12', '', 'TT:15', 'AT:19', 'TT:15'),
+      array('Chr2p25678', 'Chr2', '25678', 'GG:7', 'GG:13', 'GG:5', 'TT:2', 'GG:22', 'GT:24'),
+      array('Chr3p34567', 'Chr3', '34567', 'AA:5', 'CC:12', 'AC:7', 'TT:15', 'CC:19', 'TC:23'),
+      array('Chr4p48765', 'Chr4', '48765', '', 'CC:12', 'AC:7', '', 'CC:19', 'AA:23'),
+    ),
+  );
+  $example = theme('table', $example_table);
+  $example .= '<p style="font-size:0.9em; font-style:italic">* The above example will be referred to in the description of each filter criteria to aid in the explanation of the filter and how it will affect your data. <strong>NOTE: the cell for each SNP by germplasm combination contains the call and the read depth seperated by a colon (:).</strong> For example, AA:5 means a call of AA with a read depth of 5.</p>';
+  $form['s2']['example'] = array(
+    '#type' => 'markup',
+    '#markup' => $example,
   );
 
   $form['s3'] = array(
     '#type' => 'fieldset',
     '#title' => 'Pick your Export format.',
-    '#description' => 'Select one of the formats listed below and the filtered VCF will be converted accordingly. Keep in mind that if you choose a format with no quality information you will have to have done a very goood job of filtering at this point to ensure you are working with good data.'
+    '#description' => 'Select one of the formats listed below and the filtered VCF will be converted accordingly. <strong>Keep in mind that if you choose a format with no quality information you will have to have done a very goood job of filtering at this point to ensure you are working with good data.</strong>'
   );
 
   $header = array(
@@ -71,15 +131,22 @@ function vcf_filter_form($form, &$form_state) {
     'description' => 'Description',
   );
   $options = array(
+    /**
     'abh' => array(
       'name' => 'A/B Format',
       'has_quality' => 'No',
       'description' => 'Alleles are coded as A/B based on the parents. This format is only suitable for biparental crosses',
     ),
+    */
     'matrix' => array(
       'name' => 'SNP Matrix',
       'has_quality' => 'No',
       'description' => 'Variant by Germplasm matrix of SNP calls.',
+    ),
+    'qual_matrix' => array(
+      'name' => 'Quality Matrix',
+      'has_quality' => 'Yes',
+      'description' => 'Variant by Germplasm matrix of SNP Read Depth.',
     ),
     'vcf' => array(
       'name' => 'Variant Call Format (VCF)',
@@ -89,7 +156,6 @@ function vcf_filter_form($form, &$form_state) {
   );
   $form['s3']['format'] = array(
     '#type' => 'tableselect',
-    '#required' => TRUE,
     '#header' => $header,
     '#options' => $options,
     '#multiple' => FALSE,
@@ -108,6 +174,49 @@ function vcf_filter_form($form, &$form_state) {
  */
 function vcf_filter_form_validate($form, &$form_state) {
 
+  // CHECK: VCF File Required.
+  if (empty($form_state['values']['vcf_file_id'])) {
+    form_set_error('vcf_file_id', 'You must choose a VCF file to filter.');
+  }
+
+  // CHECK: Format required.
+  if (empty($form_state['values']['format'])) {
+    form_set_error('format', 'You must choose a format to export your filtered VCF file in.');
+  }
+
+  // CHECK: Minimum SNP Call Read Depth should be an integer.
+  if (!empty($form_state['values']['s2']['call_read_depth'])) {
+    if (!ctype_digit($form_state['values']['s2']['call_read_depth'])) {
+      form_set_error('s2][call_read_depth', 'The <em>Minimum SNP Call Read Depth</em> should be a positive whole number.');
+    }
+  }
+
+  // CHECK: Minor Allele Frequency should be between 0-100.
+  if (!empty($form_state['values']['s2']['minor_allele_freq']) && ctype_digit($form_state['values']['s2']['minor_allele_freq'])) {
+    if ($form_state['values']['s2']['minor_allele_freq'] < 0 || $form_state['values']['s2']['minor_allele_freq'] > 100) {
+      form_set_error('s2][minor_allele_freq', 'The <em>Minor Allele Frequency</em> represent a percent and thus should be between 0 and 100 (e.g. "25" for 25%).');
+    }
+  }
+  else {
+    form_set_error('s2][minor_allele_freq', 'The <em>Minor Allele Frequency</em> should be a positive whole number (e.g. "25" for 25%).');
+  }
+
+  // CHECK: Maximum Missing Count is an integer.
+  if (!empty($form_state['values']['s2']['max_missing_count'])) {
+    if (!ctype_digit($form_state['values']['s2']['max_missing_count'])) {
+      form_set_error('s2][max_missing_count', 'The <em>Maximum Missing Count</em> should be a positive whole number.');
+    }
+  }
+
+  // CHECK: Maximum Missing Frequency should be between 0-100.
+  if (!empty($form_state['values']['s2']['max_missing_freq']) && ctype_digit($form_state['values']['s2']['max_missing_freq'])) {
+    if ($form_state['values']['s2']['max_missing_freq'] < 0 || $form_state['values']['s2']['max_missing_freq'] > 100) {
+      form_set_error('s2][max_missing_freq', 'The <em>Maximum Missing Frequency</em> represent a percent and thus should be between 0 and 100 (e.g. "25" for 25%).');
+    }
+  }
+  else {
+    form_set_error('s2][max_missing_freq', 'The <em>Maximum Missing Frequency</em> should be a positive whole number (e.g. "25" for 25%).');
+  }
 }
 
 /**
