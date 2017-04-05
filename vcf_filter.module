@@ -99,8 +99,8 @@ function vcf_filter_menu() {
 
   // Manage Access to VCF Files.
   // -- Add
-  $items['admin/tripal/extension/vcf_filter/access/%'] = array(
-    'title' => 'Add VCF File Permissions',
+  $items['admin/tripal/extension/vcf_filter/access'] = array(
+    'title' => 'VCF File Permissions',
     'description' => 'Handle permissions for a VCF file.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('vcf_filter_admin_vcf_file_perm_form', 5),

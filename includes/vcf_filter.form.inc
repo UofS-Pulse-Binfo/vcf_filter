@@ -28,7 +28,7 @@ function vcf_filter_form($form, &$form_state) {
 
   $form['intro'] = array(
     '#type' => 'item',
-    '#markup' => 'With the increasing size of datasets, it becomes necessary for researchers to take advantage of command-line tools. This form provides an interface to VCF Tools, to facillitate custom filtering of VCF files and exporting of these files in common formats.',
+    '#markup' => 'With the increasing size of datasets, it becomes necessary for researchers to take advantage of command-line tools. This form provides an interface to VCFtools, to facilitate custom filtering of VCF files and exporting of these files in common formats.',
   );
 
   $form['s1'] = array(
@@ -97,7 +97,7 @@ function vcf_filter_form($form, &$form_state) {
   $form['s2']['bi-allelic'] = array(
     '#type' => 'checkbox',
     '#title' => 'Only include Bi-allelic SNPs',
-    '#description' => 'If you check this checkbox the only SNPs with 2 alleles will be kept. For example, in the example data below, SNP Chr3p34567 would be removed.',
+    '#description' => 'If you check this checkbox, only SNPs with 2 alleles across all individuals will be kept. For example, in the example data below, SNP Chr3p34567 would be removed.',
   );
 
   $form['s2']['call_read_depth'] = array(
@@ -117,7 +117,7 @@ function vcf_filter_form($form, &$form_state) {
   $form['s2']['max_missing_count'] = array(
     '#type' => 'textfield',
     '#title' => 'Maximum Missing Count',
-    '#description' => 'Exclude SNPs with more than this number of missing genotypes over all individuals/germplasm. For example, if you enter 1 for this filter then for the example data below, only SNP Chr4p48765 would be removed.',
+    '#description' => 'Exclude SNPs with more than this number of missing genotypes over all individuals/germplasm. For example, if you enter 1 for this filter for the example data below, only SNP Chr4p48765 would be removed.',
     '#default_value' => '',
   );
 
@@ -139,7 +139,7 @@ function vcf_filter_form($form, &$form_state) {
     ),
   );
   $example = theme('table', $example_table);
-  $example .= '<p style="font-size:0.9em; font-style:italic">* The above example will be referred to in the description of each filter criteria to aid in the explanation of the filter and how it will affect your data. <strong>NOTE: the cell for each SNP by germplasm combination contains the call and the read depth seperated by a colon (:).</strong> For example, AA:5 means a call of AA with a read depth of 5.</p>';
+  $example .= '<p style="font-size:0.9em; font-style:italic">* The above example will be referred to in the description of each filter criteria to aid in the explanation of how it will affect your data. <strong>NOTE: the cell for each SNP by germplasm combination contains the call and the read depth seperated by a colon (:).</strong> For example, AA:5 means a call of AA with a read depth of 5.</p>';
   $form['s2']['example'] = array(
     '#type' => 'markup',
     '#markup' => $example,
@@ -148,7 +148,7 @@ function vcf_filter_form($form, &$form_state) {
   $form['s3'] = array(
     '#type' => 'fieldset',
     '#title' => 'Pick your Export format.',
-    '#description' => 'Select one of the formats listed below and the filtered VCF will be converted accordingly. <strong>Keep in mind that if you choose a format with no quality information you will have to have done a very goood job of filtering at this point to ensure you are working with good data.</strong>'
+    '#description' => 'Select one of the formats listed below and the filtered VCF will be converted accordingly. <strong>Keep in mind that if you choose a format with no quality information, you should have been stringent with your filtering criteria to ensure you are working with good data.</strong>'
   );
 
   $header = array(
@@ -174,7 +174,7 @@ function vcf_filter_form($form, &$form_state) {
     'qual_matrix' => array(
       'name' => 'Quality Matrix',
       'has_quality' => 'Yes',
-      'description' => 'Variant by Germplasm matrix of SNP Read Depth.',
+      'description' => 'Variant by Germplasm matrix of Read Depth per call.',
     ),
     'vcf' => array(
       'name' => 'Variant Call Format (VCF)',
