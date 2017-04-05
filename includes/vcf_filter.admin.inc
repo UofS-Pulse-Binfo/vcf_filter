@@ -26,12 +26,13 @@ function vcf_filter_admin_list() {
       'backbone' => $r->backbone,
       'file' => $r->file_path,
       l('edit', 'admin/tripal/extension/vcf_filter/edit/'.$r->vcf_file_id) .' | '
-        . l('delete', 'admin/tripal/extension/vcf_filter/delete/'.$r->vcf_file_id)
+        . l('delete', 'admin/tripal/extension/vcf_filter/delete/'.$r->vcf_file_id) .' | '
+        . l('access', 'admin/tripal/extension/vcf_filter/access/'.$r->vcf_file_id)
     );
   }
   // If there are no VCF files yet, then tell the admin this.
   if (empty($table['rows'])) {
-    $table['rows'][] = array(array('data' => 'None.', 'colspan' => 3));
+    $table['rows'][] = array(array('data' => 'None.', 'colspan' => 4));
   }
 
   $output .= theme('table', $table);
@@ -46,7 +47,7 @@ function vcf_filter_admin_vcf_file_form($form, &$form_state) {
 
   $obj = NULL;
   if (isset($form_state['build_info']['args'][1])) {
-    $obj = db_query('SELECT * FROM {vcf_files} WHERE vcf_file_id=:id', 
+    $obj = db_query('SELECT * FROM {vcf_files} WHERE vcf_file_id=:id',
       array(':id' => $form_state['build_info']['args'][1]))->fetchObject();
   }
 
@@ -86,7 +87,7 @@ function vcf_filter_admin_vcf_file_form($form, &$form_state) {
 
     return $form;
   }
- 
+
   $form['file'] = array(
     '#type' => 'textfield',
     '#title' => 'VCF File (absolute path)',
@@ -146,7 +147,7 @@ function vcf_filter_admin_vcf_file_form_submit($form, &$form_state) {
   $form_state['redirect'] = 'admin/tripal/extension/vcf_filter';
 
   if ($form_state['values']['op'] == 'Delete') {
-    db_query('DELETE FROM {vcf_files} WHERE vcf_file_id=:id', 
+    db_query('DELETE FROM {vcf_files} WHERE vcf_file_id=:id',
       array(':id' => $form_state['values']['vcf_file_id']));
     drupal_set_message('Successfully deleted <em>'.$form_state['values']['name'].'</em>');
   }
@@ -169,3 +170,277 @@ function vcf_filter_admin_vcf_file_form_submit($form, &$form_state) {
   }
 }
 
+/**
+ * Form API Definition for VCF File Permissions form.
+ */
+function vcf_filter_admin_vcf_file_perm_form($form, &$form_state) {
+
+  $obj = NULL;
+  if (isset($form_state['build_info']['args'][0])) {
+    $obj = db_query('SELECT * FROM {vcf_files} WHERE vcf_file_id=:id',
+      array(':id' => $form_state['build_info']['args'][0]))->fetchObject();
+  }
+
+  $form['#attached']['css'][] = array(
+    'data' => '
+      table caption {
+        margin-top: 50px;
+        font-weight: bold;
+        font-size: 1.2em;
+        text-align: left;
+      }
+      th.name, td.name {
+        width: 300px;
+      }
+      input[type=text] {
+        width: 250px;
+      }
+      td.add {
+        background-color: #e1e2dc;
+        border-top: 1px solid #bebfb9;
+      }
+      td.add input[type=submit] {
+        margin-top: 10px;
+        margin-bottom: 0px;
+      }
+    ',
+    'type' => 'inline',
+  );
+
+  $form['vcf_file_id'] = array(
+    '#type' => 'hidden',
+    '#value' => (isset($obj->vcf_file_id)) ? $obj->vcf_file_id : NULL,
+  );
+
+  $form['info'] = array(
+    '#type' => 'markup',
+    '#theme' => 'table',
+    '#header' => NULL,
+    '#rows' => array(
+      array(array('data' => 'VCF File', 'header' => TRUE), $obj->file_path),
+      array(array('data' => 'Human-readable Name', 'header' => TRUE), $obj->name),
+      array(array('data' => 'Backbone', 'header' => TRUE), $obj->backbone),
+      array(array('data' => 'Number of SNPs', 'header' => TRUE), $obj->num_snps),
+      array(array('data' => 'Description', 'header' => TRUE), $obj->description),
+    ),
+  );
+
+  // ROLES:
+  //---------------
+  $form['role'] = array(
+    '#type' => 'markup',
+    '#tree' => TRUE,
+    '#title' => 'Role Permissions',
+    '#caption' => 'All users with the following roles have access to <em>'.$obj->name.'</em>.',
+    '#theme' => 'vcf_filter_admin_form_perm_table',
+  );
+
+  $count = 0;
+  $resource = db_query('SELECT r.rid, r.name FROM {vcf_files_perm} perm LEFT JOIN {role} r ON r.rid=perm.rid WHERE perm.rid IS NOT NULL');
+  foreach ($resource as $r) {
+    $count++;
+
+    $form['role'][$r->rid]['id'] = array(
+      '#type' => 'item',
+      '#value' => $r->rid,
+    );
+
+    $form['role'][$r->rid]['name'] = array(
+      '#type' => 'item',
+      '#value' => $r->name,
+    );
+
+    $form['role'][$r->rid]['remove_url'] = array(
+      '#type' => 'item',
+      '#value' => 'admin/tripal/extension/vcf_filter/access/'.$obj->vcf_file_id.'/remove-role/'.$r->rid,
+    );
+
+  }
+  if (!$count) {
+    $form['role']['none']['name'] = array(
+      '#type' => 'item',
+      '#value' => 'None.',
+    );
+  }
+
+  $options = array();
+  $resource = db_query('SELECT rid, name FROM {role}');
+  foreach ($resource as $r) {
+    $options[ $r->rid ] = $r->name;
+  }
+  $form['role']['add']['form_element'] = array(
+    '#type' => 'select',
+    '#title' => 'Role to give permission to',
+    '#options' => $options,
+    '#empty_value' => 'None',
+  );
+
+  $form['role']['add']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Add Role',
+  );
+
+  // USER:
+  //---------------
+  $form['user'] = array(
+    '#type' => 'markup',
+    '#tree' => TRUE,
+    '#title' => 'User Permissions',
+    '#caption' => 'The following users have access to <em>'.$obj->name.'</em>.',
+    '#theme' => 'vcf_filter_admin_form_perm_table',
+  );
+
+  $count = 0;
+  $resource = db_query('SELECT u.uid, u.name FROM {vcf_files_perm} perm LEFT JOIN {users} u ON u.uid=perm.uid WHERE perm.uid IS NOT NULL');
+  foreach ($resource as $r) {
+    $count++;
+
+    $form['user'][$r->uid]['id'] = array(
+      '#type' => 'item',
+      '#value' => $r->uid,
+    );
+
+    $form['user'][$r->uid]['name'] = array(
+      '#type' => 'item',
+      '#value' => $r->name,
+    );
+
+    $form['user'][$r->uid]['remove_url'] = array(
+      '#type' => 'item',
+      '#value' => 'admin/tripal/extension/vcf_filter/access/'.$obj->vcf_file_id.'/remove-user/'.$r->uid,
+    );
+
+  }
+  if (!$count) {
+    $form['user']['none']['name'] = array(
+      '#type' => 'item',
+      '#value' => 'None.',
+    );
+  }
+
+  $form['user']['add']['form_element'] = array(
+    '#type' => 'textfield',
+    '#title' => 'User to give permission to',
+    '#autocomplete_path' => 'user/autocomplete',
+  );
+
+  $form['user']['add']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Add User',
+  );
+
+  return $form;
+}
+
+/**
+ * VCF File Permissions form: Validation.
+ */
+function vcf_filter_admin_vcf_file_perm_form_validate($form, &$form_state) {
+
+}
+
+/**
+ * VCF File Permissions form: Submission.
+ */
+function vcf_filter_admin_vcf_file_perm_form_submit($form, &$form_state) {
+
+  if ($form_state['clicked_button']['#value'] == 'Add Role') {
+    $record = array(
+      'vcf_file_id' => $form_state['values']['vcf_file_id'],
+      'rid' => $form_state['values']['role']['add']['form_element'],
+    );
+    drupal_write_record('vcf_files_perm', $record);
+  }
+  elseif ($form_state['clicked_button']['#value'] == 'Add User') {
+    $uid = db_query('SELECT uid FROM {users} WHERE name=:name',
+      array(':name' => $form_state['values']['user']['add']['form_element']))->fetchField();
+    if ($uid) {
+      $record = array(
+        'vcf_file_id' => $form_state['values']['vcf_file_id'],
+        'uid' => $uid,
+      );
+      drupal_write_record('vcf_files_perm', $record);
+    }
+  }
+}
+
+/**
+ * Callback to remove permissions (both user or role).
+ *
+ * NOTE: There is no display or confirmation for removing users/roles. This callback will
+ * redirect to the access page when done.
+ *
+ * @param $vcf_file_id
+ *   The pkey of the VCF file we are removing permissions from.
+ * @param $action
+ *   Either 'remove-role' OR 'remove-user' based on which type of permission we need to remove.
+ * @param $id
+ *   The pkey of the role or user to remove permission to. If $action is remove-role then
+ *   this is the rid; if it's remove-user then this is the uid.
+ */
+function vcf_filter_admin_vcf_file_perm_remove_callback($vcf_file_id, $action, $id) {
+
+  if ($action == 'remove-role') {
+
+    $num_deleted = db_delete('vcf_files_perm')
+      ->condition('vcf_file_id', $vcf_file_id)
+      ->condition('rid', $id)
+      ->execute();
+    if ($num_deleted) {
+      drupal_set_message('Successfully removed permission to role.');
+    }
+
+  }
+  elseif ($action == 'remove-user') {
+
+    $num_deleted = db_delete('vcf_files_perm')
+      ->condition('vcf_file_id', $vcf_file_id)
+      ->condition('uid', $id)
+      ->execute();
+    if ($num_deleted) {
+      drupal_set_message('Successfully removed permission to user.');
+    }
+
+  }
+
+  // Redirect to access page.
+  drupal_goto('admin/tripal/extension/vcf_filter/access/'.$vcf_file_id);
+}
+
+/**
+ * Theme both permissions tables.
+ */
+function vcf_filter_admin_form_perm_table($vars) {
+  $element = $vars['element'];
+  $output = '';
+
+  $table = array(
+    'caption' => $element['#title'].': '.$element['#caption'],
+    'header' => array('Name','Operations'),
+    'rows' => array(),
+  );
+
+  foreach (element_children($element) as $key) {
+
+    if ($key == 'add') {
+      $table['rows'][] = array(
+        array('data' => render($element[$key]['form_element']), 'class' => array('name', 'add')),
+        array('data' => render($element[$key]['submit']), 'class' => array('op', 'add')),
+      );
+    }
+    else {
+      $remove_link = '';
+      if (isset($element[$key]['remove_url'])) {
+        $remove_link = l('remove', $element[$key]['remove_url']['#value']);
+      }
+
+      $table['rows'][] = array(
+        array('data' => $element[$key]['name']['#value'], 'class' => array('name')),
+        array('data' => $remove_link, 'class' => array('op')),
+      );
+    }
+
+  }
+
+  return theme('table', $table);
+}

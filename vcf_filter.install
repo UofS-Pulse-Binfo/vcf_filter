@@ -4,7 +4,7 @@
  * Installation of this module.
  */
 
-/** 
+/**
  * Implements hook_schema().
  */
 function vcf_filter_schema() {
@@ -43,6 +43,31 @@ function vcf_filter_schema() {
       ),
     ),
     'primary key' => array('vcf_file_id'),
+  );
+
+  $schema['vcf_files_perm'] = array(
+    'description' => 'Keeps track of permissions for VCF files.',
+    'fields' => array(
+      'vcf_file_perm_id' => array(
+        'description' => 'Primary Key',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'vcf_file_id' => array(
+        'description' => 'Links to the VCF files',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'rid' => array(
+        'description' => 'The ROLE ID of a role to provide access to.',
+        'type' => 'int',
+      ),
+      'uid' => array(
+        'description' => 'The USER ID of a user to provide access to.',
+        'type' => 'int',
+      ),
+    ),
+    'primary key' => array('vcf_file_perm_id'),
   );
 
   return $schema;

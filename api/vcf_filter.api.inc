@@ -11,8 +11,20 @@
  *   An array of VCF file details, keyed by vcf_file_id.
  */
 function vcf_filter_get_vcf_files() {
+  global $user;
 
-  $files = db_query('SELECT * FROM {vcf_files}')->fetchAllAssoc('vcf_file_id', PDO::FETCH_ASSOC);
+  // Gran the roles and user id of the current user.
+  $uid = $user->uid;
+  $rids = is_array($user->roles) ? array_keys($user->roles) : array();
+
+  // Only grab files that the current user has permission to see.
+  $files = db_query('
+    SELECT f.*
+    FROM {vcf_files_perm} perm
+    LEFT JOIN {vcf_files} f ON f.vcf_file_id=perm.vcf_file_id
+    WHERE perm.uid=:uid OR perm.rid IN (:rids)',
+    array(':uid' => $uid, ':rids' => $rids))->fetchAllAssoc('vcf_file_id', PDO::FETCH_ASSOC);
+
   return $files;
 }
 

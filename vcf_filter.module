@@ -66,6 +66,8 @@ function vcf_filter_menu() {
     'file' => 'includes/vcf_filter.admin.inc',
   );
 
+  // Manage VCF Files
+  // -- Add
   $items['admin/tripal/extension/vcf_filter/add'] = array(
     'title' => 'Add VCF File',
     'description' => 'Make a VCF file available to be filtered.',
@@ -75,6 +77,7 @@ function vcf_filter_menu() {
     'file' => 'includes/vcf_filter.admin.inc',
   );
 
+  // -- Edit
   $items['admin/tripal/extension/vcf_filter/edit'] = array(
     'title' => 'Edit VCF File',
     'description' => 'Edit an existing VCF file.',
@@ -84,12 +87,49 @@ function vcf_filter_menu() {
     'file' => 'includes/vcf_filter.admin.inc',
   );
 
+  // -- Delete
   $items['admin/tripal/extension/vcf_filter/delete'] = array(
     'title' => 'Delete VCF File',
     'description' => 'Delete an existing VCF file.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('vcf_filter_admin_vcf_file_form', 'delete'),
     'access arguments' => array('administer tripal'),
+    'file' => 'includes/vcf_filter.admin.inc',
+  );
+
+  // Manage Access to VCF Files.
+  // -- Add
+  $items['admin/tripal/extension/vcf_filter/access/%'] = array(
+    'title' => 'Add VCF File Permissions',
+    'description' => 'Handle permissions for a VCF file.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('vcf_filter_admin_vcf_file_perm_form', 5),
+    'access arguments' => array('administer tripal'),
+    'file' => 'includes/vcf_filter.admin.inc',
+  );
+
+  // -- Remove (no confirm)
+  $items['admin/tripal/extension/vcf_filter/access/%/%/%'] = array(
+    'title' => 'Remove VCF File Permissions',
+    'description' => 'Handle permissions for a VCF file.',
+    'page callback' => 'vcf_filter_admin_vcf_file_perm_remove_callback',
+    'page arguments' => array(5,6,7),
+    'access arguments' => array('administer tripal'),
+    'file' => 'includes/vcf_filter.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function vcf_filter_theme($existing, $type, $theme, $path) {
+  $items = array();
+
+  $items['vcf_filter_admin_form_perm_table'] = array(
+    'function' => 'vcf_filter_admin_form_perm_table',
+    'render element' => 'element',
     'file' => 'includes/vcf_filter.admin.inc',
   );
 
