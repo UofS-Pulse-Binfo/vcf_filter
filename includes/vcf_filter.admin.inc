@@ -149,6 +149,8 @@ function vcf_filter_admin_vcf_file_form_submit($form, &$form_state) {
   if ($form_state['values']['op'] == 'Delete') {
     db_query('DELETE FROM {vcf_files} WHERE vcf_file_id=:id',
       array(':id' => $form_state['values']['vcf_file_id']));
+    db_query('DELETE FROM {vcf_files_perm} WHERE vcf_file_id=:id',
+      array(':id' => $form_state['values']['vcf_file_id']));
     drupal_set_message('Successfully deleted <em>'.$form_state['values']['name'].'</em>');
   }
   else {
