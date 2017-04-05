@@ -22,13 +22,17 @@ function vcf_filter_form($form, &$form_state) {
         padding-top: 15px;
         border-top: 1px solid #d0d0d0;
       }
+      .citation {
+        font-size: 0.8em;
+        font-style: italic;
+      }
     ',
     'type' => 'inline',
   );
 
   $form['intro'] = array(
     '#type' => 'item',
-    '#markup' => 'With the increasing size of datasets, it becomes necessary for researchers to take advantage of command-line tools. This form provides an interface to VCFtools, to facilitate custom filtering of VCF files and exporting of these files in common formats.',
+    '#markup' => 'This form provides filtering of existing VCF files and export into common formats. Most of the filter criteria and many of the formats are provided by <a href="https://vcftools.github.io" target="_blank">VCFtools</a><sup>+</sup>.',
   );
 
   $form['s1'] = array(
@@ -192,6 +196,13 @@ function vcf_filter_form($form, &$form_state) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Filter',
+  );
+
+  $form['cite'] = array(
+    '#type' => 'item',
+    '#prefix' => '<div class="citation">',
+    '#suffix' => '</div>',
+    '#markup' => '<sup>+</sup> <a href="https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btr330">The Variant Call Format and VCFtools</a>, Petr Danecek, Adam Auton, Goncalo Abecasis, Cornelis A. Albers, Eric Banks, Mark A. DePristo, Robert Handsaker, Gerton Lunter, Gabor Marth, Stephen T. Sherry, Gilean McVean, Richard Durbin and 1000 Genomes Project Analysis Group, Bioinformatics, 2011.',
   );
 
   return $form;
