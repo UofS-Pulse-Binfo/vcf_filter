@@ -236,7 +236,12 @@ function vcf_filter_admin_vcf_file_perm_form($form, &$form_state) {
   );
 
   $count = 0;
-  $resource = db_query('SELECT r.rid, r.name FROM {vcf_files_perm} perm LEFT JOIN {role} r ON r.rid=perm.rid WHERE perm.rid IS NOT NULL');
+  $resource = db_query('
+    SELECT r.rid, r.name
+    FROM {vcf_files_perm} perm
+    LEFT JOIN {role} r ON r.rid=perm.rid
+    WHERE perm.rid IS NOT NULL AND vcf_file_id=:id',
+    array(':id' => $obj->vcf_file_id));
   foreach ($resource as $r) {
     $count++;
 
@@ -291,7 +296,12 @@ function vcf_filter_admin_vcf_file_perm_form($form, &$form_state) {
   );
 
   $count = 0;
-  $resource = db_query('SELECT u.uid, u.name FROM {vcf_files_perm} perm LEFT JOIN {users} u ON u.uid=perm.uid WHERE perm.uid IS NOT NULL');
+  $resource = db_query('
+    SELECT u.uid, u.name
+    FROM {vcf_files_perm} perm
+    LEFT JOIN {users} u ON u.uid=perm.uid
+    WHERE perm.uid IS NOT NULL AND vcf_file_id=:id',
+    array(':id' => $obj->vcf_file_id));
   foreach ($resource as $r) {
     $count++;
 
