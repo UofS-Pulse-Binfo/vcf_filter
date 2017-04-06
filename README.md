@@ -24,3 +24,7 @@ Tripal form interface so users can custom filter existing VCF files and export i
 1. Describe each VCF file you would like to make available at Administration > Tripal > Tripal Extensions > VCF Filter.
 2. Once the file is described, click "access" and make it available to the desired group of users.
 3. Point users at the filter form: [your drupal site]/filter_vcf
+
+## Screenshots
+The following screenshot shows the user filter form. For more screenshots, look in the "screenshots" directory in this repository.
+![screenshot of user filter form](https://github.com/UofS-Pulse-Binfo/vcf_filter/blob/master/screenshots/screencapture-vcf_filter-user_form.png)
