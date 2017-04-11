@@ -25,9 +25,16 @@ function vcf_filter_qual_matrix_generate_file($variables, $job_id = NULL) {
   $filepath = variable_get('trpdownload_fullpath', '') . $variables['filename'];
   drush_print("File: " . $filepath);
 
+
   // Get the VCF file details.
   $vcf_file = vcf_filter_get_vcf_file($variables['q']['vcf_file_id']);
   drush_print("\nVCF File (".$vcf_file->name."): ".$vcf_file->file_path);
+
+  // Check the input file still exists.
+  if (!file_exists($vcf_file->file_path)) {
+    drush_set_error("ERROR: Original VCF file not found!");
+    exit(2);
+  }
 
   // Print out parameters.
   drush_print("Parameters:");
@@ -35,16 +42,47 @@ function vcf_filter_qual_matrix_generate_file($variables, $job_id = NULL) {
     drush_print('  ' . $label . ': ' . $value);
   }
 
+  // Give the user some indication we've done something...
+  tripal_set_job_progress($job_id, 5);
+
+  // Filter.
+  //===============
   drush_print("\nFiltering the Original VCF");
   $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q']);
+  if (!$filtered_vcf) {
+    exit(3);
+  }
 
+  // Half way point...
+  tripal_set_job_progress($job_id, 50);
+
+  // FORMAT.
+  //===============
   drush_print("\nConversion from VCF to Quality Matrix Format.");
   $format_tmp = variable_get('file_temporary_path') . '/' . uniqid();
+  $outfile = $format_tmp . '.gdepth';
+  drush_print('Converted results will be in: '.$outfile);
+  drush_print(str_repeat('-', 60));
   $command = 'vcftools --vcf ' . escapeshellarg($filtered_vcf) . ' --geno-depth --out ' . escapeshellarg($format_tmp);
   drush_print(shell_exec($command));
+  drush_print(str_repeat('-', 60));
+  if (!file_exists($outfile)) {
+    drush_set_error("ERROR: Unable to convert VCF file to matrix format.");
+    exit(4); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+  }
+
+  // Tell the user we're almost there!
+  tripal_set_job_progress($job_id, 95);
 
   drush_print("\nMove Formatted file to the name we expect.");
   shell_exec("mv $format_tmp.gdepth $filepath");
+  if (!file_exists($filepath)) {
+    drush_set_error("ERROR: Unable to move Filtered VCF into expected file director: $filepath");
+    exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+  }
+
+  // Done!
+  tripal_set_job_progress($job_id, 100);
 
 }
 

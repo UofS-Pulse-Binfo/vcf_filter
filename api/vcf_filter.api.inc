@@ -95,10 +95,20 @@ function vcf_filter_filter_file($file_path, $filter_criteria) {
   }
 
   // Execute the command.
-  drush_print('Filter results will be in: '.$new_file . '.recode.vcf');
+  //-------------------------
+  $outfile = $new_file . '.recode.vcf';
+  drush_print('Filter results will be in: '.$outfile);
   drush_print(str_repeat('-', 60));
-  drush_print(shell_exec($command));
+  $output = shell_exec($command);
+
+  // Print the output from the command.
+  drush_print($output);
   drush_print(str_repeat('-', 60));
 
-  return $new_file . '.recode.vcf';
+  // Check for error.
+  if (!file_exists($outfile)) {
+    return drush_set_error('ERROR: Filtering of the VCF file was not successful.');
+  }
+
+  return $outfile;
 }
