@@ -161,13 +161,11 @@ function vcf_filter_form($form, &$form_state) {
     'description' => 'Description',
   );
   $options = array(
-    /**
     'abh' => array(
       'name' => 'A/B Format',
       'has_quality' => 'No',
       'description' => 'Alleles are coded as A/B based on the parents. This format is only suitable for biparental crosses',
     ),
-    */
     /*
     'matrix' => array(
       'name' => 'SNP Matrix',

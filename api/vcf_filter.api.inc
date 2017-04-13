@@ -112,3 +112,148 @@ function vcf_filter_filter_file($file_path, $filter_criteria) {
 
   return $outfile;
 }
+
+/*
+ * Processes a VCF file into an associative array for ease of manipulation for each SNP in the file.
+ * This function only processes a single line in a VCF at a time, thus it is designed to be used within
+ * a loop iterating through a VCF file. This is designed primarily due to the extreme size of some
+ * VCF files!
+ *
+ * @param $VCF_header
+ *   An array or tab-delimited string representing the VCF header from the same file for which a
+ *   line is being processed.
+ *   The header consists of 9 columns describing chromosome, position, ID, reference allele, alternate
+ *   allele, etc. in addition to any number of columns representing each sample for which a genotype
+ *   is recorded for that site.
+ * @param $VCF_line
+ *   A line in VCF format that represents a single site in a genome and describes variant information.
+ * @return
+ *   An associative array representing a specific LINE in a VCF file.
+ */
+
+function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line) {
+
+  // Validate the header is in the correct format
+  if (is_array($VCF_header)) {
+    if (strcmp($VCF_header[0], '#CHROM') !== 0) {
+      return drush_set_error('ERROR: Expected first element in VCF header to contain: #CHROM');
+    } else if (sizeof($VCF_header) < 10) {
+      die ("ERROR: The size of VCF header is too small to be valid.\n");
+    }
+  } else {
+    if (preg_match("/^#CHROM\t/", $VCF_header)) {
+      $header = explode("\t", $VCF_header);
+    } else {
+      return drush_set_error('ERROR: Expected VCF header to begin with: #CHROM');
+    }
+  }
+
+  // Validate the line from the VCF follows the spec as best as we can
+  // @TODO: Check for proper FORMAT? POS is an integer?
+  if (!is_array($VCF_line)) {
+    if (preg_match("/\t/", $VCF_line)) {
+      $line = explode("\t", $VCF_line);
+      $VCF_line = $line;
+    } else {
+      return drush_set_error('ERROR: Expected VCF line to be an array or tab-delimited!');
+    }
+  }
+
+  // Create an associative array using the header as the keys
+  if (count($VCF_header) === count($VCF_line)) {
+    $marker = array_combine($VCF_header,$VCF_line);
+  } else {
+    return drush_set_error('ERROR: The provided VCF header and VCF line do not contain the same number of columns.');
+  }
+
+  // Explode the FORMAT cell to find out if/where PL exists
+  $format_keys = explode(':',$marker['FORMAT']);
+  $changePL = 0;
+
+  // For each genotype source, explode the format fields so that we can pull out the genotype directly
+  $num_col = count($VCF_header);
+  for ($i=9;$i<$num_col;$i++) {
+
+    $source_name = $VCF_header[$i];
+
+    if (is_array($format_keys)) {
+      $num_fk = count($format_keys);
+      $format_fields = explode(":",$marker[$source_name]);
+      $num_ff = count($format_fields);
+      // NOTE: Why the following comparison between format key and field counts?
+      // Occasionally we may see that the format field will specify additional sub-fields than what is
+      // actually present for that source. This is because of questionably loose requirements for VCF:
+      // missing sub-fields are shown as ".", except for trailing fields which can be dropped. Therefore,
+      // if there are fewer format fields for a source than expected, we will add onto the end of the
+      // array the appropriate number of missing values.
+      while ($num_fk > $num_ff)
+      {
+        //array_push($format_fields,".");
+        $num_ff = count($format_fields);
+      }
+      $geno_field_arr = array_combine($format_keys,$format_fields);
+      // Now we nest the marker array with this new genotype fields array for each source
+      // Example: Marker -> Source1 -> GT -> 0/1
+      //                            -> DP -> 25
+      $marker[$source_name] = $geno_field_arr;
+
+      // Check if we have the PL field, and change GT accordingly if necessary
+      // Pick a ridiculously high index in case there is no minimum PL
+      $call_index = '99';
+
+      if ($marker[$source_name]['GT'] !== './.') {
+        $phred_likelihood = explode(',',$marker[$source_name]['PL']);
+        for ($j=0; $j < count($phred_likelihood); $j++) {
+          if ($phred_likelihood[$j] === '0') {
+            if ($j === 0) { $call_index = 'zero'; }
+            else { $call_index = $j; }
+          }
+        }
+        if ($call_index !== '99') {
+          switch ($call_index) {
+            case 'zero':	$genotype = '0/0'; break;
+            case 1:	$genotype = '0/1'; break;
+            case 2: $genotype = '1/1'; break;
+            case 3:	$genotype = '0/2'; break;
+            case 4:	$genotype = '1/2'; break;
+            case 5: $genotype = '2/2'; break;
+            // Can't read beyond this for PL, set to missing :-(
+            default: $genotype = './.'; break;
+          }
+        // No PL score of 0 found, strange, set the genotype call to missing.
+        } else { $genotype = './.'; }
+        $oldcall = $marker[$source_name]['GT'];
+        if (strcmp($genotype, $oldcall) !== 0 ) {
+          $marker[$source_name]['GT'] = $genotype;
+          $changePL++;
+        } //else { print "No change \t"; }
+      }
+    } else { // The FORMAT column could not be split, thus it must only contain 'GT'
+      $genotype_field = [];
+      $genotype_field[$marker['FORMAT']] = $marker[$source_name];
+      $marker[$source_name] = $genotype_field;
+    }
+  }
+  //print "Changed PL " . $changePL . " times.\n";
+  return $marker;
+}
+
+/**
+ * A simple function to move an element in an array to be the first element. All other elements
+ * will be shifted accordingly.
+ *
+ * @param &$array
+ *   An array you want to re-arrange
+ * @param $str
+ *   The element in the array that you want to move to the 0 index
+ * @return
+ *   The same array post re-arrangement (it was passed in as a reference)
+ */
+
+function moveToFirst(&$array, $str)
+{
+  $key=array_search($str,$array);
+  if($key) unset($array[$key]);
+  array_unshift($array,$str);
+  return $array;
+}
