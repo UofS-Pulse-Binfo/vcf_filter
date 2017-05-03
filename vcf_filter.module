@@ -118,6 +118,17 @@ function vcf_filter_menu() {
     'file' => 'includes/vcf_filter.admin.inc',
   );
 
+  // AUTOCOMPLETE: User
+  // Note: We can't just use user/autocomplete, user_autocomplete() because it assumes
+  // you are typing the username in order rather then simply finding the substring.
+  $items['autocomplete/vcf_filter/user'] = array(
+    'title' => 'VCF Filter: Autocomplete',
+    'page callback' => 'vcf_filter_user_autocomplete',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('administer tripal'),
+    'file' => 'includes/vcf_filter.admin.inc',
+  );
+
   return $items;
 }
 
