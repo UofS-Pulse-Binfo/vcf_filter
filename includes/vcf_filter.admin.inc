@@ -463,7 +463,7 @@ function vcf_filter_admin_form_perm_table($vars) {
 function vcf_filter_user_autocomplete($string = '') {
   $matches = array();
   if ($string) {
-    $result = db_query('SELECT name FROM {users} WHERE name~:string', array(':string' => $string));
+    $result = db_query('SELECT name FROM {users} WHERE LOWER(name) ~ LOWER(:string)', array(':string' => $string));
     foreach ($result as $user) {
       $matches[$user->name] = check_plain($user->name);
     }
