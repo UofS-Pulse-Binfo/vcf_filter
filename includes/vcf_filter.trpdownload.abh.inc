@@ -172,10 +172,28 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
       $genotype_calls = $marker[$current_sample]['GT'];
 
       if (strcmp($current_sample, $maternal_parent) === 0) {
+        if (($genotype_calls[0] === '.') || ($genotype_calls[1] === '.')) {
+          // The maternal parent is missing a genotype, thus skip this site completely
+          print "Skipping site: ( $chrom $pos ) due to missing call in $maternal_parent\n";
+          continue 2;
+        } else if (($genotype_calls[0] !== $genotype_calls[1])) {
+          // The maternal parent must be heterozygous, also skip this site.
+          print "Skipping at site: $chrom $pos due to a heterozygous call in $maternal_parent\n";
+          continue 2;
+        }
         $maternal_genotype = $genotype_calls;
         array_push($converted_line, "A");
         continue;
       } else if (strcmp($current_sample, $paternal_parent) === 0) {
+        if (($genotype_calls[0] === '.') || ($genotype_calls[1] === '.')) {
+          // The paternal parent is missing a genotype, thus skip this site completely
+          print "Skipping site: ( $chrom $pos ) due to missing call in $paternal_parent\n";
+          continue 2;
+        } else if (($genotype_calls[0] !== $genotype_calls[1])) {
+          // The paternal parent must be heterozygous, also skip this site.
+          print "Skipping at site: $chrom $pos due to a heterozygous call in $paternal_parent\n";
+          continue 2;
+        }
         $paternal_genotype = $genotype_calls;
         array_push($converted_line, "B");
         continue;
