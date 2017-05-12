@@ -156,6 +156,14 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
     $chrom = $marker['#CHROM'];
     $pos = $marker['POS'];
 
+    // Check the number of alleles that we have - we don't know how to handle multiple
+    // alleles within a bi-parental population at this point.
+    $alt_alleles = $marker['ALT'];
+    print "Ref allele: " . $marker['REF'] . " , Alt Allele(s): " . $alt_alleles . "\n";
+    if (preg_match('/,/', $alt_alleles)) {
+      print "Skipping site: ( $chrom $pos ) due to multiple alternate alleles: $alt_alleles\n";
+      continue;
+    }
     $converted_line = array($chrom, $pos);
 
     foreach ($sample_names as $current_sample) {
