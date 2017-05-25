@@ -333,7 +333,7 @@ function vcf_filter_admin_vcf_file_perm_form($form, &$form_state) {
   $form['user']['add']['form_element'] = array(
     '#type' => 'textfield',
     '#title' => 'User to give permission to',
-    '#autocomplete_path' => 'user/autocomplete',
+    '#autocomplete_path' => 'autocomplete/vcf_filter/user',
   );
 
   $form['user']['add']['submit'] = array(
@@ -455,4 +455,19 @@ function vcf_filter_admin_form_perm_table($vars) {
   }
 
   return theme('table', $table);
+}
+
+/**
+ * Autocomplete: Usernames in VCF Access permissions.
+ */
+function vcf_filter_user_autocomplete($string = '') {
+  $matches = array();
+  if ($string) {
+    $result = db_query('SELECT name FROM {users} WHERE LOWER(name) ~ LOWER(:string)', array(':string' => $string));
+    foreach ($result as $user) {
+      $matches[$user->name] = check_plain($user->name);
+    }
+  }
+
+  drupal_json_output($matches);
 }
