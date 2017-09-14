@@ -183,6 +183,11 @@ function vcf_filter_form($form, &$form_state) {
       'has_quality' => 'Yes',
       'description' => 'A variant by germplasm matrix with each cell containing a combination of SNP call and quality information. See the '.l('Specification', 'http://samtools.github.io/hts-specs/VCFv4.2.pdf').' for more information.',
     ),
+	'bgzipped' => array(
+      'name' => 'Bgzipped VCF',
+      'has_quality' => 'Yes',
+      'description' => 'An archive file which contains a Tabix file from filtered VCF and an index file, for use with an R package called VariantAnnotation. ',
+    ),
   );
   $form['s3']['format'] = array(
     '#type' => 'tableselect',
@@ -274,6 +279,7 @@ function vcf_filter_form_submit($form, &$form_state) {
     'abh' => '/filter_vcf/ABH',
     'matrix' => '/filter_vcf/SNP-Matrix',
     'qual_matrix' => '/filter_vcf/Quality-Matrix',
+	'bgzipped' => '/filter_vcf/Bgzipped',
     'vcf' => '/filter_vcf/VCF'
   );
   $form_state['redirect'] = array(
