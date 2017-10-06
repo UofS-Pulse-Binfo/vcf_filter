@@ -56,7 +56,7 @@ function vcf_filter_menu() {
   );
 
   $items['filter_vcf/Bgzipped'] = array(
-    'title' => 'Download Filtered VCF: Bgzipped VCF',
+    'title' => 'Download Filtered VCF: Block Compression/Decompression (bgzipped) Format',
     'page callback' => 'trpdownload_download_page',
     'page arguments' => array('vcf_filter_bgzipped'),
     'access arguments' => array('access content'),
