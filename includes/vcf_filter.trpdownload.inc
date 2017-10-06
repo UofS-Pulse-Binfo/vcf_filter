@@ -65,8 +65,8 @@ function vcf_filter_register_trpdownload_type() {
 
   return $types;
 }
-
+/*
 function vcf_filter_tar_extension ($vars){
   return 'tar';
 }
-
+*/
