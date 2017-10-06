@@ -53,7 +53,7 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL) {
   //remove the extension of filename we can obtain from $variables
   //since we know the extension is always '.vcf', to be safe, no longer need to remove last 3,4 characters
   //$bgzip_filename = preg_replace('/\\.[^.\\s]{3,4}$/', '', $variables['filename']);
-  $bgzip_filename = preg_replace('/\.vcf$/', '', $variables['filename']);
+  $bgzip_filename = preg_replace('/\.tar$/', '', $variables['filename']);
   
   $format_tmp = variable_get('file_temporary_path') . '/' . $bgzip_filename;
   $outfile = $format_tmp . '.tar';
