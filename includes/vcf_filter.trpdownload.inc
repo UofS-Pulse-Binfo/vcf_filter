@@ -65,8 +65,8 @@ function vcf_filter_register_trpdownload_type() {
 
   return $types;
 }
-/*
+
+//since the file we want to export is an archive, so the extension is set as .tar
 function vcf_filter_tar_extension ($vars){
   return 'tar';
 }
-*/
