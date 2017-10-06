@@ -50,34 +50,33 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL) {
   //===============
   drush_print("\nConversion from VCF to bgzipped VCF Format.");
 
-  $bgzip_filename = preg_replace('/\\.[^.\\s]{3,4}$/', '', $variables['filename']);
+  //remove the extension of filename we can obtain from $variables
+  //since we know the extension is always '.vcf', to be safe, no longer need to remove last 3,4 characters
+  //$bgzip_filename = preg_replace('/\\.[^.\\s]{3,4}$/', '', $variables['filename']);
+  $bgzip_filename = preg_replace('/\.vcf$/', '', $variables['filename']);
   
   $format_tmp = variable_get('file_temporary_path') . '/' . $bgzip_filename;
   $outfile = $format_tmp . '.tar';
-  drush_print(str_repeat('-', 60));
   
-  /*Creating a compressed and indexed VCF
-    bgzip -c file.vcf > file.vcf.gz
-    tabix -p vcf file.vcf.gz
-    tar cvf archive.tar file.vcf.gz file.vcf.gz.tbi
+  /*Creating a compressed and indexed VCF in 3 steps
+    1. bgzip -c file.vcf > file.vcf.gz
+    2. tabix -p vcf file.vcf.gz
+    3. tar cvf archive.tar file.vcf.gz file.vcf.gz.tbi
   */
-  //$command = 'vcftools --vcf ' . escapeshellarg($filtered_vcf) . ' --geno-depth --out ' . escapeshellarg($format_tmp);
-  
+ 
   $bgzip_tmp_path = variable_get('file_temporary_path');
   
+  drush_print('Useing bgzip to generate bgzip file: '.$format_tmp.'.gz');
   $command = 'bgzip -c ' . escapeshellarg($filtered_vcf) . ' > ' . escapeshellarg($format_tmp) . '.gz';
   drush_print(shell_exec($command));
-  drush_print(str_repeat('-', 60));
-  drush_print('File generated is: '.$format_tmp.'.gz');
   
+  drush_print('Useing tabix to generate index file: '.$format_tmp.'.gz.tbi');
   $command = 'tabix -p vcf ' . escapeshellarg($format_tmp) . '.gz';
   drush_print(shell_exec($command));
-  drush_print(str_repeat('-', 60));
-  drush_print('File generated is: '.$format_tmp.'.gz.tbi');
+  
+  drush_print('Combining into an archive: '.$format_tmp.'.tar');
   $command = 'tar cvf '.escapeshellarg($format_tmp).'.tar'.' -C '.escapeshellarg($bgzip_tmp_path).' '.escapeshellarg($bgzip_filename).'.gz '.escapeshellarg($bgzip_filename).'.gz.tbi';
   drush_print(shell_exec($command));
-  drush_print(str_repeat('-', 60));
-  drush_print('File generated is: '.$format_tmp.'tar');
   
   if (!file_exists($outfile)) {
     drush_set_error("ERROR: Unable to convert VCF file to an archive file (.tar).");
@@ -85,14 +84,16 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL) {
   }
   
   // Tell the user we're almost there!
-  tripal_set_job_progress($job_id, 90);                                                                                          
+  tripal_set_job_progress($job_id, 90);  
+  
   drush_print("\nMove Formatted file to the name we expect.");
   shell_exec("mv $format_tmp.tar $filepath");
+  
   if (!file_exists($filepath)) {
     drush_set_error("ERROR: Unable to move Filtered VCF into expected file director: $filepath");
     exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
   }
   // Done!
- tripal_set_job_progress($job_id, 100);
+  tripal_set_job_progress($job_id, 100);
 }
   
