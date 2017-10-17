@@ -66,11 +66,11 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL) {
  
   $bgzip_tmp_path = variable_get('file_temporary_path');
   
-  drush_print('Useing bgzip to generate bgzip file: '.$format_tmp.'.gz');
+  drush_print('Using bgzip to generate bgzipped file: '.$format_tmp.'.gz');
   $command = 'bgzip -c ' . escapeshellarg($filtered_vcf) . ' > ' . escapeshellarg($format_tmp) . '.gz';
   drush_print(shell_exec($command));
   
-  drush_print('Useing tabix to generate index file: '.$format_tmp.'.gz.tbi');
+  drush_print('Using tabix to generate index file: '.$format_tmp.'.gz.tbi');
   $command = 'tabix -p vcf ' . escapeshellarg($format_tmp) . '.gz';
   drush_print(shell_exec($command));
   
@@ -86,7 +86,7 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL) {
   // Tell the user we're almost there!
   tripal_set_job_progress($job_id, 90);  
   
-  drush_print("\nMove Formatted file to the name we expect.");
+  drush_print("Move formatted file to the name we expect.");
   shell_exec("mv $format_tmp.tar $filepath");
   
   if (!file_exists($filepath)) {
@@ -96,4 +96,3 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL) {
   // Done!
   tripal_set_job_progress($job_id, 100);
 }
-  
