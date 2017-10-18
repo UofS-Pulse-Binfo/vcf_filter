@@ -13,7 +13,8 @@ require_once('vcf_filter.trpdownload.matrix.inc');
 require_once('vcf_filter.trpdownload.qual_matrix.inc');
 // Basic VCF.
 require_once('vcf_filter.trpdownload.vcf.inc');
-
+// Bgzipped VCF file
+require_once('vcf_filter.trpdownload.bgzipped.inc');
 /**
  * Implements hook_register_trpdownload_type().
  */
@@ -53,5 +54,19 @@ function vcf_filter_register_trpdownload_type() {
     ),
   );
 
+  $types['vcf_filter_bgzipped'] = array(
+    'type_name' => 'VCF Filter',
+    'format' => 'Bgzipped VCF Format',
+    'functions' => array(
+      'generate_file' => 'vcf_filter_bgzipped_generate_file',
+      'get_file_suffix' => 'vcf_filter_tar_extension',
+    ),
+  );
+
   return $types;
+}
+
+//since the file we want to export is an archive, so the extension is set as .tar
+function vcf_filter_tar_extension ($vars){
+  return 'tar';
 }
