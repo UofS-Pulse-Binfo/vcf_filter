@@ -111,7 +111,7 @@ function vcf_filter_convert_VCF_to_Hapmap ($in_vcf_filename, $out_hapmap_filenam
 			fwrite($handle_out, ("rs#\talleles\tchrom\tpos\tstrand\tassembly#\tcenter\tprotLSID\tassayLSID\tpanel\tQCcode"));
 			for ($i = 9; $i < count($headerline); $i++)
 			{
-				fwrite($handle_out, "\t $headerline[$i]"); 
+				fwrite($handle_out, "\t$headerline[$i]"); 
 			}
 		}
 	
