@@ -15,6 +15,8 @@ require_once('vcf_filter.trpdownload.qual_matrix.inc');
 require_once('vcf_filter.trpdownload.vcf.inc');
 // Bgzipped VCF file
 require_once('vcf_filter.trpdownload.bgzipped.inc');
+// hapmap format file
+require_once('vcf_filter.trpdownload.hapmap.inc');
 /**
  * Implements hook_register_trpdownload_type().
  */
@@ -51,6 +53,14 @@ function vcf_filter_register_trpdownload_type() {
     'format' => 'VCF Format',
     'functions' => array(
       'generate_file' => 'vcf_filter_vcf_generate_file',
+    ),
+  );
+
+    $types['vcf_filter_hapmap'] = array(
+    'type_name' => 'VCF Filter',
+    'format' => 'Hapmap Format',
+    'functions' => array(
+      'generate_file' => 'vcf_filter_hapmap_generate_file',
     ),
   );
 
