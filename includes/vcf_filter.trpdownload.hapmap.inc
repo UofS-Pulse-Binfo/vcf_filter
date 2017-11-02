@@ -64,9 +64,9 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
 	vcf_filter_convert_VCF_to_Hapmap($filtered_vcf, $outfile);
 
 	if (!file_exists($outfile)) {
-    	drush_set_error("ERROR: Unable to convert VCF file to hapmap format.");
-    	exit(4); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
-  	}
+		drush_set_error("ERROR: Unable to convert VCF file to hapmap format.");
+		exit(4); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+  }
 
 	// Tell the user we're almost there!
 	tripal_set_job_progress($job_id, 90);
@@ -74,8 +74,8 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
 	drush_print("\nMove Formatted file to the name we expect.");
 	shell_exec("mv $format_tmp.hmp $filepath");
 	if (!file_exists($filepath)) {
-    	drush_set_error("ERROR: Unable to move hapmap file into expected file director: $filepath");
-    	exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+  	drush_set_error("ERROR: Unable to move hapmap file into expected file director: $filepath");
+  	exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
 	}
 
 	// Done!
