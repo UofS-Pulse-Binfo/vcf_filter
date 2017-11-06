@@ -113,7 +113,7 @@ function vcf_filter_convert_VCF_to_Hapmap ($in_vcf_filename, $out_hapmap_filenam
       {
         // tassel can not sepeare tabs and spaces in germplasm names, so we have to replace spaces with underscores for tassel
         // only for hapmap, the problem doesn't exit for vcf files
-        headerline[$i] = str_replace(' ', '_', $headerline[$i]);
+        $headerline[$i] = str_replace(' ', '_', $headerline[$i]);
         fwrite($handle_out, "\t$headerline[$i]"); 
       }
     }
