@@ -37,8 +37,8 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
   }
   // Give the user some indication we've done something...
   tripal_set_job_progress($job_id, 5);
-  // Filter.
-  //===============
+  // Using the parameters user gave to filter vcf file
+  //=====================================================
   drush_print("\nFiltering the Original VCF");
   $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q']);
   if (!$filtered_vcf) {
@@ -46,13 +46,13 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
   }
   // Half way point...
   tripal_set_job_progress($job_id, 50);
-  // FORMAT.
-  //===============
+  // Ready for next step: FORMAT. 
+  // Convert filtered vcf file to format user expected (Hapmap in this case). 
+  //=====================================================
 
   //------------------------------------------------------------------
-  // new script starts here, above codes are copied with minor changes
-  // the extension of filename can to be '.hmp' 
-  //$hapmap_filename = preg_replace('/\.txt$/', '/\.hmp/', $variables['filename']);
+  // new script starts here, above codes are copied from old script with minor changes
+  // the extension of hapmap format filename can to be '.hmp' 
   drush_print("\nConversion from VCF to Hapmap Format.");
   $format_tmp = variable_get('file_temporary_path') . '/' . uniqid();
 
@@ -92,34 +92,30 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
  *    http://samtools.github.io/hts-specs/
  *  @param $out_hapmap_filename
  *    A name to give the final Hapmap format output file.
- */
+*/
 
-function vcf_filter_convert_VCF_to_Hapmap ($in_vcf_filename, $out_hapmap_filename){
+function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename) {
 
-  //create output file
+  // create output file
   $handle_out = fopen($out_hapmap_filename,'w') or die ("\nCannot create file: $out_hapmap_filename .\n");
 
   // read vcf file by lines
-  foreach (new SplFileObject($in_vcf_filename) as $line)
-  {
+  foreach (new SplFileObject($in_vcf_filename) as $line) {
     trim ($line);
     // if one line starts with '#CHROM' => header
     // if one line doesn't start with '#' and not empty => one SNP line
-    if (preg_match('/^#CHROM/', $line))
-    {
+    if (preg_match('/^#CHROM/', $line)) {
       $headerline = explode("\t", $line);
       fwrite($handle_out, ("rs#\talleles\tchrom\tpos\tstrand\tassembly#\tcenter\tprotLSID\tassayLSID\tpanel\tQCcode"));
-      for ($i = 9; $i < count($headerline); $i++)
-      {
+      for ($i = 9; $i < count($headerline); $i++) {
         // tassel can not sepeare tabs and spaces in germplasm names, so we have to replace spaces with underscores for tassel
         // only for hapmap, the problem doesn't exit for vcf files
-        headerline[$i] = str_replace(' ', '_', $headerline[$i]);
+        $headerline[$i] = str_replace(' ', '_', $headerline[$i]);
         fwrite($handle_out, "\t$headerline[$i]"); 
       }
     }
   
-    if ((!preg_match('/^#/', $line)) && (!empty($line)))
-    {
+    if ((!preg_match('/^#/', $line)) && (!empty($line))) {
       $splitline = explode("\t", $line);
 
       fwrite($handle_out, ($splitline[0] . 'p' . $splitline[1]."\t". $splitline[3]. '/'. $splitline[4]));
@@ -135,8 +131,7 @@ function vcf_filter_convert_VCF_to_Hapmap ($in_vcf_filename, $out_hapmap_filenam
       // at first explod 0/0:0,36,89:51:5:40 into array("0/0","0,36,89",...,"40") then explode first element into new array("0", "0")
       // then match "0" for reference gt, "1" for first alternate and so on
 
-      for ($m = 9; $m < count($headerline); $m++)
-      {
+      for ($m = 9; $m < count($headerline); $m++) {
         $call = explode(":", $splitline[$m]);
 
         // should explode both by '/' and '|' for both unpashed and pahsed
@@ -144,23 +139,18 @@ function vcf_filter_convert_VCF_to_Hapmap ($in_vcf_filename, $out_hapmap_filenam
         
         fwrite($handle_out, "\t");
 
-        for ($n=0; $n < count($call_gt); $n++)
-        {
-          if (strcmp($call_gt[$n], ".") == 0)
-          {
+        for ($n=0; $n < count($call_gt); $n++) {
+          if (strcmp($call_gt[$n], ".") == 0) {
             fwrite($handle_out, 'N');
           }
-          elseif (is_numeric($call_gt[$n]) == true)
-          {
+          elseif (is_numeric($call_gt[$n]) == true) {
             fwrite($handle_out, $gt_ref_min[$call_gt[$n]]);
           }
-          else
-          {
+          else {
             die ("ERROR: invalid genotype call at marker position ". $splitline[0]. " ". $splitline[1]. "\n");
           }
         }
       }
-
       fwrite($handle_out, ("\n"));
     }
   }
