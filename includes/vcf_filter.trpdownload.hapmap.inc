@@ -139,6 +139,15 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
         
         fwrite($handle_out, "\t");
 
+        /*check the number of genotypes exits
+        * for genotypes:  .|. or 0|. or 1|. vcftools will convert it to . ; 0; 1 after filtering
+        * even the gt should not exist, but it could happen accidently
+        * it'll be the best to check this, so we can be alerted when it actually happen
+        */
+        if (count($call_gt) <= 1){
+          $germ_w_error = $m-9; 
+          drush_set_error("ERROR: Only one genotype showed, might be caused by vcftools processing improper phased genotypes for "."$germ_w_error"."th  germplasm in line:"."\n"."$line.");
+        }
         for ($n=0; $n < count($call_gt); $n++) {
           if (strcmp($call_gt[$n], ".") == 0) {
             fwrite($handle_out, 'N');

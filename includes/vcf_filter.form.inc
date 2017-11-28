@@ -285,7 +285,7 @@ function vcf_filter_form_submit($form, &$form_state) {
     'matrix' => '/filter_vcf/SNP-Matrix',
     'qual_matrix' => '/filter_vcf/Quality-Matrix',
     'bgzipped' => '/filter_vcf/Bgzipped',
-	  'hapmap' => '/filter_vcf/Hapmap',
+    'hapmap' => '/filter_vcf/Hapmap',
     'vcf' => '/filter_vcf/VCF'
   );
   $form_state['redirect'] = array(
