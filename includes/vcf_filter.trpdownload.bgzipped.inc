@@ -44,6 +44,13 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL) {
   if (!$filtered_vcf) {
     exit(3);
   }
+  // Sort filtered vcf file for use in Tassel
+  drush_print("\nSorting the Original VCF");
+  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf);
+  if (!$filtered_sorted_vcf) {
+    exit(4);
+  }
+
   // Half way point...
   tripal_set_job_progress($job_id, 50);
   // FORMAT.
@@ -67,7 +74,7 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL) {
   $bgzip_tmp_path = variable_get('file_temporary_path');
   
   drush_print('Using bgzip to generate bgzipped file: '.$format_tmp.'.gz');
-  $command = 'bgzip -c ' . escapeshellarg($filtered_vcf) . ' > ' . escapeshellarg($format_tmp) . '.gz';
+  $command = 'bgzip -c ' . escapeshellarg($filtered_sorted_vcf) . ' > ' . escapeshellarg($format_tmp) . '.gz';
   drush_print(shell_exec($command));
   
   drush_print('Using tabix to generate index file: '.$format_tmp.'.gz.tbi');
@@ -80,7 +87,7 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL) {
   
   if (!file_exists($outfile)) {
     drush_set_error("ERROR: Unable to convert VCF file to an archive file (.tar).");
-    exit(4); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+    exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
   }
   
   // Tell the user we're almost there!
@@ -91,7 +98,7 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL) {
   
   if (!file_exists($filepath)) {
     drush_set_error("ERROR: Unable to move Filtered VCF into expected file director: $filepath");
-    exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+    exit(6); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
   }
   // Done!
   tripal_set_job_progress($job_id, 100);

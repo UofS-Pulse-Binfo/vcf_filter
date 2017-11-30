@@ -44,6 +44,13 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
   if (!$filtered_vcf) {
     exit(3);
   }
+  // Sort filtered vcf file for use in Tassel
+  drush_print("\nSorting the Original VCF");
+  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf);
+  if (!$filtered_sorted_vcf) {
+    exit(4);
+  }
+  
   // Half way point...
   tripal_set_job_progress($job_id, 50);
   // Ready for next step: FORMAT. 
@@ -61,11 +68,11 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
   drush_print(str_repeat('-', 60));
 
   //use function converting filter vcf filt to hapmap format
-  vcf_filter_convert_VCF_to_Hapmap($filtered_vcf, $outfile);
+  vcf_filter_convert_VCF_to_Hapmap($filtered_sorted_vcf, $outfile);
 
   if (!file_exists($outfile)) {
     drush_set_error("ERROR: Unable to convert VCF file to hapmap format.");
-    exit(4); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+    exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
   }
 
   // Tell the user we're almost there!
@@ -75,7 +82,7 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
   shell_exec("mv $format_tmp.hmp $filepath");
   if (!file_exists($filepath)) {
     drush_set_error("ERROR: Unable to move hapmap file into expected file director: $filepath");
-    exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+    exit(6); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
   }
 
   // Done!
