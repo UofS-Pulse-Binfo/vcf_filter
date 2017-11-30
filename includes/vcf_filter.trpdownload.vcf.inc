@@ -52,6 +52,15 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL) {
   if (!$filtered_vcf) {
     exit(3);
   }
+  tripal_set_job_progress($job_id, 50);
+
+  // Sort.
+  //================
+  drush_print("\nSorting the filtered VCF");
+  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf);
+  if (!$filtered_sorted_vcf) {
+    exit(4);
+  }
 
   // Almost there!
   tripal_set_job_progress($job_id, 90);
@@ -59,10 +68,10 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL) {
   // Format.
   //===============
   drush_print("\nMove VCF file to the name we expect.");
-  shell_exec("mv $filtered_vcf $filepath");
+  shell_exec("mv $filtered_sorted_vcf $filepath");
   if (!file_exists($filepath)) {
     drush_set_error("ERROR: Unable to move Filtered VCF into expected file director: $filepath");
-    exit(4); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+    exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
   }
 
   // Done!

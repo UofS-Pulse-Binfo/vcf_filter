@@ -45,7 +45,7 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
     exit(3);
   }
   // Sort filtered vcf file for use in Tassel
-  drush_print("\nSorting the Original VCF");
+  drush_print("\nSorting the filtered VCF");
   $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf);
   if (!$filtered_sorted_vcf) {
     exit(4);
