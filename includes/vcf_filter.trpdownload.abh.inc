@@ -53,6 +53,15 @@ function vcf_filter_abh_generate_file($variables, $job_id = NULL) {
     exit(3);
   }
 
+  // Sort.
+  //================
+  drush_print("\nSorting the filtered VCF");
+  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf);
+  if (!$filtered_sorted_vcf) {
+    exit(4);
+  }
+
+
   // Almost there!
   tripal_set_job_progress($job_id, 50);
 
@@ -62,7 +71,7 @@ function vcf_filter_abh_generate_file($variables, $job_id = NULL) {
   // NOTE: Obviously, we should not be making this assumption, but it works for now as
   // a workaround.
 
-  $vcf_header = shell_exec("grep \"^#CHROM\" $filtered_vcf");
+  $vcf_header = shell_exec("grep \"^#CHROM\" $filtered_sorted_vcf");
   $vcf_header_array = explode("\t", $vcf_header);
   $maternal_parent = $vcf_header_array[9];
   $paternal_parent = $vcf_header_array[10];
@@ -70,9 +79,9 @@ function vcf_filter_abh_generate_file($variables, $job_id = NULL) {
   drush_print("\nConversion from VCF to A/B Biparental Format.");
   drush_print("USING THE FOLLOWING AS THE MATERNAL PARENT: " . $maternal_parent);
   drush_print("USING THE FOLLOWING AS THE PATERNAL PARENT: " . $paternal_parent);
-  $converted_ABH = vcf_filter_convert_VCF_to_ABH($filtered_vcf, $maternal_parent, $paternal_parent, $filepath);
+  $converted_ABH = vcf_filter_convert_VCF_to_ABH($filtered_sorted_vcf, $maternal_parent, $paternal_parent, $filepath);
   if (!$converted_ABH) {
-    exit(3);
+    exit(5);
   }
 
   // Done!

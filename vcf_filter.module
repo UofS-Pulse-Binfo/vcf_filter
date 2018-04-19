@@ -55,6 +55,14 @@ function vcf_filter_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['filter_vcf/Hapmap'] = array(
+    'title' => 'Download Filtered VCF: Haplotype Map (Hapmap) Format',
+    'page callback' => 'trpdownload_download_page',
+    'page arguments' => array('vcf_filter_hapmap'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
   $items['filter_vcf/Bgzipped'] = array(
     'title' => 'Download Filtered VCF: Block Compression/Decompression (bgzipped) Format',
     'page callback' => 'trpdownload_download_page',
