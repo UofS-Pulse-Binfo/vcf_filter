@@ -162,9 +162,9 @@ function vcf_filter_form($form, &$form_state) {
   );
   $options = array(
     'abh' => array(
-      'name' => 'A/B Format',
+      'name' => 'ABH Format',
       'has_quality' => 'No',
-      'description' => 'Alleles are coded as A/B based on the parents. This format is only suitable for biparental crosses',
+      'description' => 'Alleles are coded as A if they match the maternal parent, B based on the paternal parent, whereas H represents a heterozygous call and "-" as missing. <br><strong>NOTE:</strong> This format is only suitable for biparental crosses and any SNPs in which the parents are missing, heterozygous, or the same genotypic call will be <strong>excluded</strong>!',
     ),
     /*
     'matrix' => array(

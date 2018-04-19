@@ -165,6 +165,13 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
     $chrom = $marker['#CHROM'];
     $pos = $marker['POS'];
 
+    // Check the number of alleles that we have - we don't know how to handle multiple
+    // alleles within a bi-parental population at this point.
+    $alt_alleles = $marker['ALT'];
+    if (preg_match('/,/', $alt_alleles)) {
+      print "Skipping site: ( $chrom $pos ) due to multiple alternate alleles: $alt_alleles\n";
+      continue;
+    }
     $converted_line = array($chrom, $pos);
 
     foreach ($sample_names as $current_sample) {
@@ -185,22 +192,30 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
           // The maternal parent is missing a genotype, thus skip this site completely
           print "Skipping site: ( $chrom $pos ) due to missing call in $maternal_parent\n";
           continue 2;
-        } else if (($genotype_calls[0] !== $genotype_calls[1])) {
+        }
+        else if (($genotype_calls[0] !== $genotype_calls[1])) {
           // The maternal parent must be heterozygous, also skip this site.
-          print "Skipping at site: $chrom $pos due to a heterozygous call in $maternal_parent\n";
+          print "Skipping site: ( $chrom $pos ) due to a heterozygous call in $maternal_parent\n";
           continue 2;
         }
         $maternal_genotype = $genotype_calls;
         array_push($converted_line, "A");
         continue;
-      } else if (strcmp($current_sample, $paternal_parent) === 0) {
+      }
+      else if (strcmp($current_sample, $paternal_parent) === 0) {
         if (($genotype_calls[0] === '.') || ($genotype_calls[1] === '.')) {
           // The paternal parent is missing a genotype, thus skip this site completely
           print "Skipping site: ( $chrom $pos ) due to missing call in $paternal_parent\n";
           continue 2;
-        } else if (($genotype_calls[0] !== $genotype_calls[1])) {
+        }
+        else if (($genotype_calls[0] !== $genotype_calls[1])) {
           // The paternal parent must be heterozygous, also skip this site.
-          print "Skipping at site: $chrom $pos due to a heterozygous call in $paternal_parent\n";
+          print "Skipping site: ( $chrom $pos ) due to a heterozygous call in $paternal_parent\n";
+          continue 2;
+        }
+        else if (($genotype_calls === $maternal_genotype)) {
+          // Dad has the same genotype as Mom? That can't be right. Skip this too.
+          print "Skipping site: ( $chrom $pos ) due to parents having matching genotype: $genotype_calls[0]/$genotype_calls[1]\n";
           continue 2;
         }
         $paternal_genotype = $genotype_calls;
@@ -216,16 +231,28 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
       if ($genotype_calls[0] == $maternal_genotype[0]) {
         if ($genotype_calls[1] == $maternal_genotype[1]) {
           array_push($converted_line, "A");
-        } else if ($genotype_calls[1] == $paternal_genotype[1]) {
+        }
+        else if ($genotype_calls[1] == $paternal_genotype[1]) {
           array_push($converted_line, "H");
-        } else { array_push($converted_line, "-"); }
-      } else if ($genotype_calls[0] == $paternal_genotype[0]) {
+        }
+        else {
+          array_push($converted_line, "-");
+        }
+      }
+      else if ($genotype_calls[0] == $paternal_genotype[0]) {
         if ($genotype_calls[1] == $paternal_genotype[1]) {
           array_push($converted_line, "B");
-        } else if ($genotype_calls[1] == $maternal_genotype[1]) {
+        }
+        else if ($genotype_calls[1] == $maternal_genotype[1]) {
           array_push($converted_line, "H");
-        } else { array_push($converted_line, "-"); }
-      } else { array_push($converted_line, "-"); }
+        }
+        else {
+          array_push($converted_line, "-");
+        }
+      }
+      else {
+        array_push($converted_line, "-");
+      }
     }
 
     // And print it to the output file!
