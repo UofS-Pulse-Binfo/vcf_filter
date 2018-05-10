@@ -114,7 +114,7 @@ function vcf_filter_form($form, &$form_state) {
   $form['s2']['minor_allele_freq'] = array(
     '#type' => 'textfield',
     '#title' => 'Minor Allele Frequency',
-    '#description' => 'Only include SNP positions with a minor allele frequency greater than or equal to this value. Allele frequency is defined as the number of times an allele appears over all individuals at that site, divided by the total number of non-missing alleles at that site. For example, if your enter 45% in this filter then SNPs with minor allele frequency lower than 45% could be removed (SNP Chr1p12344 in the example data below).',
+    '#description' => 'Only include SNP positions with a minor allele frequency greater than or equal to this value. Allele frequency is defined as the number of times an allele appears over all individuals at that site, divided by the total number of non-missing alleles at that site. For example, if your enter 45% in this filter then SNPs with a minor allele frequency lower than 45% could be removed (SNP Chr1p12344 in the example data below).',
     '#default_value' => '',
   );
 
@@ -128,7 +128,7 @@ function vcf_filter_form($form, &$form_state) {
   $form['s2']['max_missing_freq'] = array(
     '#type' => 'textfield',
     '#title' => 'Maximum Missing Frequency',
-    '#description' => 'Exclude SNPs based on the proportion of missing data. For example, if you enter 25% for this filter then SNPs with a missing data frequence higher than 25% would be removed (SNP Chr4p48765 in the example data below).',
+    '#description' => 'Exclude SNPs based on the proportion of missing data. For example, if you enter 25% for this filter then SNPs with a missing data frequency higher than 25% would be removed (SNP Chr4p48765 in the example data below).',
     '#default_value' => '',
   );
 
