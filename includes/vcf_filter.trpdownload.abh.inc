@@ -153,6 +153,15 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
   $new_header = array_merge(array("Chromosome", "Position"), $sample_names);
   fputcsv($OUTFILE, $new_header, "\t");
 
+  // one array to record number of skipping sites
+  $skipping_site_count = array(
+    "multiple_alternate_alleles" => 0,
+    "missing_call_maternal" =>0,
+    "heterozygous_call_maternal" => 0,
+    "missing_call_paternal" => 0,
+    "heterozygous_call_paternal" => 0,
+    "parents_matching_genotype" => 0);
+
   // Now iterate through all the SNPs
   while (!feof($INFILE)) {
 
@@ -169,7 +178,8 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
     // alleles within a bi-parental population at this point.
     $alt_alleles = $marker['ALT'];
     if (preg_match('/,/', $alt_alleles)) {
-      print "Skipping site: ( $chrom $pos ) due to multiple alternate alleles: $alt_alleles\n";
+      #print "Skipping site: ( $chrom $pos ) due to multiple alternate alleles: $alt_alleles\n";
+      $skipping_site_count["multiple_alternate_alleles"]++;
       continue;
     }
     $converted_line = array($chrom, $pos);
@@ -190,12 +200,14 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
       if (strcmp($current_sample, $maternal_parent) === 0) {
         if (($genotype_calls[0] === '.') || ($genotype_calls[1] === '.')) {
           // The maternal parent is missing a genotype, thus skip this site completely
-          print "Skipping site: ( $chrom $pos ) due to missing call in $maternal_parent\n";
+          #print "Skipping site: ( $chrom $pos ) due to missing call in $maternal_parent\n";
+          $skipping_site_count["missing_call_maternal"]++;
           continue 2;
         }
         else if (($genotype_calls[0] !== $genotype_calls[1])) {
           // The maternal parent must be heterozygous, also skip this site.
-          print "Skipping site: ( $chrom $pos ) due to a heterozygous call in $maternal_parent\n";
+          #print "Skipping site: ( $chrom $pos ) due to a heterozygous call in $maternal_parent\n";
+          $skipping_site_count["heterozygous_call_maternal"]++;
           continue 2;
         }
         $maternal_genotype = $genotype_calls;
@@ -205,17 +217,20 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
       else if (strcmp($current_sample, $paternal_parent) === 0) {
         if (($genotype_calls[0] === '.') || ($genotype_calls[1] === '.')) {
           // The paternal parent is missing a genotype, thus skip this site completely
-          print "Skipping site: ( $chrom $pos ) due to missing call in $paternal_parent\n";
+          #print "Skipping site: ( $chrom $pos ) due to missing call in $paternal_parent\n";
+          $skipping_site_count["missing_call_paternal"]++;
           continue 2;
         }
         else if (($genotype_calls[0] !== $genotype_calls[1])) {
           // The paternal parent must be heterozygous, also skip this site.
-          print "Skipping site: ( $chrom $pos ) due to a heterozygous call in $paternal_parent\n";
+          #print "Skipping site: ( $chrom $pos ) due to a heterozygous call in $paternal_parent\n";
+          $skipping_site_count["heterozygous_call_paternal"]++;
           continue 2;
         }
         else if (($genotype_calls === $maternal_genotype)) {
           // Dad has the same genotype as Mom? That can't be right. Skip this too.
-          print "Skipping site: ( $chrom $pos ) due to parents having matching genotype: $genotype_calls[0]/$genotype_calls[1]\n";
+          #print "Skipping site: ( $chrom $pos ) due to parents having matching genotype: $genotype_calls[0]/$genotype_calls[1]\n";
+          $skipping_site_count["parents_matching_genotype"]++;
           continue 2;
         }
         $paternal_genotype = $genotype_calls;
@@ -259,6 +274,15 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
     fputcsv($OUTFILE, $converted_line, "\t");
 
   }
+
+  // its too verbose to print one line for each skipping site, myabe a summary
+  print $skipping_site_count["multiple_alternate_alleles"]." sites skipped due to multiple alternate alleles.\n";
+  print $skipping_site_count["missing_call_maternal"]." sites skipped due to missing call in maternal parent.\n";
+  print $skipping_site_count["heterozygous_call_maternal"]." sites skipped due to a heterozygous call in maternal parent.\n";
+  print $skipping_site_count["missing_call_paternal"]." sites skipped due to missing call in paternal parent.\n";
+  print $skipping_site_count["heterozygous_call_paternal"]." sites skipped due to a heterozygous call in paternal parent.\n";
+  print $skipping_site_count["parents_matching_genotype"]." sites skipped due to parents having matching genotype.\n";
+
   print "Finished Conversion.\n";
 
   fclose($INFILE);
