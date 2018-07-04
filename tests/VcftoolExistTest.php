@@ -15,6 +15,6 @@ class VcftoolExistTest extends TripalTestCase {
    */
   public function testBasicExample() {
     $vcftools_output = exec('vcftools --version');
-    $this->assertTrue(preg_match("/VCFtools/", $vcftools_output)));
+    $this->assertTrue(preg_match("/VCFtools/", $vcftools_output));
   }
 }
