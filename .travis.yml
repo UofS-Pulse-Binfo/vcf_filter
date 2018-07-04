@@ -17,8 +17,8 @@ script:
   - docker run -it -d --rm --name tripal -v "$(pwd)":/modules/vcf_filter statonlab/tripal3
   - sleep 30 # We pause here so postgres and apache complete booting up
   - docker exec -it tripal drush pm-enable -y vcf_filter
-#  - docker exec -it tripal bash -c "sudo apt-get install -y vcftools"
-  - docker exec -it tripal bash -c "cd /var/www/html/sites/all/libraries && git clone https://github.com/samtools/htslib.git"
-  - docker exec -it tripal bash -c "cd /var/www/html/sites/all/libraries/htslib && autoheader && autoconf"
-  - docker exec -it tripal bash -c "cd /var/www/html/sites/all/libraries/htslib && ./configure && make && make install"
+  - docker exec -it tripal bash -c "sudo apt install -y vcftools"
+#  - docker exec -it tripal bash -c "cd /var/www/html/sites/all/libraries && git clone https://github.com/samtools/htslib.git"
+#  - docker exec -it tripal bash -c "cd /var/www/html/sites/all/libraries/htslib && autoheader && autoconf"
+#  - docker exec -it tripal bash -c "cd /var/www/html/sites/all/libraries/htslib && ./configure && make && make install"
   - docker exec -it tripal bash -c "cd /modules/vcf_filter && composer install && DRUPAL_ROOT=/var/www/html ./vendor/bin/phpunit"
