@@ -1,5 +1,6 @@
-# VCF Filter
-Tripal form interface so users can custom filter existing VCF files and export in a variety of formats. The form simply provides an interface to VCFtools and uses the Tripal Download API to provide the filtered file to the user.
+[![Build Status](https://travis-ci.org/UofS-Pulse-Binfo/vcf_filter.svg?branch=master)](https://travis-ci.org/UofS-Pulse-Binfo/vcf_filter)
+
+This modules provides a form interface so users can custom filter existing VCF files and export in a variety of formats. The form simply provides an interface to VCFtools and uses the Tripal Download API to provide the filtered file to the user.
 
 ## Features
 - User "Filter VCF" form providing well documented filter options (includes examples) and a variety of formats.
