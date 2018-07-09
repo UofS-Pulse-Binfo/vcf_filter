@@ -21,7 +21,7 @@
  * @param $test_no_drush
  *   is this function is used for UnitTest ;-).
  */
-function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $test_no_drush = NULL) {
+function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $use_4_unit_test = false) {
 
   // Create the file and ready it for writting to.
   $filepath = variable_get('trpdownload_fullpath', '') . $variables['filename'];
@@ -34,7 +34,7 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $test_no_drush
 
   // Check the input file still exists.
   if (!file_exists($vcf_file->file_path)) {
-    if (is_null($test_no_drush)){
+    if ($use_4_unit_test === false){
       drush_set_error("ERROR: Original VCF file not found!");
       exit(2);
     }else{
@@ -76,7 +76,7 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $test_no_drush
   print "\nMove VCF file to the name we expect.\n";
   shell_exec("mv $filtered_sorted_vcf $filepath");
   if (!file_exists($filepath)) {
-    if (is_null($test_no_drush)){
+    if ($use_4_unit_test === false){
       drush_set_error("ERROR: Unable to move Filtered VCF into expected file director: $filepath");
       exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
     }else{
