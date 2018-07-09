@@ -130,7 +130,7 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $use_4_unit_test =
  *   sorted vcf format file so different export format files can be used in tassel directly
 */
 
-function vcf_filter_sort_filtered_file($vcf_file_unsorted) {
+function vcf_filter_sort_filtered_file($vcf_file_unsorted, $use_4_unit_test = false) {
   $new_file = variable_get('file_temporary_path') . '/' . uniqid();
   $new_file = $new_file . '.filtered.sorted.vcf';
 

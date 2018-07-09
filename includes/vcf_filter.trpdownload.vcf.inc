@@ -54,7 +54,7 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $use_4_unit_te
   // Filter.
   //===============
   print "\nFiltering the Original VCF\n";
-  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q']);
+  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q'], $use_4_unit_test;
   if (!$filtered_vcf) {
     exit(3);
   }
@@ -63,7 +63,7 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $use_4_unit_te
   // Sort.
   //================
   print "\nSorting the filtered VCF\n";
-  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf);
+  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf, $use_4_unit_test);
   if (!$filtered_sorted_vcf) {
     exit(4);
   }
