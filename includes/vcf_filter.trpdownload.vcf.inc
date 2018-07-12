@@ -38,7 +38,8 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $drush_use_lim
       drush_set_error("ERROR: Original VCF file not found!");
       exit(2);
     }else{
-      return(2);
+      print "ERROR: Original VCF file not found!\n";
+      exit(2);
     }
   }
 
@@ -80,7 +81,8 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $drush_use_lim
       drush_set_error("ERROR: Unable to move Filtered VCF into expected file director: $filepath");
       exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
     }else{
-      return(5);
+      print "ERROR: Unable to move Filtered VCF into expected file director: $filepath\n";
+      exit(5);
     }
   }
 

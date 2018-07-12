@@ -61,6 +61,8 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
 
   if ($drush_use_limited === false){
     drush_log('NOTE: We are not using the PL at this point to specify the genotypes.', 'warning');
+  }else{
+    print "NOTE: We are not using the PL at this point to specify the genotypes.\n";
   }
 
 
@@ -113,7 +115,8 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
     if ($drush_use_limited === false){
       return drush_set_error('ERROR: Filtering of the VCF file was not successful.');
     }else{
-      die ("ERROR: Sorting of the VCF file was not successful.\n");
+      print "ERROR: Sorting of the VCF file was not successful.\n";
+      return false;
     }
   }
 
@@ -159,7 +162,8 @@ function vcf_filter_sort_filtered_file($vcf_file_unsorted, $drush_use_limited = 
     if ($drush_use_limited === false){
       return drush_set_error('ERROR: Sorting of the VCF file was not successful.');
     }else{
-      die ("ERROR: Sorting of the VCF file was not successful.\n");
+      print "ERROR: Sorting of the VCF file was not successful.\n";
+      return false;
     }
   }
   return $new_file;
@@ -191,7 +195,8 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $drush_use_limit
       if ($drush_use_limited === false){
         return drush_set_error('ERROR: Expected first element in VCF header to contain: #CHROM');
       }else{
-        die ("ERROR: Expected first element in VCF header to contain: #CHROM\n");
+        print "ERROR: Expected first element in VCF header to contain: #CHROM\n";
+        return false;
       }
     } else if (sizeof($VCF_header) < 10) {
       die ("ERROR: The size of VCF header is too small to be valid.\n");
@@ -203,7 +208,8 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $drush_use_limit
       if ($drush_use_limited === false){
         return drush_set_error('ERROR: Expected VCF header to begin with: #CHROM');
       }else{
-        die ("ERROR: Expected VCF header to begin with: #CHROM\n");
+        print "ERROR: Expected VCF header to begin with: #CHROM\n";
+        return false;
       }
     }
   }
@@ -218,7 +224,8 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $drush_use_limit
       if ($drush_use_limited === false){
         return drush_set_error('ERROR: Expected VCF line to be an array or tab-delimited!');
       }else{
-        die ("ERROR: Expected VCF line to be an array or tab-delimited\n");
+        print "ERROR: Expected VCF line to be an array or tab-delimited\n";
+        return false;
       }
     }
   }
@@ -230,7 +237,8 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $drush_use_limit
     if ($drush_use_limited === false){
       return drush_set_error('ERROR: The provided VCF header and VCF line do not contain the same number of columns.');
     }else{
-      die ("ERROR: The provided VCF header and VCF line do not contain the same number of columns.\n");
+      print "ERROR: The provided VCF header and VCF line do not contain the same number of columns.\n";
+      return false;
     }
   }
 
