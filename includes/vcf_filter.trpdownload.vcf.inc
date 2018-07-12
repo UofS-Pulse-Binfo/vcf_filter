@@ -21,7 +21,7 @@
  * @param $test_no_drush
  *   is this function is used for UnitTest ;-).
  */
-function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $use_4_unit_test = false) {
+function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $drush_use_limited = false) {
 
   // Create the file and ready it for writting to.
   $filepath = variable_get('trpdownload_fullpath', '') . $variables['filename'];
@@ -34,7 +34,7 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $use_4_unit_te
 
   // Check the input file still exists.
   if (!file_exists($vcf_file->file_path)) {
-    if ($use_4_unit_test === false){
+    if ($drush_use_limited === false){
       drush_set_error("ERROR: Original VCF file not found!");
       exit(2);
     }else{
@@ -54,7 +54,7 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $use_4_unit_te
   // Filter.
   //===============
   print "\nFiltering the Original VCF\n";
-  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q'], $use_4_unit_test);
+  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q'], $drush_use_limited);
   if (!$filtered_vcf) {
     exit(3);
   }
@@ -63,7 +63,7 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $use_4_unit_te
   // Sort.
   //================
   print "\nSorting the filtered VCF\n";
-  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf, $use_4_unit_test);
+  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf, $drush_use_limited);
   if (!$filtered_sorted_vcf) {
     exit(4);
   }
@@ -76,7 +76,7 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $use_4_unit_te
   print "\nMove VCF file to the name we expect.\n";
   shell_exec("mv $filtered_sorted_vcf $filepath");
   if (!file_exists($filepath)) {
-    if ($use_4_unit_test === false){
+    if ($drush_use_limited === false){
       drush_set_error("ERROR: Unable to move Filtered VCF into expected file director: $filepath");
       exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
     }else{

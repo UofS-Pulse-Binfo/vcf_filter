@@ -56,10 +56,10 @@ function vcf_filter_get_vcf_file($vcf_file_id) {
  * @return
  *   The full patch of the filtered VCF file.
  */
-function vcf_filter_filter_file($file_path, $filter_criteria, $use_4_unit_test = false) {
+function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited = false) {
   $new_file = variable_get('file_temporary_path') . '/' . uniqid();
 
-  if ($use_4_unit_test === false){
+  if ($drush_use_limited === false){
     drush_log('NOTE: We are not using the PL at this point to specify the genotypes.', 'warning');
   }
 
@@ -110,7 +110,7 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $use_4_unit_test =
 
   // Check for error.
   if (!file_exists($outfile)) {
-    if ($use_4_unit_test === false){
+    if ($drush_use_limited === false){
       return drush_set_error('ERROR: Filtering of the VCF file was not successful.');
     }else{
       die ("ERROR: Sorting of the VCF file was not successful.\n");
@@ -130,7 +130,7 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $use_4_unit_test =
  *   sorted vcf format file so different export format files can be used in tassel directly
 */
 
-function vcf_filter_sort_filtered_file($vcf_file_unsorted, $use_4_unit_test = false) {
+function vcf_filter_sort_filtered_file($vcf_file_unsorted, $drush_use_limited = false) {
   $new_file = variable_get('file_temporary_path') . '/' . uniqid();
   $new_file = $new_file . '.filtered.sorted.vcf';
 
@@ -156,7 +156,7 @@ function vcf_filter_sort_filtered_file($vcf_file_unsorted, $use_4_unit_test = fa
 
   // Check for error.
   if (!file_exists($new_file)) {
-    if ($use_4_unit_test === false){
+    if ($drush_use_limited === false){
       return drush_set_error('ERROR: Sorting of the VCF file was not successful.');
     }else{
       die ("ERROR: Sorting of the VCF file was not successful.\n");
@@ -183,12 +183,12 @@ function vcf_filter_sort_filtered_file($vcf_file_unsorted, $use_4_unit_test = fa
  *   An associative array representing a specific LINE in a VCF file.
  */
 
-function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $use_4_unit_test = false) {
+function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $drush_use_limited = false) {
 
   // Validate the header is in the correct format
   if (is_array($VCF_header)) {
     if (strcmp($VCF_header[0], '#CHROM') !== 0) {
-      if ($use_4_unit_test === false){
+      if ($drush_use_limited === false){
         return drush_set_error('ERROR: Expected first element in VCF header to contain: #CHROM');
       }else{
         die ("ERROR: Expected first element in VCF header to contain: #CHROM\n");
@@ -200,7 +200,7 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $use_4_unit_test
     if (preg_match("/^#CHROM\t/", $VCF_header)) {
       $header = explode("\t", $VCF_header);
     } else {
-      if ($use_4_unit_test === false){
+      if ($drush_use_limited === false){
         return drush_set_error('ERROR: Expected VCF header to begin with: #CHROM');
       }else{
         die ("ERROR: Expected VCF header to begin with: #CHROM\n");
@@ -215,7 +215,7 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $use_4_unit_test
       $line = explode("\t", $VCF_line);
       $VCF_line = $line;
     } else {
-      if ($use_4_unit_test === false){
+      if ($drush_use_limited === false){
         return drush_set_error('ERROR: Expected VCF line to be an array or tab-delimited!');
       }else{
         die ("ERROR: Expected VCF line to be an array or tab-delimited\n");
@@ -227,7 +227,7 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $use_4_unit_test
   if (count($VCF_header) === count($VCF_line)) {
     $marker = array_combine($VCF_header,$VCF_line);
   } else {
-    if ($use_4_unit_test === false){
+    if ($drush_use_limited === false){
       return drush_set_error('ERROR: The provided VCF header and VCF line do not contain the same number of columns.');
     }else{
       die ("ERROR: The provided VCF header and VCF line do not contain the same number of columns.\n");
