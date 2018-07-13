@@ -74,7 +74,7 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $drush_use_lim
 
   // Format.
   //===============
-  print "\nMove VCF file to the name we expect.\n";
+  print "\nMove VCF file $filtered_sorted_vcf to the name we expect: $filepath\n";
   shell_exec("mv $filtered_sorted_vcf $filepath");
   if (!file_exists($filepath)) {
     if ($drush_use_limited === false){

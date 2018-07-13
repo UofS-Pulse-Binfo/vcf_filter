@@ -34,13 +34,13 @@ class DrushUnitTest extends TripalTestCase {
               ),
           ),
       "suffix" => 'txt',
-      "filename" => 'KnowPulse.vcf_filter_VCF'.$faker->uuid,
+      "filename" => 'KnowPulse.vcf_filter_VCF_'.$faker->uuid,
       "fullpath" => '/var/www/dev/cloned-clone/sites/default/files/tripal/tripal_downloads/',
       "relpath" => 'public://tripal/tripal_downloads/',
       "format_name" => 'VCF Format',
   );
 
-  $result_file_vcf = $variables_test['filepath'].$variables_test['filename'];
+  $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
 
   vcf_filter_vcf_generate_file($variables_test, NULL, true);
 
