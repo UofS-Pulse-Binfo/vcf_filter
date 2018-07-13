@@ -14,7 +14,7 @@ class DrushUnitTest extends TripalTestCase {
    * Tests must begin with the word "test".
    * See https://phpunit.readthedocs.io/en/latest/ for more information.
    */
-  public function testBasicExample() {
+  public function testVcfFormat() {
     $faker = Factory::create();
     $variables_test = array(
       "q" => array(
@@ -42,7 +42,7 @@ class DrushUnitTest extends TripalTestCase {
 
   $result_file_vcf = $variables_test['filepath'].$variables_test['filename'];
 
-  vcf_filter_vcf_generate_file($result_file_vcf, NULL, true);
+  vcf_filter_vcf_generate_file($variables_test, NULL, true);
 
   $this->assertFileExists($result_file_vcf, "Result File, $result_file_vcf, does not exist.");
 
