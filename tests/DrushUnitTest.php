@@ -3,6 +3,7 @@ namespace Tests;
 
 use StatonLab\TripalTestSuite\DBTransaction;
 use StatonLab\TripalTestSuite\TripalTestCase;
+use Faker\Factory;
 
 class DrushUnitTest extends TripalTestCase {
   // Uncomment to auto start and rollback db transactions per test method.
