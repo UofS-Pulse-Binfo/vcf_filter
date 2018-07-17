@@ -51,7 +51,7 @@ class DrushUnitTest extends TripalTestCase {
   $variables_test['q']['vcf_file_id'] = $one_datafile['vcf_file_id'];
   print_r($one_datafile);
 
-  $result_file_vcf = $variables_test"'fullpath'".$variables_test"'filename'";
+  $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
 
   vcf_filter_vcf_generate_file($variables_test, NULL, true);
 
