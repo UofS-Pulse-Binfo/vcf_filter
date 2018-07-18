@@ -7,7 +7,7 @@ use Faker\Factory;
 
 class DrushUnitTest extends TripalTestCase {
   // Uncomment to auto start and rollback db transactions per test method.
-  // use DBTransaction;
+  use DBTransaction;
 
   /**
    * Basic test example.
@@ -41,16 +41,18 @@ class DrushUnitTest extends TripalTestCase {
   );
 
   $one_datafile = array(
-    "file_path" => drupal_get_path('module','vcf_filter') . '/tests/test_files/example_file1.txt',
+    "file_path" => DRUPAL_ROOT . '/' . drupal_get_path('module','vcf_filter') . '/tests/test_files/example_file1.txt',
     "name" => 'test_file1', // Use $faker here as well
     "num_snps" => 506,
     "backbone" => 'Test Backbone',  // Use $faker here.
     "description" => 'This is a a test file containing 506 SNPs.', // Use $faker here
   );
+
   drupal_write_record('vcf_files', $one_datafile);
   $variables_test['q']['vcf_file_id'] = $one_datafile['vcf_file_id'];
   print_r($one_datafile);
-
+  print_r($variables_test);
+ 
   $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
 
   vcf_filter_vcf_generate_file($variables_test, NULL, true);
