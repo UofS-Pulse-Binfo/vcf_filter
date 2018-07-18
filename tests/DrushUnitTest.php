@@ -63,6 +63,6 @@ class DrushUnitTest extends TripalTestCase {
   $this->assertNotEquals(0, filesize($result_file_vcf), "The Result File, $result_file_vcf, is empty.");
 
 
-  unlink $result_file_vcf;
+  unlink($result_file_vcf);
   }
 }
