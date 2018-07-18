@@ -17,8 +17,7 @@ script:
   - docker run -it -d --rm --name tripal -v "$(pwd)":/modules/vcf_filter statonlab/tripal3
   - sleep 30 # We pause here so postgres and apache complete booting up
   # install trpdownload_api function, and enable this dependency
-  - docker exec -it tripal bash -c "cd /sites/all/modules/ && git clone https://github.com/tripal/trpdownload_api.git"
-  - docker exec -it tripal drush pm-enable -y trpdownload_api
+  - docker exec -it tripal bash -c "cd /var/www/html/sites/all/modules/ && git clone https://github.com/tripal/trpdownload_api.git && drush pm-enable -y trpdownload_api"
   # install vcftools
   - docker exec -it tripal bash -c "sudo yum install -y vcftools"
   # enable module vcf_filter
