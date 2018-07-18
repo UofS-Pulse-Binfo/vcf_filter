@@ -45,7 +45,7 @@ class DrushUnitTest extends TripalTestCase {
     "name" => 'test_file1', // Use $faker here as well
     "num_snps" => 506,
     "backbone" => 'Test Backbone',  // Use $faker here.
-    "description" => 'This is a a test file containing 506 SNPs.', // Use $faker here
+    "description" => $faker->text,
   );
   drupal_write_record('vcf_files', $one_datafile);
   $variables_test['q']['vcf_file_id'] = $one_datafile['vcf_file_id'];
