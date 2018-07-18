@@ -35,7 +35,8 @@ class DrushUnitTest extends TripalTestCase {
           ),
       "suffix" => 'txt',
       "filename" => 'KnowPulse.vcf_filter_VCF_'.$faker->uuid,
-      "fullpath" => '/var/www/dev/cloned-clone/sites/default/files/tripal/tripal_downloads/',
+      //"fullpath" => '/var/www/dev/cloned-clone/sites/default/files/tripal/tripal_downloads/',
+      "fullpath" => DRUPAL_ROOT . '/' . drupal_get_path('module','vcf_filter') . '/tests/test_files/',
       "relpath" => 'public://tripal/tripal_downloads/',
       "format_name" => 'VCF Format',
   );
@@ -61,5 +62,7 @@ class DrushUnitTest extends TripalTestCase {
 
   $this->assertNotEquals(0, filesize($result_file_vcf), "The Result File, $result_file_vcf, is empty.");
 
+
+  unlink $result_file_vcf;
   }
 }
