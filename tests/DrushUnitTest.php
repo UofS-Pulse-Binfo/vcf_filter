@@ -35,8 +35,9 @@ class DrushUnitTest extends TripalTestCase {
           ),
       "suffix" => 'txt',
       "filename" => 'KnowPulse.vcf_filter_VCF_'.$faker->uuid,
-      "fullpath" => DRUPAL_ROOT . '/sites/default/files/tripal/tripal_downloads/',
+      //"fullpath" => DRUPAL_ROOT . '/sites/default/files/tripal/tripal_downloads/',
       //"fullpath" => DRUPAL_ROOT . '/' . drupal_get_path('module','vcf_filter') . '/tests/test_files/',
+      "fullpath" => drupal_realpath('public://') . '/tripal/tripal_downloads/',
       "relpath" => 'public://tripal/tripal_downloads/',
       "format_name" => 'VCF Format',
   );

@@ -18,8 +18,8 @@
  *     - format_name: a human-readable description of the format.
  * @param $job_id
  *   The ID of the tripal job executing this function ;-).
- * @param $test_no_drush
- *   is this function is used for UnitTest ;-).
+ * @param $drush_use_limited
+ *   are drush function limited
  */
 function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $drush_use_limited = false) {
 
