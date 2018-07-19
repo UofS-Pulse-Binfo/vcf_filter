@@ -14,7 +14,7 @@ class DrushUnitTest extends TripalTestCase {
    * Tests must begin with the word "test".
    * See https://phpunit.readthedocs.io/en/latest/ for more information.
    */
-  public function testVcfFormat() {
+  public function testAllFormats() {
     $faker = Factory::create();
     $variables_test = array(
       "q" => array(
@@ -35,7 +35,7 @@ class DrushUnitTest extends TripalTestCase {
           ),
       "suffix" => 'txt',
       "filename" => 'KnowPulse.vcf_filter_VCF_'.$faker->uuid,
-      "fullpath" => DRUPAL_ROOT . '/sites/default/files' .trpdownload_api_get_filedir('full'),
+      "fullpath" => DRUPAL_ROOT . '/sites/default/files' . trpdownload_api_get_filedir('full'),
       "relpath" => 'public://tripal/tripal_downloads/',
       "format_name" => 'VCF Format',
   );
@@ -62,15 +62,22 @@ class DrushUnitTest extends TripalTestCase {
   unlink($result_file_vcf);
 
   //test format Hapmap
+  $variables_test['type_info']['format'] = 'Hapmap format';
+  $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_hapmap_generate_file';
   vcf_filter_hapmap_generate_file($variables_test, NULL, true);
   $this->assertFileExists($result_file_vcf, "Hapmap format: Result File, $result_file_vcf, does not exist.");
   $this->assertNotEquals(0, filesize($result_file_vcf), "Hapmap format: The Result File, $result_file_vcf, is empty.");
   unlink($result_file_vcf);
 
-  //test format Hapmap
+  //test format bgzipped
+  $variables_test['type_info']['format'] = 'bgzipped format';
+  $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_bgzipped_generate_file';
   vcf_filter_bgzipped_generate_file($variables_test, NULL, true);
-  $this->assertFileExists($result_file_vcf, "Hapmap format: Result File, $result_file_vcf, does not exist.");
-  $this->assertNotEquals(0, filesize($result_file_vcf), "Hapmap format: The Result File, $result_file_vcf, is empty.");
+  $this->assertFileExists($result_file_vcf, "Bgzipped format: Result File, $result_file_vcf, does not exist.");
+  $this->assertNotEquals(0, filesize($result_file_vcf), "Bgzipped format: The Result File, $result_file_vcf, is empty.");
   unlink($result_file_vcf);
+
+
+
   }
 }
