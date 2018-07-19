@@ -47,13 +47,13 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL, $drush_us
   // Filter.
   //===============
   print "\nFiltering the Original VCF\n";
-  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q']);
+  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q'], $drush_use_limited);
   if (!$filtered_vcf) {
     exit(3);
   }
   // Sort filtered vcf file for use in Tassel
   print "\nSorting the Original VCF\n";
-  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf);
+  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf, $drush_use_limited);
   if (!$filtered_sorted_vcf) {
     exit(4);
   }
