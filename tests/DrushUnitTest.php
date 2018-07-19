@@ -66,5 +66,11 @@ class DrushUnitTest extends TripalTestCase {
   $this->assertFileExists($result_file_vcf, "Hapmap format: Result File, $result_file_vcf, does not exist.");
   $this->assertNotEquals(0, filesize($result_file_vcf), "Hapmap format: The Result File, $result_file_vcf, is empty.");
   unlink($result_file_vcf);
+
+  //test format Hapmap
+  vcf_filter_bgzipped_generate_file($variables_test, NULL, true);
+  $this->assertFileExists($result_file_vcf, "Hapmap format: Result File, $result_file_vcf, does not exist.");
+  $this->assertNotEquals(0, filesize($result_file_vcf), "Hapmap format: The Result File, $result_file_vcf, is empty.");
+  unlink($result_file_vcf);
   }
 }
