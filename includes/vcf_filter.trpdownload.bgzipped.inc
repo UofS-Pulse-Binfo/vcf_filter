@@ -69,7 +69,7 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL, $drush_us
   //$bgzip_filename = preg_replace('/\\.[^.\\s]{3,4}$/', '', $variables['filename']);
   $bgzip_filename = preg_replace('/\.tar$/', '', $variables['filename']);
 
-  $format_tmp = $variables['fullpath'] . '/' . $bgzip_filename;
+  $format_tmp = variable_get('file_temporary_path') . '/' . $bgzip_filename;
   $outfile = $format_tmp . '.tar';
 
   /*Creating a compressed and indexed VCF in 3 steps
@@ -82,15 +82,15 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL, $drush_us
 
   print 'Using bgzip to generate bgzipped file: '.$format_tmp.'.gz'."\n";
   $command = 'bgzip -c ' . escapeshellarg($filtered_sorted_vcf) . ' > ' . escapeshellarg($format_tmp) . '.gz';
-  shell_exec($command);
+  print shell_exec($command);
 
   print 'Using tabix to generate index file: '.$format_tmp.'.gz.tbi'."\n";
   $command = 'tabix -p vcf ' . escapeshellarg($format_tmp) . '.gz';
-  shell_exec($command);
+  print shell_exec($command);
 
   print 'Combining into an archive: '.$format_tmp.'.tar'."\n";
   $command = 'tar cvf '.escapeshellarg($format_tmp).'.tar'.' -C '.escapeshellarg($bgzip_tmp_path).' '.escapeshellarg($bgzip_filename).'.gz '.escapeshellarg($bgzip_filename).'.gz.tbi';
-  shell_exec($command);
+  print shell_exec($command);
 
   if (!file_exists($outfile)) {
     if ($drush_use_limited === false){
