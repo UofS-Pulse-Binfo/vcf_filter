@@ -35,8 +35,6 @@ class DrushUnitTest extends TripalTestCase {
           ),
       "suffix" => 'txt',
       "filename" => 'KnowPulse.vcf_filter_VCF_'.$faker->uuid,
-      //"fullpath" => DRUPAL_ROOT . '/sites/default/files/tripal/tripal_downloads/',
-      //"fullpath" => DRUPAL_ROOT . '/' . drupal_get_path('module','vcf_filter') . '/tests/test_files/',
       "fullpath" => DRUPAL_ROOT . '/sites/default/files' .trpdownload_api_get_filedir('full'),
       "relpath" => 'public://tripal/tripal_downloads/',
       "format_name" => 'VCF Format',
@@ -44,9 +42,9 @@ class DrushUnitTest extends TripalTestCase {
 
   $one_datafile = array(
     "file_path" => DRUPAL_ROOT . '/' . drupal_get_path('module','vcf_filter') . '/tests/test_files/example_file1.txt',
-    "name" => 'test_file1', // Use $faker here as well
+    "name" => $faker->word, // Use $faker here as well
     "num_snps" => 506,
-    "backbone" => 'Test Backbone',  // Use $faker here.
+    "backbone" => $faker->word,  // Use $faker here.
     "description" => $faker->text,
   );
 
@@ -57,13 +55,16 @@ class DrushUnitTest extends TripalTestCase {
 
   $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
 
+  //test format VCF
   vcf_filter_vcf_generate_file($variables_test, NULL, true);
+  $this->assertFileExists($result_file_vcf, "VCF format: Result File, $result_file_vcf, does not exist.");
+  $this->assertNotEquals(0, filesize($result_file_vcf), "VCF format: The Result File, $result_file_vcf, is empty.");
+  unlink($result_file_vcf);
 
-  $this->assertFileExists($result_file_vcf, "Result File, $result_file_vcf, does not exist.");
-
-  $this->assertNotEquals(0, filesize($result_file_vcf), "The Result File, $result_file_vcf, is empty.");
-
-
+  //test format Hapmap
+  vcf_filter_hapmap_generate_file($variables_test, NULL, true);
+  $this->assertFileExists($result_file_vcf, "Hapmap format: Result File, $result_file_vcf, does not exist.");
+  $this->assertNotEquals(0, filesize($result_file_vcf), "Hapmap format: The Result File, $result_file_vcf, is empty.");
   unlink($result_file_vcf);
   }
 }

@@ -17,18 +17,25 @@
  *     - format_name: a human-readable description of the format.
  * @param $job_id
  *   The ID of the tripal job executing this function ;-).
+ * @param $drush_use_limited
+ *   are drush function limited
  */
-function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
+function vcf_filter_hapmap_generate_file($variables, $job_id = NULL, $drush_use_limited = false) {
   // Create the file and ready it for writting to.
-  $filepath = variable_get('trpdownload_fullpath', '') . $variables['filename'];
+  $filepath = $variables['fullpath'] . $variables['filename'];
   print "File: ".$filepath."\n";
   // Get the VCF file details.
   $vcf_file = vcf_filter_get_vcf_file($variables['q']['vcf_file_id']);
   print "\nVCF File (".$vcf_file->name."): ".$vcf_file->file_path."\n";
   // Check the input file still exists.
   if (!file_exists($vcf_file->file_path)) {
-    drush_set_error("ERROR: Original VCF file not found!");
-    exit(2);
+    if ($drush_use_limited === false){
+      drush_set_error("ERROR: Original VCF file not found!");
+      exit(2);
+    }else{
+      print "ERROR: Original VCF file not found!\n";
+      exit(2);
+    }
   }
   // Print out parameters.
   print "Parameters:\n";
@@ -40,13 +47,13 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
   // Using the parameters user gave to filter vcf file
   //=====================================================
   print "\nFiltering the Original VCF\n";
-  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q']);
+  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q'], $drush_use_limited);
   if (!$filtered_vcf) {
     exit(3);
   }
   // Sort filtered vcf file for use in Tassel
   print "\nSorting the filtered VCF\n";
-  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf);
+  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf, $drush_use_limited);
   if (!$filtered_sorted_vcf) {
     exit(4);
   }
@@ -61,18 +68,23 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
   // new script starts here, above codes are copied from old script with minor changes
   // the extension of hapmap format filename can to be '.hmp'
   print "\nConversion from VCF to Hapmap Format.\n";
-  $format_tmp = variable_get('file_temporary_path') . '/' . uniqid();
+  $format_tmp = $variables['fullpath'] . '/' . uniqid();
 
   $outfile = $format_tmp . '.hmp';
   print 'Converted results will be in: '.$outfile."\n";
   print str_repeat('-', 60)."\n";
 
   //use function converting filter vcf filt to hapmap format
-  vcf_filter_convert_VCF_to_Hapmap($filtered_sorted_vcf, $outfile);
+  vcf_filter_convert_VCF_to_Hapmap($filtered_sorted_vcf, $outfile, $drush_use_limited);
 
   if (!file_exists($outfile)) {
-    drush_set_error("ERROR: Unable to convert VCF file to hapmap format.");
-    exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+    if ($drush_use_limited === false){
+      drush_set_error("ERROR: Unable to convert VCF file to hapmap format.");
+      exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+    }else{
+      print "ERROR: Unable to convert VCF file to hapmap format.\n";
+      exit(5);
+    }
   }
 
   // Tell the user we're almost there!
@@ -81,12 +93,17 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL) {
   print "\nMove Formatted file to the name we expect.\n";
   shell_exec("mv $format_tmp.hmp $filepath");
   if (!file_exists($filepath)) {
-    drush_set_error("ERROR: Unable to move hapmap file into expected file director: $filepath");
-    exit(6); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+    if ($drush_use_limited === false){
+      drush_set_error("ERROR: Unable to move hapmap file into expected file director: $filepath");
+      exit(6); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+    }else{
+      print "ERROR: Unable to move hapmap file into expected file director: $filepath\n";
+      exit(6);
+    }
   }
 
   // Done!
-  tripal_set_job_progress($job_id, 100);  
+  tripal_set_job_progress($job_id, 100);
 
 }
 
@@ -153,7 +170,7 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
         */
         if (count($call_gt) <= 1){
           $germ_w_error = $m-9;
-          drush_set_error("ERROR: Only one genotype showed, might be caused by vcftools processing improper phased genotypes for "."$germ_w_error"."th  germplasm in line:"."\n"."$line.");
+          print "ERROR: Only one genotype showed, might be caused by vcftools processing improper phased genotypes for "."$germ_w_error"."th  germplasm in line:"."\n"."$line.\n";
         }
         for ($n=0; $n < count($call_gt); $n++) {
           if (strcmp($call_gt[$n], ".") == 0) {
