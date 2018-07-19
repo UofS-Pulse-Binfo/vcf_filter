@@ -124,7 +124,7 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
     if ($drush_use_limited === false){
       return drush_set_error(dt('ERROR: Unable to find input file: @input_file!', array('@input_file' => $input_file)));
     }else{
-      print 'ERROR: Unable to find input file: @input_file!'. array('@input_file' => $input_file) . "\n";
+      print "ERROR: Unable to find input file: $input_file!\n";
       return false;
     }
   }
@@ -132,7 +132,7 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
     if ($drush_use_limited === false){
       return drush_set_error(dt('ERROR: A name for your output file is required!'));
     }else{
-      print 'ERROR: A name for your output file is required!' . "\n";
+      print "ERROR: A name for your output file is required!\n";
       return false;
     }
   }
@@ -164,7 +164,7 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
     if ($drush_use_limited === false){
       return drush_set_error(dt('ERROR: Could not find a match for @maternal in your input file (@input_file).', array('@maternal' => $maternal_parent, '@input_file' => $input_file)));
     }else{
-      print 'ERROR: Could not find a match for @maternal in your input file (@input_file).'. array('@maternal' => $maternal_parent, '@input_file' => $input_file) . "\n";
+      print "ERROR: Could not find a match for $maternal_parent in your input file $input_file.\n";
       return false;
     }
   }
@@ -172,7 +172,7 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
     if ($drush_use_limited === false){
       return drush_set_error(dt('ERROR: Could not find a match for @paternal in your input file (@input_file).', array('@paternal' => $paternal_parent, '@input_file' => $input_file)));
     }else{
-      print 'ERROR: Could not find a match for @paternal in your input file (@input_file).'. array('@paternal' => $paternal_parent, '@input_file' => $input_file) . "\n";
+      print "ERROR: Could not find a match for $paternal_parent in your input file $input_file.\n";
       return false;
     }
   }
