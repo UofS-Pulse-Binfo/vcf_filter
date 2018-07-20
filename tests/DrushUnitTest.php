@@ -77,7 +77,21 @@ class DrushUnitTest extends TripalTestCase {
   $this->assertNotEquals(0, filesize($result_file_vcf), "Bgzipped format: The Result File, $result_file_vcf, is empty.");
   unlink($result_file_vcf);
 
+  //test format ABH
+  $variables_test['type_info']['format'] = 'ABH format';
+  $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_abh_generate_file';
+  vcf_filter_abh_generate_file($variables_test, NULL, true);
+  $this->assertFileExists($result_file_vcf, "Bgzipped format: Result File, $result_file_vcf, does not exist.");
+  $this->assertNotEquals(0, filesize($result_file_vcf), "Bgzipped format: The Result File, $result_file_vcf, is empty.");
+  unlink($result_file_vcf);
 
+  //test format qual_matrix
+  $variables_test['type_info']['format'] = 'qual_matrix format';
+  $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_qual_matrix_generate_file';
+  vcf_filter_qual_matrix_generate_file($variables_test, NULL, true);
+  $this->assertFileExists($result_file_vcf, "Bgzipped format: Result File, $result_file_vcf, does not exist.");
+  $this->assertNotEquals(0, filesize($result_file_vcf), "Bgzipped format: The Result File, $result_file_vcf, is empty.");
+  unlink($result_file_vcf);
 
   }
 }
