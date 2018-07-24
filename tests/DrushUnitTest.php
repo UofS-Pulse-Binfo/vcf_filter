@@ -81,7 +81,7 @@ class DrushUnitTest extends TripalTestCase {
     unlink($result_file_vcf);
   }
 
-  public function testHapMapFormat() {
+  public function testBgzippedFormat() {
     //test format bgzipped
     $variables_test = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'bgzipped format';
