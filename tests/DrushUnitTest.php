@@ -8,7 +8,6 @@ use Faker\Factory;
 class DrushUnitTest extends TripalTestCase {
   // Uncomment to auto start and rollback db transactions per test method.
   use DBTransaction;
-  public $all_variables;
   /**
    * prepare all variables we need for test
    * using faker to generate names and IDs
@@ -38,7 +37,8 @@ class DrushUnitTest extends TripalTestCase {
         "fullpath" => DRUPAL_ROOT . '/sites/default/files' . trpdownload_api_get_filedir('full'),
         "relpath" => 'public://tripal/tripal_downloads/',
         "format_name" => 'VCF Format',
-      );
+    );
+
     $datafile_fake = array(
         "file_path" => DRUPAL_ROOT . '/' . drupal_get_path('module','vcf_filter') . '/tests/test_files/example_file1.txt',
         "name" => $faker->word, // Use $faker here as well
@@ -59,7 +59,7 @@ class DrushUnitTest extends TripalTestCase {
    * See https://phpunit.readthedocs.io/en/latest/ for more information.
    */
   public function testVCFFormat() {
-    $result_file_vcf = this -> generate_test_file();
+    $variables_test = $this -> generate_test_file();
     $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
     //test format VCF
     vcf_filter_vcf_generate_file($variables_test, NULL, true);
@@ -70,9 +70,11 @@ class DrushUnitTest extends TripalTestCase {
 
   public function testHapMapFormat() {
     //test format Hapmap
-    $result_file_vcf = this -> generate_test_file();
+    $variables_test = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'Hapmap format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_hapmap_generate_file';
+    $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
+
     vcf_filter_hapmap_generate_file($variables_test, NULL, true);
     $this->assertFileExists($result_file_vcf, "Hapmap format: Result File, $result_file_vcf, does not exist.");
     $this->assertNotEquals(0, filesize($result_file_vcf), "Hapmap format: The Result File, $result_file_vcf, is empty.");
@@ -81,9 +83,11 @@ class DrushUnitTest extends TripalTestCase {
 
   public function testHapMapFormat() {
     //test format bgzipped
-    $result_file_vcf = this -> generate_test_file();
+    $variables_test = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'bgzipped format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_bgzipped_generate_file';
+    $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
+
     vcf_filter_bgzipped_generate_file($variables_test, NULL, true);
     $this->assertFileExists($result_file_vcf, "Bgzipped format: Result File, $result_file_vcf, does not exist.");
     $this->assertNotEquals(0, filesize($result_file_vcf), "Bgzipped format: The Result File, $result_file_vcf, is empty.");
@@ -92,9 +96,11 @@ class DrushUnitTest extends TripalTestCase {
 
   public function testABHFormat() {
     //test format ABH
-    $result_file_vcf = this -> generate_test_file();
+    $variables_test = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'ABH format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_abh_generate_file';
+    $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
+
     vcf_filter_abh_generate_file($variables_test, NULL, true);
     $this->assertFileExists($result_file_vcf, "Bgzipped format: Result File, $result_file_vcf, does not exist.");
     $this->assertNotEquals(0, filesize($result_file_vcf), "Bgzipped format: The Result File, $result_file_vcf, is empty.");
@@ -103,9 +109,11 @@ class DrushUnitTest extends TripalTestCase {
 
   public function testQualMatrixFormat() {
     //test format qual_matrix
-    $result_file_vcf = this -> generate_test_file();
+    $result_file_vcf = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'qual_matrix format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_qual_matrix_generate_file';
+    $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
+
     vcf_filter_qual_matrix_generate_file($variables_test, NULL, true);
     $this->assertFileExists($result_file_vcf, "Bgzipped format: Result File, $result_file_vcf, does not exist.");
     $this->assertNotEquals(0, filesize($result_file_vcf), "Bgzipped format: The Result File, $result_file_vcf, is empty.");
