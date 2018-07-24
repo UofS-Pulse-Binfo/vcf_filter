@@ -46,7 +46,7 @@ class DrushUnitTest extends TripalTestCase {
         "backbone" => $faker->word,  // Use $faker here.
         "description" => $faker->text,
     );
-    drupal_write_record('vcf_files', $variables);
+    drupal_write_record('vcf_files', $datafile_fake);
     $variables['q']['vcf_file_id'] = $datafile_fake['vcf_file_id'];
     print $variables["filename"] . ' is generated in path ' . $variables["fullpath"] . ' with file ID: ' . $variables['q']['vcf_file_id'] . "\n";
     return $variables;
