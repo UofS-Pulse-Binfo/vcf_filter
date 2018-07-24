@@ -23,10 +23,10 @@
  */
 function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $drush_use_limited = false) {
 
-  //for writting tests, should be removed after
+  /*for writting tests, should be removed after
   print_r($variables);
   print "\n";
-
+  */
   // Create the file and ready it for writting to.
   $filepath = $variables['fullpath'] . $variables['filename'];
   print "File: ".$filepath."\n";
