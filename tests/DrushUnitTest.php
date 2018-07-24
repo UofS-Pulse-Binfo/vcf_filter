@@ -18,10 +18,10 @@ class DrushUnitTest extends TripalTestCase {
     $variables = array(
         "q" => array(
             "bi-allelic" => 0,
-            "call_read_depth" => 5,
-            "minor_allele_freq" => 25,
+            "call_read_depth" => 3,
+            "minor_allele_freq" => 10,
             "max_missing_count" => 10,
-            "max_missing_freq" => 25,
+            "max_missing_freq" => 35,
             "vcf_file_id" => NULL,
           ),
         "safe_site_name" => "KnowPulse",
@@ -39,16 +39,15 @@ class DrushUnitTest extends TripalTestCase {
         "format_name" => 'VCF Format',
     );
 
-    $datafile_fake = array(
+    $one_datafile = array(
         "file_path" => DRUPAL_ROOT . '/' . drupal_get_path('module','vcf_filter') . '/tests/test_files/example_file1.txt',
         "name" => $faker->word, // Use $faker here as well
         "num_snps" => 506,
         "backbone" => $faker->word,  // Use $faker here.
         "description" => $faker->text,
     );
-    drupal_write_record('vcf_files', $datafile_fake);
-    $variables['q']['vcf_file_id'] = $datafile_fake['vcf_file_id'];
-    print $variables["filename"] . ' is generated in path ' . $variables["fullpath"] . ' with file ID: ' . $variables['q']['vcf_file_id'] . "\n";
+    drupal_write_record('vcf_files', $one_datafile);
+    $variables['q']['vcf_file_id'] = $one_datafile['vcf_file_id'];
     return $variables;
     //return array($variables, $datafile_fake);
   }
@@ -60,6 +59,7 @@ class DrushUnitTest extends TripalTestCase {
    */
   public function testVCFFormat() {
     $variables_test = $this -> generate_test_file();
+    print "\n\n\n\nStarting test for VCF format wiht: \n" . "Filename: " . $variables["filename"] . "\nFullpath: " . $variables["fullpath"] . "\nFile ID: " . $variables['q']['vcf_file_id'] . "\n\n";
     $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
     //test format VCF
     vcf_filter_vcf_generate_file($variables_test, NULL, true);
@@ -73,6 +73,7 @@ class DrushUnitTest extends TripalTestCase {
     $variables_test = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'Hapmap format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_hapmap_generate_file';
+    print "\n\n\nStarting test for Hapmap format wiht: \n" . "Filename: " . $variables["filename"] . "\nFullpath: " . $variables["fullpath"] . "\nFile ID: " . $variables['q']['vcf_file_id'] . "\n\n";
     $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
 
     vcf_filter_hapmap_generate_file($variables_test, NULL, true);
@@ -86,6 +87,7 @@ class DrushUnitTest extends TripalTestCase {
     $variables_test = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'bgzipped format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_bgzipped_generate_file';
+    print "\n\n\nStarting test for Bgzipped format wiht: \n" . "Filename: " . $variables["filename"] . "\nFullpath: " . $variables["fullpath"] . "\nFile ID: " . $variables['q']['vcf_file_id'] . "\n\n";
     $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
 
     vcf_filter_bgzipped_generate_file($variables_test, NULL, true);
@@ -99,6 +101,7 @@ class DrushUnitTest extends TripalTestCase {
     $variables_test = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'ABH format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_abh_generate_file';
+    print "\n\n\nStarting test for ABH format wiht: \n" . "Filename: " . $variables["filename"] . "\nFullpath: " . $variables["fullpath"] . "\nFile ID: " . $variables['q']['vcf_file_id'] . "\n\n";
     $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
 
     vcf_filter_abh_generate_file($variables_test, NULL, true);
@@ -112,6 +115,7 @@ class DrushUnitTest extends TripalTestCase {
     $result_file_vcf = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'qual_matrix format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_qual_matrix_generate_file';
+    print "\n\n\nStarting test for Qual_matrix format wiht: \n" . "Filename: " . $variables["filename"] . "\nFullpath: " . $variables["fullpath"] . "\nFile ID: " . $variables['q']['vcf_file_id'] . "\n\n";
     $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
 
     vcf_filter_qual_matrix_generate_file($variables_test, NULL, true);
