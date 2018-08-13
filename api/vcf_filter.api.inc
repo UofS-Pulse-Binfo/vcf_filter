@@ -61,7 +61,8 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
 
   if ($drush_use_limited === false){
     drush_log('NOTE: We are not using the PL at this point to specify the genotypes.', 'warning');
-  }else{
+  }
+  else {
     print "NOTE: We are not using the PL at this point to specify the genotypes.\n";
   }
 
@@ -114,7 +115,8 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
   if (!file_exists($outfile)) {
     if ($drush_use_limited === false){
       return drush_set_error('ERROR: Filtering of the VCF file was not successful.');
-    }else{
+    }
+    else {
       print "ERROR: Sorting of the VCF file was not successful.\n";
       return false;
     }
@@ -161,7 +163,8 @@ function vcf_filter_sort_filtered_file($vcf_file_unsorted, $drush_use_limited = 
   if (!file_exists($new_file)) {
     if ($drush_use_limited === false){
       return drush_set_error('ERROR: Sorting of the VCF file was not successful.');
-    }else{
+    }
+    else {
       print "ERROR: Sorting of the VCF file was not successful.\n";
       return false;
     }
@@ -194,20 +197,25 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $drush_use_limit
     if (strcmp($VCF_header[0], '#CHROM') !== 0) {
       if ($drush_use_limited === false){
         return drush_set_error('ERROR: Expected first element in VCF header to contain: #CHROM');
-      }else{
+      }
+      else {
         print "ERROR: Expected first element in VCF header to contain: #CHROM\n";
         return false;
       }
-    } else if (sizeof($VCF_header) < 10) {
+    }
+    else if (sizeof($VCF_header) < 10) {
       die ("ERROR: The size of VCF header is too small to be valid.\n");
     }
-  } else {
+  }
+  else {
     if (preg_match("/^#CHROM\t/", $VCF_header)) {
       $header = explode("\t", $VCF_header);
-    } else {
+    }
+    else {
       if ($drush_use_limited === false){
         return drush_set_error('ERROR: Expected VCF header to begin with: #CHROM');
-      }else{
+      }
+      else{
         print "ERROR: Expected VCF header to begin with: #CHROM\n";
         return false;
       }
@@ -220,10 +228,12 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $drush_use_limit
     if (preg_match("/\t/", $VCF_line)) {
       $line = explode("\t", $VCF_line);
       $VCF_line = $line;
-    } else {
+    }
+    else {
       if ($drush_use_limited === false){
         return drush_set_error('ERROR: Expected VCF line to be an array or tab-delimited!');
-      }else{
+      }
+      else {
         print "ERROR: Expected VCF line to be an array or tab-delimited\n";
         return false;
       }
@@ -233,10 +243,12 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $drush_use_limit
   // Create an associative array using the header as the keys
   if (count($VCF_header) === count($VCF_line)) {
     $marker = array_combine($VCF_header,$VCF_line);
-  } else {
+  }
+  else {
     if ($drush_use_limited === false){
       return drush_set_error('ERROR: The provided VCF header and VCF line do not contain the same number of columns.');
-    }else{
+    }
+    else {
       print "ERROR: The provided VCF header and VCF line do not contain the same number of columns.\n";
       return false;
     }
@@ -281,8 +293,12 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $drush_use_limit
         $phred_likelihood = explode(',',$marker[$source_name]['PL']);
         for ($j=0; $j < count($phred_likelihood); $j++) {
           if ($phred_likelihood[$j] === '0') {
-            if ($j === 0) { $call_index = 'zero'; }
-            else { $call_index = $j; }
+            if ($j === 0) {
+              $call_index = 'zero';
+            }
+            else {
+              $call_index = $j;
+            }
           }
         }
         if ($call_index !== '99') {
@@ -297,14 +313,16 @@ function vcf_filter_read_VCF_into_array($VCF_header, $VCF_line, $drush_use_limit
             default: $genotype = './.'; break;
           }
         // No PL score of 0 found, strange, set the genotype call to missing.
-        } else { $genotype = './.'; }
+        }
+        else { $genotype = './.'; }
         $oldcall = $marker[$source_name]['GT'];
         if (strcmp($genotype, $oldcall) !== 0 ) {
           $marker[$source_name]['GT'] = $genotype;
           $changePL++;
         } //else { print "No change \t"; }
       }
-    } else { // The FORMAT column could not be split, thus it must only contain 'GT'
+    }
+    else { // The FORMAT column could not be split, thus it must only contain 'GT'
       $genotype_field = [];
       $genotype_field[$marker['FORMAT']] = $marker[$source_name];
       $marker[$source_name] = $genotype_field;

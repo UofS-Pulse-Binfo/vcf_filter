@@ -46,91 +46,140 @@ class DrushUnitTest extends TripalTestCase {
         "backbone" => $faker->word,  // Use $faker here.
         "description" => $faker->text,
     );
+
     drupal_write_record('vcf_files', $one_datafile);
     $variables['q']['vcf_file_id'] = $one_datafile['vcf_file_id'];
     return $variables;
-    //return array($variables, $datafile_fake);
   }
 
   /**
-   * Several tests for different formats.
+   * @section
+   * Tests for different functions(formats)
    * Tests must begin with the word "test".
    * See https://phpunit.readthedocs.io/en/latest/ for more information.
    * reasons to split into different test functions are:
-   *  1. each time test_file can be regenerated with unique id, and random vcftool parameters
-   *  2. maybe good for more specific and expanded tests for each format for next
+   *  1. each time test_file can be regenerated with unique id, and random parameters for VcfTools
+   *  2. maybe good for more specific and expanded tests for each format next
    */
 
-  // VCF format
+  /**
+   * test VCF format
+   * Specifically testing vcf_filter_vcf_generate_file():
+   *  - result file exists
+   *  - result file is not empty
+  */
   public function testVCFFormat() {
     //import test file
     $variables_test = $this -> generate_test_file();
-    print "\n\n\n\nStarting test for VCF format with: \n" . "Filename: " . $variables_test["filename"] . "\nFullpath: " . $variables_test["fullpath"] . "\nFile ID: " . $variables_test['q']['vcf_file_id'] . "\n\n";
+    print "\n\n\n\nStarting test for VCF format with: \n" . "Filename: " . $variables_test["filename"] . "\nFullpath: " . $variables_test["fullpath"] . "\nFile ID: " . $variables_test['q']['vcf_file_id'] . "\n";
     $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
+
     //execute function and do tests
     vcf_filter_vcf_generate_file($variables_test, NULL, true);
     $this->assertFileExists($result_file_vcf, "VCF format: Result File, $result_file_vcf, does not exist.");
     $this->assertNotEquals(0, filesize($result_file_vcf), "VCF format: The Result File, $result_file_vcf, is empty.");
+
+    //remove files that won't be used anymore
     unlink($result_file_vcf);
   }
 
-  // Hapmao format
+  /**
+   * test Hapmap format
+   * Specifically testing vcf_filter_hapmap_generate_file():
+   *  - result file exists
+   *  - result file is not empty
+  */
   public function testHapMapFormat() {
-    //import test file and change some variables
+    //import test file and update variables
     $variables_test = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'Hapmap format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_hapmap_generate_file';
-    print "\n\n\nStarting test for Hapmap format with: \n" . "Filename: " . $variables_test["filename"] . "\nFullpath: " . $variables_test["fullpath"] . "\nFile ID: " . $variables_test['q']['vcf_file_id'] . "\n\n";
+
+    //print varialbes on screen to show test processes
+    print "\n\n\nStarting test for Hapmap format with: \n" . "Filename: " . $variables_test["filename"] . "\nFullpath: " . $variables_test["fullpath"] . "\nFile ID: " . $variables_test['q']['vcf_file_id'] . "\n";
     $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
+
     //execute function and do tests
     vcf_filter_hapmap_generate_file($variables_test, NULL, true);
     $this->assertFileExists($result_file_vcf, "Hapmap format: Result File, $result_file_vcf, does not exist.");
     $this->assertNotEquals(0, filesize($result_file_vcf), "Hapmap format: The Result File, $result_file_vcf, is empty.");
+
+    //remove files that won't be used anymore
     unlink($result_file_vcf);
   }
 
-  // Bgzipped format
+  /**
+   * test Bgzipped format
+   * Specifically testing vcf_filter_bgzipped_generate_file():
+   *  - result file exists
+   *  - result file is not empty
+  */
   public function testBgzippedFormat() {
-    //import test file and change some variables
+    //import test file and update variables
     $variables_test = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'bgzipped format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_bgzipped_generate_file';
-    print "\n\n\nStarting test for Bgzipped format with: \n" . "Filename: " . $variables_test["filename"] . "\nFullpath: " . $variables_test["fullpath"] . "\nFile ID: " . $variables_test['q']['vcf_file_id'] . "\n\n";
+
+    //print varialbes on screen to show test processes
+    print "\n\n\nStarting test for Bgzipped format with: \n" . "Filename: " . $variables_test["filename"] . "\nFullpath: " . $variables_test["fullpath"] . "\nFile ID: " . $variables_test['q']['vcf_file_id'] . "\n";
     $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
+
     //execute function and do tests
     vcf_filter_bgzipped_generate_file($variables_test, NULL, true);
     $this->assertFileExists($result_file_vcf, "Bgzipped format: Result File, $result_file_vcf, does not exist.");
     $this->assertNotEquals(0, filesize($result_file_vcf), "Bgzipped format: The Result File, $result_file_vcf, is empty.");
+
+    //remove files that won't be used anymore
     unlink($result_file_vcf);
   }
 
-  // ABH format
+  /**
+   * test ABH format
+   * Specifically testing vcf_filter_abh_generate_file():
+   *  - result file exists
+   *  - result file is not empty
+  */
   public function testABHFormat() {
-    //import test file and change some variables
+    //import test file and update variables
     $variables_test = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'ABH format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_abh_generate_file';
-    print "\n\n\nStarting test for ABH format with: \n" . "Filename: " . $variables_test["filename"] . "\nFullpath: " . $variables_test["fullpath"] . "\nFile ID: " . $variables_test['q']['vcf_file_id'] . "\n\n";
+
+    //print varialbes on screen to show test processes
+    print "\n\n\nStarting test for ABH format with: \n" . "Filename: " . $variables_test["filename"] . "\nFullpath: " . $variables_test["fullpath"] . "\nFile ID: " . $variables_test['q']['vcf_file_id'] . "\n";
     $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
+
     //execute function and do tests
     vcf_filter_abh_generate_file($variables_test, NULL, true);
     $this->assertFileExists($result_file_vcf, "Bgzipped format: Result File, $result_file_vcf, does not exist.");
     $this->assertNotEquals(0, filesize($result_file_vcf), "Bgzipped format: The Result File, $result_file_vcf, is empty.");
+
+    //remove files that won't be used anymore
     unlink($result_file_vcf);
   }
 
-  // Quality Matrix format
+  /**
+   * test Quality Matrix format
+   * Specifically testing vcf_filter_qual_matrix_generate_file():
+   *  - result file exists
+   *  - result file is not empty
+  */
   public function testQualMatrixFormat() {
     //import test file and change some variables
     $variables_test = $this -> generate_test_file();
     $variables_test['type_info']['format'] = 'qual_matrix format';
     $variables_test['type_info']['functions']['generate_file'] = 'vcf_filter_qual_matrix_generate_file';
-    print "\n\n\nStarting test for Qual_matrix format with: \n" . "Filename: " . $variables_test["filename"] . "\nFullpath: " . $variables_test["fullpath"] . "\nFile ID: " . $variables_test['q']['vcf_file_id'] . "\n\n";
+
+    //print varialbes on screen to show test processes
+    print "\n\n\nStarting test for Qual_matrix format with: \n" . "Filename: " . $variables_test["filename"] . "\nFullpath: " . $variables_test["fullpath"] . "\nFile ID: " . $variables_test['q']['vcf_file_id'] . "\n";
     $result_file_vcf = $variables_test['fullpath'].$variables_test['filename'];
+
     //execute function and do tests
     vcf_filter_qual_matrix_generate_file($variables_test, NULL, true);
     $this->assertFileExists($result_file_vcf, "Bgzipped format: Result File, $result_file_vcf, does not exist.");
     $this->assertNotEquals(0, filesize($result_file_vcf), "Bgzipped format: The Result File, $result_file_vcf, is empty.");
+
+    //remove files that won't be used anymore
     unlink($result_file_vcf);
   }
 
