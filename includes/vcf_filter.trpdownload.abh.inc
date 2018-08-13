@@ -18,28 +18,35 @@
  *     - format_name: a human-readable description of the format.
  * @param $job_id
  *   The ID of the tripal job executing this function ;-).
+ * @param $drush_use_limited
+ *   are drush function limited
  */
 function vcf_filter_abh_generate_file($variables, $job_id = NULL) {
 
   // Create the file and ready it for writing to.
-  $filepath = variable_get('trpdownload_fullpath', '') . $variables['filename'];
-  drush_print("File: " . $filepath);
+  $filepath = $variables['fullpath'] . $variables['filename'];
+  print "File: ".$filepath."\n";
   //$FILE = fopen($filepath, 'w') or die ('Unable to create file to write to');
 
   // Get the VCF file details.
   $vcf_file = vcf_filter_get_vcf_file($variables['q']['vcf_file_id']);
-  drush_print("\nVCF File (".$vcf_file->name."): ".$vcf_file->file_path);
+  print "\nVCF File (".$vcf_file->name."): ".$vcf_file->file_path."\n";
 
   // Check the input file still exists.
   if (!file_exists($vcf_file->file_path)) {
-    drush_set_error("ERROR: Original VCF file not found!");
-    exit(2);
+    if ($drush_use_limited === false){
+      drush_set_error("ERROR: Original VCF file not found!");
+      exit(2);
+    }else{
+      print "ERROR: Original VCF file not found!\n";
+      exit(2);
+    }
   }
 
   // Print out parameters.
-  drush_print("Parameters:");
+  print "Parameters:\n";
   foreach ($variables['q'] as $label => $value) {
-    drush_print('  ' . $label . ': ' . $value);
+    print '  ' . $label . ': ' . $value."\n";
   }
 
   // Give the user some indication we've done something...
@@ -47,16 +54,16 @@ function vcf_filter_abh_generate_file($variables, $job_id = NULL) {
 
   // Filter
   //================
-  drush_print("\nFiltering the Original VCF");
-  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q']);
+  print "\nFiltering the Original VCF\n";
+  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q'], $drush_use_limited);
   if (!$filtered_vcf) {
     exit(3);
   }
 
   // Sort.
   //================
-  drush_print("\nSorting the filtered VCF");
-  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf);
+  print "\nSorting the filtered VCF\n";
+  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf, $drush_use_limited);
   if (!$filtered_sorted_vcf) {
     exit(4);
   }
@@ -76,10 +83,10 @@ function vcf_filter_abh_generate_file($variables, $job_id = NULL) {
   $maternal_parent = $vcf_header_array[9];
   $paternal_parent = $vcf_header_array[10];
 
-  drush_print("\nConversion from VCF to A/B Biparental Format.");
-  drush_print("USING THE FOLLOWING AS THE MATERNAL PARENT: " . $maternal_parent);
-  drush_print("USING THE FOLLOWING AS THE PATERNAL PARENT: " . $paternal_parent);
-  $converted_ABH = vcf_filter_convert_VCF_to_ABH($filtered_sorted_vcf, $maternal_parent, $paternal_parent, $filepath);
+  print "\nConversion from VCF to A/B Biparental Format.\n";
+  print "USING THE FOLLOWING AS THE MATERNAL PARENT: " . $maternal_parent . "\n";
+  print "USING THE FOLLOWING AS THE PATERNAL PARENT: " . $paternal_parent . "\n";
+  $converted_ABH = vcf_filter_convert_VCF_to_ABH($filtered_sorted_vcf, $maternal_parent, $paternal_parent, $filepath, $drush_use_limited);
   if (!$converted_ABH) {
     exit(5);
   }
@@ -109,12 +116,26 @@ function vcf_filter_abh_generate_file($variables, $job_id = NULL) {
  *    A name to give the final ABH format output file.
  */
 
-function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_parent, $output_file) {
+function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_parent, $output_file, $drush_use_limited = false) {
 
   // ----- FILE VALIDATION -----
   $input_file = trim($input_file);
-  if (!$input_file) { return drush_set_error(dt('ERROR: Unable to find input file: @input_file!', array('@input_file' => $input_file))); }
-  if ($output_file == NULL) { return drush_set_error(dt('ERROR: A name for your output file is required!')); }
+  if (!$input_file) {
+    if ($drush_use_limited === false){
+      return drush_set_error(dt('ERROR: Unable to find input file: @input_file!', array('@input_file' => $input_file)));
+    }else{
+      print "ERROR: Unable to find input file: $input_file!\n";
+      return false;
+    }
+  }
+  if ($output_file == NULL) {
+    if ($drush_use_limited === false){
+      return drush_set_error(dt('ERROR: A name for your output file is required!'));
+    }else{
+      print "ERROR: A name for your output file is required!\n";
+      return false;
+    }
+  }
 
   // Open our files
   $INFILE = fopen($input_file, 'r') or die ("ERROR: Unable to open $input_file!\n");
@@ -140,10 +161,20 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
   $sample_names = array_slice($header, 9);
   //print_r($sample_names);
   if (!in_array($maternal_parent, $sample_names)) {
-    return drush_set_error(dt('ERROR: Could not find a match for @maternal in your input file (@input_file).', array('@maternal' => $maternal_parent, '@input_file' => $input_file)));
+    if ($drush_use_limited === false){
+      return drush_set_error(dt('ERROR: Could not find a match for @maternal in your input file (@input_file).', array('@maternal' => $maternal_parent, '@input_file' => $input_file)));
+    }else{
+      print "ERROR: Could not find a match for $maternal_parent in your input file $input_file.\n";
+      return false;
+    }
   }
   if (!in_array($paternal_parent, $sample_names)) {
-    return drush_set_error(dt('ERROR: Could not find a match for @paternal in your input file (@input_file).', array('@paternal' => $paternal_parent, '@input_file' => $input_file)));
+    if ($drush_use_limited === false){
+      return drush_set_error(dt('ERROR: Could not find a match for @paternal in your input file (@input_file).', array('@paternal' => $paternal_parent, '@input_file' => $input_file)));
+    }else{
+      print "ERROR: Could not find a match for $paternal_parent in your input file $input_file.\n";
+      return false;
+    }
   }
 
   // First move the paternal parent, then the maternal, to ensure maternal is 1st and paternal is 2nd
@@ -168,7 +199,7 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
     $current_line = fgetcsv($INFILE, 0, "\t");
     if (empty($current_line)) continue;
 
-    $marker = vcf_filter_read_VCF_into_array($header, $current_line);
+    $marker = vcf_filter_read_VCF_into_array($header, $current_line, $drush_use_limited);
 
     // Save the chromosome and position
     $chrom = $marker['#CHROM'];

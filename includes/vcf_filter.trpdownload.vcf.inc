@@ -18,28 +18,38 @@
  *     - format_name: a human-readable description of the format.
  * @param $job_id
  *   The ID of the tripal job executing this function ;-).
+ * @param $drush_use_limited
+ *   are drush function limited
  */
-function vcf_filter_vcf_generate_file($variables, $job_id = NULL) {
+function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $drush_use_limited = false) {
+
+  // @debug print "Varialbes in vcf_filter_vcf_generate_file():\n" . print_r($variables, TRUE)."\n";
 
   // Create the file and ready it for writting to.
-  $filepath = variable_get('trpdownload_fullpath', '') . $variables['filename'];
-  drush_print("File: " . $filepath);
-
+  $filepath = $variables['fullpath'] . $variables['filename'];
+  print "File: ".$filepath."\n";
 
   // Get the VCF file details.
   $vcf_file = vcf_filter_get_vcf_file($variables['q']['vcf_file_id']);
-  drush_print("\nVCF File (".$vcf_file->name."): ".$vcf_file->file_path);
+  print "\nVCF File (".$vcf_file->name."): ".$vcf_file->file_path."\n";
+
+  // @debug "File name form vcf_filter_get_vcf_file():\n" . print_r($vcf_file)."\n";
 
   // Check the input file still exists.
   if (!file_exists($vcf_file->file_path)) {
-    drush_set_error("ERROR: Original VCF file not found!");
-    exit(2);
+    if ($drush_use_limited === false){
+      drush_set_error("ERROR: Original VCF file not found!");
+      exit(2);
+    }else{
+      print "ERROR: Original VCF file not found!\n";
+      exit(2);
+    }
   }
 
   // Print out parameters.
-  drush_print("Parameters:");
+  print "Parameters:\n";
   foreach ($variables['q'] as $label => $value) {
-    drush_print('  ' . $label . ': ' . $value);
+    print '  ' . $label . ': ' . $value."\n";
   }
 
   // Give the user some indication we've done something...
@@ -47,8 +57,8 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL) {
 
   // Filter.
   //===============
-  drush_print("\nFiltering the Original VCF");
-  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q']);
+  print "\nFiltering the Original VCF\n";
+  $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q'], $drush_use_limited);
   if (!$filtered_vcf) {
     exit(3);
   }
@@ -56,8 +66,8 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL) {
 
   // Sort.
   //================
-  drush_print("\nSorting the filtered VCF");
-  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf);
+  print "\nSorting the filtered VCF\n";
+  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf, $drush_use_limited);
   if (!$filtered_sorted_vcf) {
     exit(4);
   }
@@ -67,14 +77,18 @@ function vcf_filter_vcf_generate_file($variables, $job_id = NULL) {
 
   // Format.
   //===============
-  drush_print("\nMove VCF file to the name we expect.");
+  print "\nMove VCF file $filtered_sorted_vcf to the name we expect: $filepath\n";
   shell_exec("mv $filtered_sorted_vcf $filepath");
   if (!file_exists($filepath)) {
-    drush_set_error("ERROR: Unable to move Filtered VCF into expected file director: $filepath");
-    exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+    if ($drush_use_limited === false){
+      drush_set_error("ERROR: Unable to move Filtered VCF into expected file director: $filepath");
+      exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+    }else{
+      print "ERROR: Unable to move Filtered VCF into expected file director: $filepath\n";
+      exit(5);
+    }
   }
 
   // Done!
   tripal_set_job_progress($job_id, 100);
 }
-
