@@ -98,6 +98,73 @@ function vcf_filter_form($form, &$form_state) {
     '#tree' => TRUE,
   );
 
+  $form['s2']['restrick_dataset'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Restrick dataset',
+    '#tree' => TRUE,
+  );
+  
+  $form['s2']['restrick_dataset']['germplasm'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Germplasm',
+    '#tree' => TRUE,
+    );
+    
+  //give some germplasm names for now, need to extract from vcf file header line in future
+  $germplasm_names_table = array(    
+    'caption' => 'Name of all germplasm in this data file.',
+    'header' => array('Germplasm Name'),
+    'rows' => array(
+      array('PI_431679_LSP_AGL'), 
+      array('PI_273664_LSP_AGL'), 
+      array('PI_431705_LSP_AGL'),
+      array('ILL_313_AGL'),
+      array('ILL_5888_AGL'),
+      array('PI_472488_LSP_AGL'),
+      array('ILL_7979_AGL'),
+      array('ILL_8009_AGL'),
+      array('PI_297287_AGL'),
+      array('PI_193548_LSP_AGL'),
+      array('CDC_Vantage_AGL'),
+      array('PI_431756_LSP_AGL'),
+      array('CN_105777_AGL'),
+      array('ILL_7668_AGL'),
+      array('ILL_8010_AGL')
+      ),
+    );
+  
+  $germplasm_names = theme('table', $germplasm_names_table);
+  
+  $form['s2']['restrick_dataset']['germplasm']['germplasm_name_from_vcf'] = array(
+    '#type' => 'markup',
+    '#markup' => $germplasm_names,
+    '#rows' => 3,
+    
+  );
+  
+
+  $form['s2']['restrick_dataset']['germplasm']['user_input'] = array(
+    '#type' => 'textarea',
+    '#title' => 'Include Germplasm',
+    '#description' => 'Only include these individuals(germplasm) in export file.',
+    '#default_value' => '',
+    '#rows' => 3,
+  );
+
+  $form['s2']['restrick_dataset']['regions'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Regions',
+    '#tree' => TRUE,
+    );
+
+  $form['s2']['restrick_dataset']['regions']['user_input'] = array(
+    '#type' => 'textarea',
+    '#title' => 'Include Regions',
+    '#description' => 'Only include sites from VCF file with matched chromosome and located in specified lower and upper bound position.',
+    '#default_value' => '',
+    '#rows' => 3,
+  );
+
   $form['s2']['bi-allelic'] = array(
     '#type' => 'checkbox',
     '#title' => 'Only include Bi-allelic SNPs',
