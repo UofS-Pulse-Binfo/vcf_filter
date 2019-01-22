@@ -69,6 +69,62 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
 
   $command = 'vcftools --vcf ' . $file_path . ' --recode --out ' . $new_file;
 
+  //restrict_dataset:germplasm
+  //1.need to read GERMPLASM array from $filter_criteria, and save it into a file
+  //2.use the file from last step in vcftools
+  //var_dump($filter_criteria['restrict_dataset']['germplasm']);
+  
+  $filter_criteria_germplasm_temp = variable_get('file_temporary_path') . '/' . 'germplasm' . uniqid() . '.txt';
+  
+  if (!empty($filter_criteria['restrict_dataset']['germplasm'])){
+    
+    $handle_out = fopen($filter_criteria_germplasm_temp,'w') or die ("\nCannot create file: $filter_criteria_germplasm_temp .\n");
+    fwrite($handle_out, $filter_criteria['restrict_dataset']['germplasm']);
+    var_dump($filter_criteria['restrict_dataset']['germplasm']);
+    /**
+    var_dump($filter_criteria['restrict_dataset']['germplasm']);
+    $germplasm_names_parsed = explode('\n', $filter_criteria['restrict_dataset']['germplasm']);
+    var_dump($germplasm_names_parsed);
+    
+    foreach($germplasm_names_parsed as $value_germplasm){
+      if (preg_match('/^#/', $value_germplasm)){
+        continue;
+      }
+      print $value_germplasm . "\n";
+      fwrite($handle_out, ($value_germplasm . "\n"));
+      
+    }
+    */
+    $command .= ' --keep ' .  $filter_criteria_germplasm_temp;
+  }
+  
+  //restrict_dataset:regions
+  //1.need to read REGIONS array from $filter_criteria, parse each line, and save it into a file in bed format
+  //2.use the file from last step in vcftools
+  //var_dump($filter_criteria['restrict_dataset']['regions']);
+  
+  $filter_criteria_regions_temp = variable_get('file_temporary_path') . '/' . 'regions' . uniqid();
+  
+  if (!empty($filter_criteria['restrict_dataset']['regions'])){
+    $handle_out = fopen($filter_criteria_regions_temp,'w') or die ("\nCannot create file: $filter_criteria_regions_temp .\n");
+    
+    foreach($filter_criteria['restrict_dataset']['regions'] as &$value_regions){
+      
+      if (preg_match('/^#/', $value_regions)){
+        continue;
+      }
+      
+      $fc_rd_regions_chrom = explode(":", $value_regions);
+      fwrite($handle_out, ($fc_rd_regions_chrom[0] . "\t"));
+      
+      $fc_rd_regions_position = explode("..", $fc_rd_regions_chrom[1]);
+      fwrite($handle_out, ($fc_rd_regions_position[0]."\t".$fc_rd_regions_position[1]."\n"));
+      
+    }
+    $command .= ' --positions ' .  $filter_criteria_regions_temp;
+  }
+
+
   // Bi-allelic:
   if ($filter_criteria['bi-allelic'] == 1) {
     $command .= ' --min-alleles 2 --max-alleles 2';
@@ -107,6 +163,8 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
   print str_repeat('-', 60)."\n";
   $output = shell_exec($command);
 
+  print "\n" . $command . "\n";
+
   // Print the output from the command.
   print $output."\n";
   print str_repeat('-', 60)."\n";
@@ -121,7 +179,15 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
       return false;
     }
   }
-
+/**
+  if (exists($filter_criteria_germplasm_temp)){
+    unlink($filter_criteria_germplasm_temp);
+  }
+  
+  if (exists($filter_criteria_regions_temp)){
+    unlink($filter_criteria_regions_temp);
+  }
+  */
   return $outfile;
 }
 

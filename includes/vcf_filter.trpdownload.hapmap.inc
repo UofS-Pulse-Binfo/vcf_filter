@@ -68,7 +68,7 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL, $drush_use_
   // new script starts here, above codes are copied from old script with minor changes
   // the extension of hapmap format filename can to be '.hmp'
   print "\nConversion from VCF to Hapmap Format.\n";
-  $format_tmp = $variables['fullpath'] . '/' . uniqid();
+  $format_tmp = $variables['fullpath'] . uniqid();
 
   $outfile = $format_tmp . '.hmp';
   print 'Converted results will be in: '.$outfile."\n";

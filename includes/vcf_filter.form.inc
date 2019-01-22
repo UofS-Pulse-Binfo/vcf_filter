@@ -98,71 +98,28 @@ function vcf_filter_form($form, &$form_state) {
     '#tree' => TRUE,
   );
 
-  $form['s2']['restrick_dataset'] = array(
+  $form['s2']['restrict_dataset'] = array(
     '#type' => 'fieldset',
-    '#title' => 'Restrick dataset',
+    '#title' => 'Restrict dataset',
     '#tree' => TRUE,
+    '#collapsible' => TRUE,
   );
   
-  $form['s2']['restrick_dataset']['germplasm'] = array(
-    '#type' => 'fieldset',
+  dpm($form_state, 'form state');
+  
+  $form['s2']['restrict_dataset']['germplasm'] = array(
+    '#type' => 'textarea',
     '#title' => 'Germplasm',
-    '#tree' => TRUE,
+    '#default_value' => user_chart_germplasm_names_file(),
+    '#description' => 'All germplasm (individuals) in this  Only include these germplasm (individuals) in export file.',
     );
-    
-  //give some germplasm names for now, need to extract from vcf file header line in future
-  $germplasm_names_table = array(    
-    'caption' => 'Name of all germplasm in this data file.',
-    'header' => array('Germplasm Name'),
-    'rows' => array(
-      array('PI_431679_LSP_AGL'), 
-      array('PI_273664_LSP_AGL'), 
-      array('PI_431705_LSP_AGL'),
-      array('ILL_313_AGL'),
-      array('ILL_5888_AGL'),
-      array('PI_472488_LSP_AGL'),
-      array('ILL_7979_AGL'),
-      array('ILL_8009_AGL'),
-      array('PI_297287_AGL'),
-      array('PI_193548_LSP_AGL'),
-      array('CDC_Vantage_AGL'),
-      array('PI_431756_LSP_AGL'),
-      array('CN_105777_AGL'),
-      array('ILL_7668_AGL'),
-      array('ILL_8010_AGL')
-      ),
-    );
-  
-  $germplasm_names = theme('table', $germplasm_names_table);
-  
-  $form['s2']['restrick_dataset']['germplasm']['germplasm_name_from_vcf'] = array(
-    '#type' => 'markup',
-    '#markup' => $germplasm_names,
-    '#rows' => 3,
-    
-  );
-  
 
-  $form['s2']['restrick_dataset']['germplasm']['user_input'] = array(
+  $form['s2']['restrict_dataset']['regions'] = array(
     '#type' => 'textarea',
-    '#title' => 'Include Germplasm',
-    '#description' => 'Only include these individuals(germplasm) in export file.',
-    '#default_value' => '',
-    '#rows' => 3,
-  );
-
-  $form['s2']['restrick_dataset']['regions'] = array(
-    '#type' => 'fieldset',
     '#title' => 'Regions',
-    '#tree' => TRUE,
-    );
-
-  $form['s2']['restrick_dataset']['regions']['user_input'] = array(
-    '#type' => 'textarea',
-    '#title' => 'Include Regions',
-    '#description' => 'Only include sites from VCF file with matched chromosome and located in specified lower and upper bound position.',
-    '#default_value' => '',
-    '#rows' => 3,
+    '#description' => 'Region inpu format: (Chrom):(lower bound)..(upper bound).<br />Only include sites from VCF file with matched chromosome and located in specified lower and upper bound position.',
+    '#attributes' =>array('placeholder' => 'Chr1:11111..22222'),
+    '#rows' => 2,
   );
 
   $form['s2']['bi-allelic'] = array(
@@ -368,4 +325,15 @@ function vcf_filter_form_submit($form, &$form_state) {
  */
 function ajax_vcf_filter_show_description_callback($form, $form_state) {
   return $form['s1']['file_description'];
+}
+
+/**
+  * Grap data in a file to use in Specifiy_fileter_criterria:Germplasm
+  * FOR NOW: provide a exampel file from directory: example_data
+  * NEXT: grep germplasm names from vcf file
+*/ 
+function user_chart_germplasm_names_file(){
+  $file = drupal_get_path('module', 'vcf_filter') . '/example_data/Example_Germplasm_names.csv';
+  
+  return file_get_contents(drupal_realpath($file));
 }
