@@ -74,7 +74,7 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
   //2.use the file from last step in vcftools
   //var_dump($filter_criteria['restrict_dataset']['germplasm']);
   
-  $filter_criteria_germplasm_temp = variable_get('file_temporary_path') . '/' . 'germplasm' . uniqid() . '.txt';
+  $filter_criteria_germplasm_temp = variable_get('file_temporary_path') . '/' . 'germplasm.' . uniqid() . '.txt';
   
   if (!empty($filter_criteria['restrict_dataset']['germplasm'])){
     
@@ -103,7 +103,7 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
   //2.use the file from last step in vcftools
   //var_dump($filter_criteria['restrict_dataset']['regions']);
   
-  $filter_criteria_regions_temp = variable_get('file_temporary_path') . '/' . 'regions' . uniqid();
+  $filter_criteria_regions_temp = variable_get('file_temporary_path') . '/' . 'regions.' . uniqid() . '.bed';
   
   if (!empty($filter_criteria['restrict_dataset']['regions'])){
     $handle_out = fopen($filter_criteria_regions_temp,'w') or die ("\nCannot create file: $filter_criteria_regions_temp .\n");

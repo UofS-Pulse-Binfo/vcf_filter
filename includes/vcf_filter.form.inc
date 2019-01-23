@@ -39,6 +39,7 @@ function vcf_filter_form($form, &$form_state) {
     '#type' => 'fieldset',
     '#title' => 'Choose your VCF File.',
     '#description' => 'The following table contains all the available VCF Files. Choose the one you would like to filter and export by selecting the circle at the beginning of the appropriate row.',
+    '#prefix' => '<span id="all-vcf-options">'
   );
 
   // Get the list of files keyed by vcf_file_id.
@@ -66,7 +67,7 @@ function vcf_filter_form($form, &$form_state) {
     '#multiple' => FALSE,
     '#ajax' => array(
       'callback' => 'ajax_vcf_filter_show_description_callback',
-      'wrapper' => 'vcf-description',
+      'wrapper' => 'all-vcf-options', 
       'method' => 'replace',
       'effect' => 'fade',
     ),
@@ -87,8 +88,6 @@ function vcf_filter_form($form, &$form_state) {
   }
   $form['s1']['file_description'] = array(
     '#type' => 'markup',
-    '#prefix' => '<span id="vcf-description">',
-    '#suffix' => '</span>',
     '#markup' => $descrip_markup,
   );
 
@@ -96,6 +95,7 @@ function vcf_filter_form($form, &$form_state) {
     '#type' => 'fieldset',
     '#title' => 'Specify filter criteria.',
     '#tree' => TRUE,
+    '#suffix' => '</div>',
   );
 
   $form['s2']['restrict_dataset'] = array(
@@ -103,6 +103,7 @@ function vcf_filter_form($form, &$form_state) {
     '#title' => 'Restrict dataset',
     '#tree' => TRUE,
     '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
   );
   
   dpm($form_state, 'form state');
@@ -110,17 +111,31 @@ function vcf_filter_form($form, &$form_state) {
   $form['s2']['restrict_dataset']['germplasm'] = array(
     '#type' => 'textarea',
     '#title' => 'Germplasm',
-    '#default_value' => user_chart_germplasm_names_file(),
+    //'#default_value' => user_chart_germplasm_names_file(),
     '#description' => 'All germplasm (individuals) in this  Only include these germplasm (individuals) in export file.',
+    '#rows' => 2,
     );
 
   $form['s2']['restrict_dataset']['regions'] = array(
     '#type' => 'textarea',
     '#title' => 'Regions',
     '#description' => 'Region inpu format: (Chrom):(lower bound)..(upper bound).<br />Only include sites from VCF file with matched chromosome and located in specified lower and upper bound position.',
-    '#attributes' =>array('placeholder' => 'Chr1:11111..22222'),
+    '#attributes' =>array('placeholder' => 'Chr1:111100..222200'),
     '#rows' => 2,
   );
+  
+  if (isset($form_state['values']['vcf_file_id'])) {
+    $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
+    $form['s2']['restrict_dataset']['germplasm'] = array(
+      '#type' => 'textarea',
+      '#title' => 'Germplasm',
+      '#default_value' => user_chart_germplasm_names_file(),
+      '#description' => 'All germplasm (individuals) in this  Only include these germplasm (individuals) in export file.',
+      '#rows' => 4,
+    );
+    //$form['s2']['restrict_dataset']['germplasm']['#default_value'] = user_chart_germplasm_names_file();
+    $form['s2']['restrict_dataset']['regions']['#attributes'] = array('placeholder' => 'Chr1:111111..222222');
+  }
 
   $form['s2']['bi-allelic'] = array(
     '#type' => 'checkbox',
@@ -324,8 +339,9 @@ function vcf_filter_form_submit($form, &$form_state) {
  * AJAX Callback: Update the description of the VCF file.
  */
 function ajax_vcf_filter_show_description_callback($form, $form_state) {
-  return $form['s1']['file_description'];
+  return array($form['s1'], $form['s2']);
 }
+
 
 /**
   * Grap data in a file to use in Specifiy_fileter_criterria:Germplasm
