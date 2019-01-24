@@ -108,32 +108,44 @@ function vcf_filter_form($form, &$form_state) {
   
   dpm($form_state, 'form state');
   
-  $form['s2']['restrict_dataset']['germplasm'] = array(
-    '#type' => 'textarea',
-    '#title' => 'Germplasm',
-    //'#default_value' => user_chart_germplasm_names_file(),
-    '#description' => 'All germplasm (individuals) in this  Only include these germplasm (individuals) in export file.',
-    '#rows' => 2,
-    );
-
-  $form['s2']['restrict_dataset']['regions'] = array(
+    $form['s2']['restrict_dataset']['regions'] = array(
     '#type' => 'textarea',
     '#title' => 'Regions',
     '#description' => 'Region inpu format: (Chrom):(lower bound)..(upper bound).<br />Only include sites from VCF file with matched chromosome and located in specified lower and upper bound position.',
     '#attributes' =>array('placeholder' => 'Chr1:111100..222200'),
     '#rows' => 2,
   );
-  
+ /** 
+  $form['s2']['restrict_dataset']['germplasm'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Germplasm',
+    '#tree' => TRUE,
+  );
+  */
+  //dpm(user_example_germplasm_names_file(), 'example_germplasm_list');
+  $form['s2']['restrict_dataset']['germplasm_available'] = array(
+    '#type' => 'textarea',
+    '#title' => 'Germplasm from selected file',
+    '#value' => user_example_germplasm_names_file(),
+    '#disable' => TRUE,
+    '#description' => 'All germplasm (individuals) in selected file.',
+    '#rows' => 2,
+    );
+    
+  $form['s2']['restrict_dataset']['germplasm_select'] = array(
+    '#type' => 'textarea',
+    '#title' => 'Select these Germplasm',
+    '#description' => 'Include these germplasm (individuals) in export file. Please copy germplasm from above to avoid spelling errors.',
+    '#rows' => 2,
+    );
+  //dpm(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']), 'read_from_vcf');
   if (isset($form_state['values']['vcf_file_id'])) {
     $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
-    $form['s2']['restrict_dataset']['germplasm'] = array(
-      '#type' => 'textarea',
-      '#title' => 'Germplasm',
-      '#default_value' => user_chart_germplasm_names_file(),
-      '#description' => 'All germplasm (individuals) in this  Only include these germplasm (individuals) in export file.',
-      '#rows' => 4,
-    );
-    //$form['s2']['restrict_dataset']['germplasm']['#default_value'] = user_chart_germplasm_names_file();
+    //dpm($form_state, 'form state');
+    $form['s2']['restrict_dataset']['germplasm_available']['#value'] = user_chart_germplasm_names_file($form_state['values']['vcf_file_id']);
+    $form['s2']['restrict_dataset']['germplasm_available']['#rows'] = 5;
+    $form['s2']['restrict_dataset']['germplasm_available']['#disabled'] = FALSE;
+    $form['s2']['restrict_dataset']['germplasm_select']['#rows'] = 5;
     $form['s2']['restrict_dataset']['regions']['#attributes'] = array('placeholder' => 'Chr1:111111..222222');
   }
 
@@ -346,10 +358,24 @@ function ajax_vcf_filter_show_description_callback($form, $form_state) {
 /**
   * Grap data in a file to use in Specifiy_fileter_criterria:Germplasm
   * FOR NOW: provide a exampel file from directory: example_data
-  * NEXT: grep germplasm names from vcf file
 */ 
-function user_chart_germplasm_names_file(){
+function user_example_germplasm_names_file(){
   $file = drupal_get_path('module', 'vcf_filter') . '/example_data/Example_Germplasm_names.csv';
   
   return file_get_contents(drupal_realpath($file));
+}
+
+/**
+  * Grap data in a file to use in Specifiy_fileter_criterria:Germplasm
+  * grep germplasm names from vcf file
+*/ 
+function user_chart_germplasm_names_file($one_file_id){
+  $vcf_file = vcf_filter_get_vcf_file($one_file_id);
+  $command_get_germplasm = 'grep "#CHROM" ' . $vcf_file->file_path;
+  $header = shell_exec($command_get_germplasm);
+  $temp_file = variable_get('file_temporary_path') . '/' .  'germplasm_name_all'. uniqid();
+  $header = explode("\t", $header);
+  for ($i=0;$i<9;$i++){array_shift($header);}
+  $header = implode("\n", $header);
+  return $header;
 }

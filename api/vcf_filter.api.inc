@@ -76,11 +76,11 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
   
   $filter_criteria_germplasm_temp = variable_get('file_temporary_path') . '/' . 'germplasm.' . uniqid() . '.txt';
   
-  if (!empty($filter_criteria['restrict_dataset']['germplasm'])){
+  if (!empty($filter_criteria['restrict_dataset']['germplasm']['select'])){
     
     $handle_out = fopen($filter_criteria_germplasm_temp,'w') or die ("\nCannot create file: $filter_criteria_germplasm_temp .\n");
-    fwrite($handle_out, $filter_criteria['restrict_dataset']['germplasm']);
-    var_dump($filter_criteria['restrict_dataset']['germplasm']);
+    fwrite($handle_out, $filter_criteria['restrict_dataset']['germplasm']['select']);
+    var_dump($filter_criteria['restrict_dataset']['germplasm']['select']);
     /**
     var_dump($filter_criteria['restrict_dataset']['germplasm']);
     $germplasm_names_parsed = explode('\n', $filter_criteria['restrict_dataset']['germplasm']);
@@ -108,7 +108,9 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
   if (!empty($filter_criteria['restrict_dataset']['regions'])){
     $handle_out = fopen($filter_criteria_regions_temp,'w') or die ("\nCannot create file: $filter_criteria_regions_temp .\n");
     
-    foreach($filter_criteria['restrict_dataset']['regions'] as &$value_regions){
+    $one_value_regions = explode("\n", $filter_criteria['restrict_dataset']['regions']);
+    
+    foreach($one_value_regions as $value_regions){
       
       if (preg_match('/^#/', $value_regions)){
         continue;
