@@ -142,7 +142,7 @@ function vcf_filter_form($form, &$form_state) {
   if (isset($form_state['values']['vcf_file_id'])) {
     $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
     //dpm($form_state, 'form state');
-    $form['s2']['restrict_dataset']['germplasm_available']['#value'] = user_chart_germplasm_names_file($form_state['values']['vcf_file_id']);
+    $form['s2']['restrict_dataset']['germplasm_available']['#value'] = trim(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']));
     $form['s2']['restrict_dataset']['germplasm_available']['#rows'] = 5;
     $form['s2']['restrict_dataset']['germplasm_available']['#disabled'] = FALSE;
     $form['s2']['restrict_dataset']['germplasm_select']['#rows'] = 5;
