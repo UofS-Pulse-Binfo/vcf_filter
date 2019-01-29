@@ -39,7 +39,7 @@ function vcf_filter_form($form, &$form_state) {
     '#type' => 'fieldset',
     '#title' => 'Choose your VCF File.',
     '#description' => 'The following table contains all the available VCF Files. Choose the one you would like to filter and export by selecting the circle at the beginning of the appropriate row.',
-    '#prefix' => '<span id="all-vcf-options">'
+    '#prefix' => '<div id="all-vcf-options">'
   );
 
   // Get the list of files keyed by vcf_file_id.
