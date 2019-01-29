@@ -95,7 +95,7 @@ function vcf_filter_form($form, &$form_state) {
     '#type' => 'fieldset',
     '#title' => 'Specify filter criteria.',
     '#tree' => TRUE,
-    '#suffix' => '</div>',
+    '#suffix' => '</span>',
   );
 
   $form['s2']['restrict_dataset'] = array(
