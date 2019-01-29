@@ -106,8 +106,6 @@ function vcf_filter_form($form, &$form_state) {
     '#collapsed' => TRUE,
   );
   
-  dpm($form_state, 'form state');
-  
     $form['s2']['restrict_dataset']['regions'] = array(
     '#type' => 'textarea',
     '#title' => 'Regions',
