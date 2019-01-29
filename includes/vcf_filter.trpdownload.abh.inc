@@ -54,7 +54,40 @@ function vcf_filter_abh_generate_file($variables, $job_id = NULL) {
 
   // Filter
   //================
+  // Need to modify user input for germplams filter because maternal/paternal paternents may not include in user's input
   print "\nFiltering the Original VCF\n";
+  
+  if (!empty($variables['q']['restrict_dataset']['germplasm_select'])){
+    
+    $filter_restrict_dataset_germplasm_all = $variables['q']['restrict_dataset']['germplasm_available'];
+    $filter_restrict_dataset_germplasm_all = trim($filter_restrict_dataset_germplasm_all);
+    $filter_restrict_dataset_germplasm_all = explode("\n", $filter_restrict_dataset_germplasm_all);
+    $filter_restrict_dataset_germplasm_user_select = $variables['q']['restrict_dataset']['germplasm_select'];
+    $filter_restrict_dataset_germplasm_user_select = trim($filter_restrict_dataset_germplasm_user_select);
+    $filter_restrict_dataset_germplasm_user_select = explode("\n", $filter_restrict_dataset_germplasm_user_select);
+    
+    $partent_added = 0;
+    $two_partents = array();
+    while ($partent_added < 2){
+      $one_partent = array_shift($filter_restrict_dataset_germplasm_all);
+      print $one_partent . "\n";
+      if (preg_match('/^#/', $one_partent)){
+        continue;
+      }
+      if (preg_match('/^$/', $one_partent)){
+        continue;
+      }
+      
+      array_push($two_partents, $one_partent);
+      $partent_added = $partent_added + 1;
+      
+    }
+    array_unshift($filter_restrict_dataset_germplasm_user_select, $two_partents[1]);
+    array_unshift($filter_restrict_dataset_germplasm_user_select, $two_partents[0]);
+    $filter_restrict_dataset_germplasm_user_select = implode("\n", $filter_restrict_dataset_germplasm_user_select);
+    $variables['q']['restrict_dataset']['germplasm_select'] = $filter_restrict_dataset_germplasm_user_select;
+  }
+  
   $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q'], $drush_use_limited);
   if (!$filtered_vcf) {
     exit(3);

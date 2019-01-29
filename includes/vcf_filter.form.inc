@@ -111,37 +111,29 @@ function vcf_filter_form($form, &$form_state) {
     $form['s2']['restrict_dataset']['regions'] = array(
     '#type' => 'textarea',
     '#title' => 'Regions',
-    '#description' => 'Region inpu format: (Chrom):(lower bound)..(upper bound).<br />Only include sites from VCF file with matched chromosome and located in specified lower and upper bound position.',
+    '#description' => 'Only include sites in these regions. <strong>Please leave it blank if filter by regions is not required.</strong> <br>Region input format: Chrom:position-lower-bound..position-upper-bound (e.g., chr1:111100..222200). ',
     '#attributes' =>array('placeholder' => 'Chr1:111100..222200'),
     '#rows' => 2,
   );
- /** 
-  $form['s2']['restrict_dataset']['germplasm'] = array(
-    '#type' => 'fieldset',
-    '#title' => 'Germplasm',
-    '#tree' => TRUE,
-  );
-  */
-  //dpm(user_example_germplasm_names_file(), 'example_germplasm_list');
+
   $form['s2']['restrict_dataset']['germplasm_available'] = array(
     '#type' => 'textarea',
     '#title' => 'Germplasm from selected file',
     '#value' => user_example_germplasm_names_file(),
     '#disable' => TRUE,
-    '#description' => 'All germplasm (individuals) in selected file.',
+    '#description' => 'All germplasm (individuals) in selected file. Please copy the germplasm that need to be kept to textarea under.',
     '#rows' => 2,
     );
     
   $form['s2']['restrict_dataset']['germplasm_select'] = array(
     '#type' => 'textarea',
     '#title' => 'Select these Germplasm',
-    '#description' => 'Include these germplasm (individuals) in export file. Please copy germplasm from above to avoid spelling errors.',
+    '#description' => 'Only include these germplasm (individuals) in export file. <strong>Please leave it blank if filter by germplasm is not required.</strong>',
     '#rows' => 2,
     );
   //dpm(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']), 'read_from_vcf');
   if (isset($form_state['values']['vcf_file_id'])) {
     $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
-    //dpm($form_state, 'form state');
     $form['s2']['restrict_dataset']['germplasm_available']['#value'] = trim(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']));
     $form['s2']['restrict_dataset']['germplasm_available']['#rows'] = 5;
     $form['s2']['restrict_dataset']['germplasm_available']['#disabled'] = FALSE;
