@@ -54,14 +54,19 @@ function vcf_filter_abh_generate_file($variables, $job_id = NULL) {
 
   // Filter
   //================
-  // Need to modify user input for germplams filter because maternal/paternal paternents may not include in user's input
-  print "\nFiltering the Original VCF\n";
   
+  /** 
+   * Need to modify user input for germplams filter because maternal/paternal paternents may not include in user's input
+   * read all germplasm names from filter_criteria-restrict_dataset-germplasm_available
+   * obtain paternal/maternal germplasm names from available and update to select
+   * TESTED: it's fine to have repeated germplasm names in a list, vcftools can deal with it
+   */
   if (!empty($variables['q']['restrict_dataset']['germplasm_select'])){
     
     $filter_restrict_dataset_germplasm_all = $variables['q']['restrict_dataset']['germplasm_available'];
     $filter_restrict_dataset_germplasm_all = trim($filter_restrict_dataset_germplasm_all);
     $filter_restrict_dataset_germplasm_all = explode("\n", $filter_restrict_dataset_germplasm_all);
+    
     $filter_restrict_dataset_germplasm_user_select = $variables['q']['restrict_dataset']['germplasm_select'];
     $filter_restrict_dataset_germplasm_user_select = trim($filter_restrict_dataset_germplasm_user_select);
     $filter_restrict_dataset_germplasm_user_select = explode("\n", $filter_restrict_dataset_germplasm_user_select);
@@ -70,10 +75,11 @@ function vcf_filter_abh_generate_file($variables, $job_id = NULL) {
     $two_partents = array();
     while ($partent_added < 2){
       $one_partent = array_shift($filter_restrict_dataset_germplasm_all);
-      print $one_partent . "\n";
+      
       if (preg_match('/^#/', $one_partent)){
         continue;
       }
+      
       if (preg_match('/^$/', $one_partent)){
         continue;
       }
@@ -88,6 +94,7 @@ function vcf_filter_abh_generate_file($variables, $job_id = NULL) {
     $variables['q']['restrict_dataset']['germplasm_select'] = $filter_restrict_dataset_germplasm_user_select;
   }
   
+  print "\nFiltering the Original VCF\n";
   $filtered_vcf = vcf_filter_filter_file($vcf_file->file_path, $variables['q'], $drush_use_limited);
   if (!$filtered_vcf) {
     exit(3);

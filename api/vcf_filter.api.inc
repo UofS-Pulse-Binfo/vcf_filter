@@ -71,8 +71,7 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
 
   //restrict_dataset:germplasm
   //1.need to read GERMPLASM array from $filter_criteria, and save it into a file
-  // *** need to keep maternal/paternal paternents, which are first two individuals
-  //2.use the file from last step in vcftools
+  //2.use the file in vcftools with command --keep
   
   $filter_criteria_germplasm_temp = variable_get('file_temporary_path') . '/' . 'germplasm.' . uniqid() . '.txt';
   
@@ -81,14 +80,12 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
     $handle_out = fopen($filter_criteria_germplasm_temp,'w') or die ("\nCannot create file: $filter_criteria_germplasm_temp .\n");
     fwrite($handle_out, $filter_criteria['restrict_dataset']['germplasm_select']);
     
-    //var_dump($filter_criteria['restrict_dataset']['germplasm_select']);
-    
     $command .= ' --keep ' .  $filter_criteria_germplasm_temp;
   }
   
   //restrict_dataset:regions
   //1.need to read REGIONS array from $filter_criteria, parse each line, and save it into a file in bed format
-  //2.use the file from last step in vcftools
+  //2.use the file in vcftools with command --bed
   
   $filter_criteria_regions_temp = variable_get('file_temporary_path') . '/' . 'regions.' . uniqid() . '.bed';
   

@@ -125,11 +125,12 @@ function vcf_filter_form($form, &$form_state) {
     
   $form['s2']['restrict_dataset']['germplasm_select'] = array(
     '#type' => 'textarea',
-    '#title' => 'Select these Germplasm',
+    '#title' => 'Keep these Germplasm',
     '#description' => 'Only include these germplasm (individuals) in export file. <strong>Please leave it blank if filter by germplasm is not required.</strong>',
     '#rows' => 2,
     );
-  //dpm(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']), 'read_from_vcf');
+  
+  //update $form['s2']['restrict_dataset']
   if (isset($form_state['values']['vcf_file_id'])) {
     $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
     $form['s2']['restrict_dataset']['germplasm_available']['#value'] = trim(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']));
@@ -347,7 +348,7 @@ function ajax_vcf_filter_show_description_callback($form, $form_state) {
 
 /**
   * Grap data in a file to use in Specifiy_fileter_criterria:Germplasm
-  * FOR NOW: provide a exampel file from directory: example_data
+  * provide a exampel file from directory: example_data
 */ 
 function user_example_germplasm_names_file(){
   $file = drupal_get_path('module', 'vcf_filter') . '/example_data/Example_Germplasm_names.csv';
@@ -358,6 +359,10 @@ function user_example_germplasm_names_file(){
 /**
   * Grap data in a file to use in Specifiy_fileter_criterria:Germplasm
   * grep germplasm names from vcf file
+  * steps: 
+  *   1. use command to obtain header line, convert from string to array
+  *   2. remove first 9 elements, and keep all germplasm names
+  *   3. convert from array to string and return
 */ 
 function user_chart_germplasm_names_file($one_file_id){
   $vcf_file = vcf_filter_get_vcf_file($one_file_id);
@@ -365,7 +370,10 @@ function user_chart_germplasm_names_file($one_file_id){
   $header = shell_exec($command_get_germplasm);
   $temp_file = variable_get('file_temporary_path') . '/' .  'germplasm_name_all'. uniqid();
   $header = explode("\t", $header);
-  for ($i=0;$i<9;$i++){array_shift($header);}
+  for ($i=0;$i<9;$i++){
+    array_shift($header);
+    
+  }
   $header = implode("\n", $header);
   return $header;
 }
