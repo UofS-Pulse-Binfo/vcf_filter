@@ -109,7 +109,7 @@ function vcf_filter_form($form, &$form_state) {
     $form['s2']['restrict_dataset']['regions'] = array(
     '#type' => 'textarea',
     '#title' => 'Regions',
-    '#description' => 'Only include sites in these regions. <strong>Please leave it blank if filter by regions is not required.</strong> <br>Region input format: Chrom:position-lower-bound..position-upper-bound (e.g., Chr1:111100..222200). ',
+    '#description' => 'Only include sites in specific regions. For example, if you want to include all genotypic data for a QTL on Chr1 from 5555 to 6666 then you would enter Chr1:5555..6666 <br>Region input format: Chrom:position-lower-bound..position-upper-bound (e.g., Chr1:111100..222200). ',
     '#attributes' =>array('placeholder' => 'Chr1:111100..222200'),
     '#rows' => 2,
   );
