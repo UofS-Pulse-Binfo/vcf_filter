@@ -100,7 +100,7 @@ function vcf_filter_form($form, &$form_state) {
 
   $form['s2']['restrict_dataset'] = array(
     '#type' => 'fieldset',
-    '#title' => 'Restrict dataset',
+    '#title' => 'Restrict dataset to specific germplasm or regions',
     '#tree' => TRUE,
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
