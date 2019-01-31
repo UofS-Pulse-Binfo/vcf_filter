@@ -126,7 +126,7 @@ function vcf_filter_form($form, &$form_state) {
   $form['s2']['restrict_dataset']['germplasm_select'] = array(
     '#type' => 'textarea',
     '#title' => 'Keep these Germplasm',
-    '#description' => 'Only include these germplasm (individuals) in export file. <strong>Please leave it blank if filter by germplasm is not required.</strong>',
+    '#description' => 'Only include these germplasm (individuals) in export file. Each germplasm name should be on it's own line and must match exactly the names in the file chosen (names are shown above).',
     '#rows' => 2,
     );
   
