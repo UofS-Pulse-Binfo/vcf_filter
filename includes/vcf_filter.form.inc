@@ -104,6 +104,7 @@ function vcf_filter_form($form, &$form_state) {
     '#tree' => TRUE,
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
+    '#description' => 'Select a VCF file from above to see specific germplasm.'
   );
   
     $form['s2']['restrict_dataset']['regions'] = array(
@@ -117,16 +118,15 @@ function vcf_filter_form($form, &$form_state) {
   $form['s2']['restrict_dataset']['germplasm_available'] = array(
     '#type' => 'textarea',
     '#title' => 'Germplasm from selected file',
-    '#value' => user_example_germplasm_names_file(),
     '#disable' => TRUE,
-    '#description' => 'All germplasm (individuals) in selected file. Please copy the germplasm that need to be kept to textarea under.',
+    '#description' => 'All germplasm (individuals) in selected file. <strong>Please copy the germplasm that need to be kept to textarea under.</strong>',
     '#rows' => 2,
     );
     
   $form['s2']['restrict_dataset']['germplasm_select'] = array(
     '#type' => 'textarea',
     '#title' => 'Keep these Germplasm',
-    '#description' => 'Only include these germplasm (individuals) in export file. Each germplasm name should be on it's own line and must match exactly the names in the file chosen (names are shown above).',
+    '#description' => 'Only include these germplasm (individuals) in export file. Each germplasm name should be on it\'s own line and must match exactly the names in the file chosen (names are shown above).',
     '#rows' => 2,
     );
   
