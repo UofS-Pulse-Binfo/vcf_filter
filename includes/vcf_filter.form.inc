@@ -12,6 +12,7 @@ function vcf_filter_form($form, &$form_state) {
   $form['#attached']['css'][] = array(
     'data' => '
       .form-type-checkbox label {
+      
         font-weight: bold;
         position: relative;
         top: 2px;
@@ -123,6 +124,21 @@ function vcf_filter_form($form, &$form_state) {
     '#rows' => 2,
     );
     
+    //$value_4_germplasm_availalbe = trim(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']));
+    $value_4_attributes_placeholder = array('placeholder' => 'Chr1:111111..222222');
+    
+  if (!empty($form['s1']['vcf_file_id']['#default_value'])) {
+    $curr_file = $files[  $form['s1']['vcf_file_id']['#default_value']  ];
+    if (!empty($curr_file['specific_germplasm'])) {
+      $value_4_germplasm_availalbe = $curr_file['specific_germplasm'];
+    }
+    if (!empty($curr_file['chromosome_format'])) {
+      $value_4_attributes_placeholder = trim($curr_file['chromosome_format'] . ':111111..222222');
+      $value_4_attributes_placeholder = array('placeholder' => $value_4_attributes_placeholder);
+    }    
+    
+  }
+  
   $form['s2']['restrict_dataset']['germplasm_select'] = array(
     '#type' => 'textarea',
     '#title' => 'Keep these Germplasm',
@@ -133,11 +149,17 @@ function vcf_filter_form($form, &$form_state) {
   //update $form['s2']['restrict_dataset']
   if (isset($form_state['values']['vcf_file_id'])) {
     $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
-    $form['s2']['restrict_dataset']['germplasm_available']['#value'] = trim(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']));
+    //$form['s2']['restrict_dataset']['germplasm_available']['#value'] = $value_4_germplasm_availalbe;
     $form['s2']['restrict_dataset']['germplasm_available']['#rows'] = 5;
     $form['s2']['restrict_dataset']['germplasm_available']['#disabled'] = FALSE;
     $form['s2']['restrict_dataset']['germplasm_select']['#rows'] = 5;
-    $form['s2']['restrict_dataset']['regions']['#attributes'] = array('placeholder' => 'Chr1:111111..222222');
+    $form['s2']['restrict_dataset']['regions']['#attributes'] = $value_4_attributes_placeholder;
+    if ($value_4_germplasm_availalbe){
+      $form['s2']['restrict_dataset']['germplasm_available']['#value'] = $value_4_germplasm_availalbe;
+    }
+    else{
+      $form['s2']['restrict_dataset']['germplasm_available']['#value'] = trim(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']));
+    }
   }
 
   $form['s2']['bi-allelic'] = array(

@@ -71,7 +71,9 @@ function vcf_filter_admin_vcf_file_form($form, &$form_state) {
       '#type' => 'markup',
       '#markup' => '<p>Would you like to delete the following VCF File?</p>'
         .theme('table', $table)
-        .'<p><strong>Description:</strong> '.$obj->description.'</p>',
+        .'<p><strong>Description:</strong> '.$obj->description.'</p>'
+        .'<p><strong>Germplasm From Header:</strong> '.$obj->specific_germplasm.'</p>'
+        .'<p><strong>Chromosome format:</strong> '.$obj->chromosome_format.'</p>',
     );
 
     $form['name'] = array(
@@ -122,7 +124,22 @@ function vcf_filter_admin_vcf_file_form($form, &$form_state) {
     '#description' => 'This should include the method used to generate the file and any filtering that has already been done. It may also be helpful to include some stats about the file such as average read depth to give users some context when filtering.',
     '#default_value' => (isset($obj->description)) ? $obj->description : '',
   );
-
+  
+  $form['specific_germplasm'] = array(
+    '#type' => 'textarea',
+    '#title' => 'Germplasm From Header',
+    '#description' => 'This should include all names of germplasm (individuals) from the header of VCF file. If this textarea is not filled, shell command will be used to find the header and extract all germplasm names but it may slow down this module a lot.',
+    '#default_value' => (isset($obj->specific_germplasm)) ? $obj->specific_germplasm : '',
+  );
+  
+  $form['chromosome_format'] = array(
+    '#type' => 'textarea',
+    '#title' => 'Chromosome format',
+    '#description' => 'This should indicate how chromosome names are formatted in this VCF file. For example, Chr1, chr1, Chr01 or name with a prefix like Lc, Ca, Gm, Pv or Mt.',
+    '#default_value' => (isset($obj->chromosome_format)) ? $obj->chromosome_format : '',
+  );
+  
+  
   $op = ucwords($form_state['build_info']['args'][0]);
   $form['submit'] = array(
     '#type' => 'submit',
@@ -160,6 +177,8 @@ function vcf_filter_admin_vcf_file_form_submit($form, &$form_state) {
       'num_snps' => str_replace(',','', $form_state['values']['num_SNPs']),
       'backbone' => $form_state['values']['assembly'],
       'description' => $form_state['values']['description'],
+      'specific_germplasm' => $form_state['values']['specific_germplasm'],
+      'chromosome_format' => $form_state['values']['chromosome_format'],
     );
 
     if ($form_state['values']['op'] == 'Add') {
@@ -224,6 +243,8 @@ function vcf_filter_admin_vcf_file_perm_form($form, &$form_state) {
       array(array('data' => 'Backbone', 'header' => TRUE), $obj->backbone),
       array(array('data' => 'Number of SNPs', 'header' => TRUE), $obj->num_snps),
       array(array('data' => 'Description', 'header' => TRUE), $obj->description),
+      array(array('data' => 'Germplasm From Header', 'header' => TRUE), $obj->specific_germplasm),
+      array(array('data' => 'Chromosome format', 'header' => TRUE), $obj->chromosome_format),
     ),
   );
 
