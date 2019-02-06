@@ -124,7 +124,6 @@ function vcf_filter_form($form, &$form_state) {
     '#rows' => 2,
     );
     
-    //$value_4_germplasm_availalbe = trim(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']));
     $value_4_attributes_placeholder = array('placeholder' => 'Chr1:111111..222222');
     
   if (!empty($form['s1']['vcf_file_id']['#default_value'])) {
@@ -149,11 +148,12 @@ function vcf_filter_form($form, &$form_state) {
   //update $form['s2']['restrict_dataset']
   if (isset($form_state['values']['vcf_file_id'])) {
     $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
-    //$form['s2']['restrict_dataset']['germplasm_available']['#value'] = $value_4_germplasm_availalbe;
     $form['s2']['restrict_dataset']['germplasm_available']['#rows'] = 5;
     $form['s2']['restrict_dataset']['germplasm_available']['#disabled'] = FALSE;
     $form['s2']['restrict_dataset']['germplasm_select']['#rows'] = 5;
     $form['s2']['restrict_dataset']['regions']['#attributes'] = $value_4_attributes_placeholder;
+    $form['s2']['restrict_dataset']['regions']['#description'] = 'Only include sites in specific regions. For example, if you want to include all genotypic data for a QTL on Chr1 from 5555 to 6666 then you would enter Chr1:5555..6666 <br>Region input format: Chrom:position-lower-bound..position-upper-bound (e.g.,' . $value_4_attributes_placeholder['placeholder'] . ').';
+    
     if ($value_4_germplasm_availalbe){
       $form['s2']['restrict_dataset']['germplasm_available']['#value'] = $value_4_germplasm_availalbe;
     }
