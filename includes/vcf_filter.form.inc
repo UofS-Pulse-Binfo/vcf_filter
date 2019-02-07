@@ -135,6 +135,11 @@ function vcf_filter_form($form, &$form_state) {
     }    
     
   }
+
+    $form['s2']['restrict_dataset']['help'] = array(
+    '#type' => 'markup',
+    '#markup' => '<div class="messages warning">You must <strong>copy</strong> the germplasm you want to keep into the <strong>Keep these Germplasm</strong> or your file will contain all germplasm.</div>'
+  );
   
   $form['s2']['restrict_dataset']['germplasm_select'] = array(
     '#type' => 'textarea',
