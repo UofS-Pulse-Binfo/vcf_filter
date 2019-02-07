@@ -69,6 +69,48 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
 
   $command = 'vcftools --vcf ' . $file_path . ' --recode --out ' . $new_file;
 
+  //restrict_dataset:germplasm
+  //1.need to read GERMPLASM array from $filter_criteria, and save it into a file
+  //2.use the file in vcftools with command --keep
+  
+  $filter_criteria_germplasm_temp = variable_get('file_temporary_path') . '/' . 'germplasm.' . uniqid() . '.txt';
+  
+  if (!empty($filter_criteria['restrict_dataset']['germplasm_select'])){
+    
+    $handle_out = fopen($filter_criteria_germplasm_temp,'w') or die ("\nCannot create file: $filter_criteria_germplasm_temp .\n");
+    fwrite($handle_out, $filter_criteria['restrict_dataset']['germplasm_select']);
+    
+    $command .= ' --keep ' .  $filter_criteria_germplasm_temp;
+  }
+  
+  //restrict_dataset:regions
+  //1.need to read REGIONS array from $filter_criteria, parse each line, and save it into a file in bed format
+  //2.use the file in vcftools with command --bed
+  
+  $filter_criteria_regions_temp = variable_get('file_temporary_path') . '/' . 'regions.' . uniqid() . '.bed';
+  
+  if (!empty($filter_criteria['restrict_dataset']['regions'])){
+    $handle_out = fopen($filter_criteria_regions_temp,'w') or die ("\nCannot create file: $filter_criteria_regions_temp .\n");
+    fwrite($handle_out, ('#Filter by regions' . "\n"));
+    
+    $one_value_regions = explode("\n", $filter_criteria['restrict_dataset']['regions']);
+    
+    foreach($one_value_regions as $value_regions){
+      if (preg_match('/^#/', $value_regions)){
+        continue;
+      }
+      
+      $fc_rd_regions_chrom = explode(":", $value_regions);
+      fwrite($handle_out, ($fc_rd_regions_chrom[0] . "\t"));
+      
+      $fc_rd_regions_position = explode("..", $fc_rd_regions_chrom[1]);
+      fwrite($handle_out, ($fc_rd_regions_position[0] . "\t" . $fc_rd_regions_position[1] . "\n"));
+      
+    }
+    $command .= ' --bed ' .  $filter_criteria_regions_temp;
+  }
+
+
   // Bi-allelic:
   if ($filter_criteria['bi-allelic'] == 1) {
     $command .= ' --min-alleles 2 --max-alleles 2';
@@ -107,6 +149,8 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
   print str_repeat('-', 60)."\n";
   $output = shell_exec($command);
 
+  print "\n" . $command . "\n";
+
   // Print the output from the command.
   print $output."\n";
   print str_repeat('-', 60)."\n";
@@ -121,7 +165,15 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
       return false;
     }
   }
-
+  
+  if (file_exists($filter_criteria_germplasm_temp)){
+    unlink($filter_criteria_germplasm_temp);
+  }
+  
+  if (file_exists($filter_criteria_regions_temp)){
+    unlink($filter_criteria_regions_temp);
+  }
+  
   return $outfile;
 }
 

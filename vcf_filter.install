@@ -41,6 +41,14 @@ function vcf_filter_schema() {
         'description' => 'Free text description of the VCF file.',
         'type' => 'text',
       ),
+      'specific_germplasm' => array(
+        'description' => 'Free text includes all germplasm names of the VCF file.',
+        'type' => 'text',
+      ),
+      'chromosome_format' => array(
+        'description' => 'Free text description of the chromosome format applied in the VCF file.',
+        'type' => 'text',
+      ),
     ),
     'primary key' => array('vcf_file_id'),
   );
@@ -71,4 +79,22 @@ function vcf_filter_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Add newcol field to {vcf_files} table.
+ */
+function vcf_filter_update_7000() {
+  
+  $specific_germplasm = array(
+    'description' => 'Free text includes all germplasm names of the VCF file.',
+    'type' => 'text',
+  );
+  
+  $chromosome_format = array(
+    'description' => 'Free text description of the chromosome format applied in the VCF file.',
+    'type' => 'text',
+  );
+  db_add_field('vcf_files', 'specific_germplasm', $specific_germplasm);
+  db_add_field('vcf_files', 'chromosome_format', $chromosome_format);
 }
