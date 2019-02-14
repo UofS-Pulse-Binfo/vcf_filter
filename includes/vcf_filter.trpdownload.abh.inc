@@ -345,9 +345,9 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
     fputcsv($OUTFILE, $converted_line, "\t");
     
     //delete inpute file to leave a clean track
-    unlink($input_file);
   }
-
+  unlink($input_file);
+  
   // its too verbose to print one line for each skipping site, myabe a summary
   print $skipping_site_count["multiple_alternate_alleles"]." sites skipped due to multiple alternate alleles.\n";
   print $skipping_site_count["missing_call_maternal"]." sites skipped due to missing call in maternal parent.\n";
