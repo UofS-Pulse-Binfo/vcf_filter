@@ -91,6 +91,11 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL, $drush_us
   print 'Combining into an archive: '.$format_tmp.'.tar'."\n";
   $command = 'tar cvf '.escapeshellarg($format_tmp).'.tar'.' -C '.escapeshellarg($bgzip_tmp_path).' '.escapeshellarg($bgzip_filename).'.gz '.escapeshellarg($bgzip_filename).'.gz.tbi';
   print shell_exec($command);
+  
+  //delete uncessary files
+  unlink($filtered_sorted_vcf);
+  $temp_file_vcf_gz = $format_tmp . '.gz';
+  unlink($temp_file_vcf_gz);
 
   if (!file_exists($outfile)) {
     if ($drush_use_limited === false){

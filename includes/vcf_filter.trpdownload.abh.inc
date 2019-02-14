@@ -343,7 +343,9 @@ function vcf_filter_convert_VCF_to_ABH($input_file, $maternal_parent, $paternal_
 
     // And print it to the output file!
     fputcsv($OUTFILE, $converted_line, "\t");
-
+    
+    //delete inpute file to leave a clean track
+    unlink($input_file);
   }
 
   // its too verbose to print one line for each skipping site, myabe a summary
