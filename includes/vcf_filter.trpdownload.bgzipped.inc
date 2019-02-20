@@ -91,11 +91,7 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL, $drush_us
   print 'Combining into an archive: '.$format_tmp.'.tar'."\n";
   $command = 'tar cvf '.escapeshellarg($format_tmp).'.tar'.' -C '.escapeshellarg($bgzip_tmp_path).' '.escapeshellarg($bgzip_filename).'.gz '.escapeshellarg($bgzip_filename).'.gz.tbi';
   print shell_exec($command);
-  
-  //delete uncessary files
-  unlink($filtered_sorted_vcf);
-  $temp_file_vcf_gz = $format_tmp . '.gz';
-  unlink($temp_file_vcf_gz);
+
 
   if (!file_exists($outfile)) {
     if ($drush_use_limited === false){
@@ -121,7 +117,11 @@ function vcf_filter_bgzipped_generate_file($variables, $job_id = NULL, $drush_us
       print "ERROR: Unable to move Filtered VCF into expected file director: $filepath\n";
       exit(6);
     }
-
+  }else{
+    //delete uncessary files in temp directory since final file is available for download already
+    unlink($filtered_sorted_vcf);
+    $temp_file_vcf_gz = $format_tmp . '.gz';
+    unlink($temp_file_vcf_gz);
   }
   // Done!
   tripal_set_job_progress($job_id, 100);

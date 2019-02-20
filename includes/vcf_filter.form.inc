@@ -12,7 +12,6 @@ function vcf_filter_form($form, &$form_state) {
   $form['#attached']['css'][] = array(
     'data' => '
       .form-type-checkbox label {
-      
         font-weight: bold;
         position: relative;
         top: 2px;
@@ -68,7 +67,7 @@ function vcf_filter_form($form, &$form_state) {
     '#multiple' => FALSE,
     '#ajax' => array(
       'callback' => 'ajax_vcf_filter_show_description_callback',
-      'wrapper' => 'all-vcf-options', 
+      'wrapper' => 'all-vcf-options',
       'method' => 'replace',
       'effect' => 'fade',
     ),
@@ -107,7 +106,7 @@ function vcf_filter_form($form, &$form_state) {
     '#collapsed' => TRUE,
     '#description' => 'Select a VCF file from above to see specific germplasm.'
   );
-  
+
     $form['s2']['restrict_dataset']['regions'] = array(
     '#type' => 'textarea',
     '#title' => 'Regions',
@@ -123,7 +122,7 @@ function vcf_filter_form($form, &$form_state) {
     '#description' => 'All germplasm (individuals) in selected file. <strong>Please copy the germplasm that need to be kept to textarea under.</strong>',
     '#rows' => 2,
     );
-    
+
   if (!empty($form['s1']['vcf_file_id']['#default_value'])) {
     $curr_file = $files[  $form['s1']['vcf_file_id']['#default_value']  ];
     if (!empty($curr_file['specific_germplasm'])) {
@@ -132,34 +131,34 @@ function vcf_filter_form($form, &$form_state) {
     if (!empty($curr_file['chromosome_format'])) {
       $value_4_attributes_placeholder = trim($curr_file['chromosome_format'] . ':111111..222222');
       $value_4_attributes_placeholder = array('placeholder' => $value_4_attributes_placeholder);
-    }    
-    
+    }
+
   }
 
     $form['s2']['restrict_dataset']['help'] = array(
     '#type' => 'markup',
     '#markup' => '<div class="messages warning">You must <strong>copy</strong> the germplasm you want to keep into the <strong>Keep these Germplasm</strong> or your file will contain all germplasm.</div>'
   );
-  
+
   $form['s2']['restrict_dataset']['germplasm_select'] = array(
     '#type' => 'textarea',
     '#title' => 'Keep these Germplasm',
     '#description' => 'Only include these germplasm (individuals) in export file. Each germplasm name should be on it\'s own line and must match exactly the names in the file chosen (names are shown above).',
     '#rows' => 2,
     );
-  
+
   //update $form['s2']['restrict_dataset']
   if (isset($form_state['values']['vcf_file_id'])) {
     $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
     $form['s2']['restrict_dataset']['germplasm_available']['#rows'] = 5;
     $form['s2']['restrict_dataset']['germplasm_available']['#disabled'] = FALSE;
     $form['s2']['restrict_dataset']['germplasm_select']['#rows'] = 5;
-    
+
     if ($value_4_attributes_placeholder){
       $form['s2']['restrict_dataset']['regions']['#attributes'] = $value_4_attributes_placeholder;
       $form['s2']['restrict_dataset']['regions']['#description'] = 'Only include sites in specific regions. For example, if you want to include all genotypic data for a QTL on Chr1 from 5555 to 6666 then you would enter Chr1:5555..6666 <br>Region input format: Chrom:position-lower-bound..position-upper-bound (e.g.,' . $value_4_attributes_placeholder['placeholder'] . ').';
     }
-    
+
     if ($value_4_germplasm_availalbe){
       $form['s2']['restrict_dataset']['germplasm_available']['#value'] = $value_4_germplasm_availalbe;
     }
@@ -377,21 +376,21 @@ function ajax_vcf_filter_show_description_callback($form, $form_state) {
 /**
   * Grap data in a file to use in Specifiy_fileter_criterria:Germplasm
   * provide a exampel file from directory: example_data
-*/ 
+*/
 function user_example_germplasm_names_file(){
   $file = drupal_get_path('module', 'vcf_filter') . '/example_data/Example_Germplasm_names.csv';
-  
+
   return file_get_contents(drupal_realpath($file));
 }
 
 /**
   * Grap data in a file to use in Specifiy_fileter_criterria:Germplasm
   * grep germplasm names from vcf file
-  * steps: 
+  * steps:
   *   1. use command to obtain header line, convert from string to array
   *   2. remove first 9 elements, and keep all germplasm names
   *   3. convert from array to string and return
-*/ 
+*/
 function user_chart_germplasm_names_file($one_file_id){
   $vcf_file = vcf_filter_get_vcf_file($one_file_id);
   $command_get_germplasm = 'grep "#CHROM" ' . $vcf_file->file_path;
@@ -400,7 +399,7 @@ function user_chart_germplasm_names_file($one_file_id){
   $header = explode("\t", $header);
   for ($i=0;$i<9;$i++){
     array_shift($header);
-    
+
   }
   $header = implode("\n", $header);
   return $header;
