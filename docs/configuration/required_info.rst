@@ -1,4 +1,3 @@
 Required information for Adding a file
-========================================
-
-..image:: ----
+======================================
+.. image:: required_info.1.blank.png

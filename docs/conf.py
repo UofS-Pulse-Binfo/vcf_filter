@@ -54,7 +54,7 @@ author = u'Lacey-Anne Sanderson; Carolyn Caron; Yichao Shen, University of Saska
 # built documents.
 #
 # The short X.Y version.
-version = '1'
+version = '1.0'
 # The full version, including alpha/beta/rc tags.
 release = '1.0'
 
