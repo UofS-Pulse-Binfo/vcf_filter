@@ -19,7 +19,7 @@ The commands from above will download the module into the specified directory. A
   drush pm-enable vcf_filter
 
 
-Now we should able to find this module in "Home » Administration » Tripal » Extensions".
+Now we should able to find this module in Home » Administration » Tripal » Extensions.
 
 .. image:: install.1.menubar.png
 
@@ -46,6 +46,12 @@ In this example, it is clear that Trpdownload_api is required but not available 
   git clone https://github.com/tripal/trpdownload_api.git
 
   drush pm-enable trpdownload_api
+
+
+.. note::
+
+  `VCFtools <http://vcftools.sourceforge.net/>`_ is required for VCF Filter.
+
 
 .. note::
 

@@ -27,4 +27,4 @@ Basic filter options include:
 
 .. note::
 
-  Filter of CVF files is achieved by using commands from `VCFtools <https://vcftools.github.io/index.html>`_.
+  Filter of CVF files is achieved by using bioinoformatic tool `VCFtools <https://vcftools.github.io/index.html>`_.
