@@ -77,6 +77,7 @@ function vcf_filter_qual_matrix_generate_file($variables, $job_id = NULL, $drush
   print str_repeat('-', 60) . "\n";
   $command = 'vcftools --vcf ' . escapeshellarg($filtered_sorted_vcf) . ' --geno-depth --out ' . escapeshellarg($format_tmp);
   print shell_exec($command);
+
   print str_repeat('-', 60) . "\n";
   if (!file_exists($outfile)) {
     if ($drush_use_limited === false){
@@ -102,9 +103,12 @@ function vcf_filter_qual_matrix_generate_file($variables, $job_id = NULL, $drush
       print "ERROR: Unable to move Filtered VCF into expected file director: $filepath\n";
       exit(6);
     }
-
+  }else{
+    //delete uncessary files in temp directory since final file is available for download already
+    unlink($filtered_sorted_vcf);
+    $log_file_name_vcftools = $format_tmp . '.log';
+    unlink($log_file_name_vcftools);
   }
-
   // Done!
   tripal_set_job_progress($job_id, 100);
 

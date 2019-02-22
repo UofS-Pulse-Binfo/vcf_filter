@@ -188,4 +188,5 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
     }
   }
   fclose($handle_out);
+  unlink($in_vcf_filename);
 }
