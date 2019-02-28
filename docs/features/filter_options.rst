@@ -1,6 +1,6 @@
 Various Filter Options
 ======================
-Many filter options are available in this module. Each filter option is well documented with description, example, or even warning as users may not familier with all fiter options.
+Many filter options are available in this module. Each filter option is well documented with description, example, or even warning as users may not familiar with all filter options.
 
 
 
