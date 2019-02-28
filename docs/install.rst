@@ -23,7 +23,6 @@ Now we should able to find this module in Home » Administration » Tripal » Ex
 
 .. image:: install.1.menubar.png
 
-We still need to check dependencies and enable the module before make it public.
 
 
 Dependencies
