@@ -8,7 +8,7 @@ Restrict dataset to specific germplasm or regions
 -------------------------------------------------
   - This section will be collasped if no file is selected.
   - Germplasm names from the file are provided to the user, who can then make changes and copy those they want to the textarea below.
-  - Site name format will also be provided, user can follow the format to keep only sites in one specific region or multiple regions.
+  - Users can follow the example format provided to keep only sites in one specific region or multiple regions.
   - Help information can be configured to improve user experience.
 
 .. image:: filter_options.1.RegGerm.png
