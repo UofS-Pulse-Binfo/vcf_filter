@@ -1,4 +1,4 @@
-Optinlal information for Adding a file
+Optional information for Adding a file
 ======================================
 
 The module can work without optional configuration, but it is highly recommended to provide it for better user experience. Instructions are provided for each configuration option.
