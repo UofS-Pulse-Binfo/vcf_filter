@@ -1,7 +1,7 @@
 Test before Publication
 =====================================
 
-An comprehensive test is recommended before make this module public to users.
+An comprehensive test of your configuration is recommended before making this module public to users. Some good things to check include:
   - test if all files added are downloadable
   - test if download files have proper contents
   - test if accesses are given to proper groups and/or individuals
