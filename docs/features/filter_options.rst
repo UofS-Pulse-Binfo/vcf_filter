@@ -7,7 +7,7 @@ Many filter options are available in this module. Each filter option is well doc
 Restrict dataset to specific germplasm or regions
 -------------------------------------------------
   - This section will be collasped if no file is selected.
-  - All germplasm names will be provided, user can make change on the list of all germplasm and copy wanted ones to textare under for filtering.
+  - Germplasm names from the file are provided to the user, who can then make changes and copy those they want to the textarea below.
   - Site name format will also be provided, user can follow the format to keep only sites in one specific region or multiple regions.
   - Help information can be configured to improve user experience.
 
