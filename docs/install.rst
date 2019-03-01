@@ -58,3 +58,7 @@ Also, VCF Filter can be enabled by drush command:
 .. code:: bash
 
     drush pm-enable vcf_filter
+
+This command will enable the module after which we should able to find it in Home » Administration » Tripal » Extensions.
+
+.. image:: install.1.menubar.png
