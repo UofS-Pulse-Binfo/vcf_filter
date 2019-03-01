@@ -16,7 +16,6 @@ The module is availabe as one repository for `Pulse Bioinformatics, University o
 
   git clone https://github.com/UofS-Pulse-Binfo/vcf_filter.git
 
-The commands from above will download the module into the specified directory. And we should able to find this module in Home » Administration » Tripal » Extensions.
 
 .. image:: install.1.menubar.png
 
