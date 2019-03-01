@@ -17,7 +17,6 @@ The module is availabe as one repository for `Pulse Bioinformatics, University o
   git clone https://github.com/UofS-Pulse-Binfo/vcf_filter.git
 
 
-.. image:: install.1.menubar.png
 
 
 
