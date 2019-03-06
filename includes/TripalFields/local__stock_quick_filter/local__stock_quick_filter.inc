@@ -148,23 +148,21 @@ class local__stock_quick_filter extends ChadoField {
           if(preg_match("/{$stock_name}/i", $germplasm_list)){
             array_push($value['related_vcf_file'], array('name' => $file_detail['name'], 'id' => $vcf_file_id, 'url' => '/chado/filter_vcf?one_germplasm=' . $stock_name));
             
-            //$value['related_vcf_file'][$vcf_file_id]['name'] = $file_detail['name'];
-            //$value['related_vcf_file'][$vcf_file_id]['id'] = $vcf_file_id;
-            //$value['related_vcf_file'][$vcf_file_id]['url'] = '/chado/filter_vcf?one_germplasm=' . $stock_name;
           }
         }
         
       }
     }
+    
   //@test dpm($value);
     if (!empty($value['related_vcf_file'])){
-      //$value['schema:url'] = '/chado/filter_vcf/' . $value['related_vcf_file']['url'];
-      $entity->{$field_name}['und'][0]['value'] = $value['related_vcf_file'];
+      $value['schema:url'] = '/filter_vcf/';
+      $value['stock_name'] = $stock_name;
+      $entity->{$field_name}['und'][0]['value'] = $value;
       //$entity->{$field_name}['und'][0]['qparams'] = $value['related_vcf_file']['vcf_file_id'];
     }
   
   }
-
 
 
     /**

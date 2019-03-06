@@ -1,0 +1,23 @@
+
+/**
+ * CSS for the local__stock_quick_filter Field
+ */
+ 
+.field-type-local--stock-quick-filter .vf-button a {
+  margin-left: 0px;
+  display: inline-block;
+  vertical-align: middle;
+  vertical-align: auto;
+  zoom: 1;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 0;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-size: .8em;
+  line-height: 1em;
+  padding: 0.75em 2em;
+  background: #314355;
+  color: #fff;
+}

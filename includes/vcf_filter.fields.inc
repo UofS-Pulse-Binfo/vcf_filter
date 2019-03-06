@@ -125,44 +125,25 @@ function vcf_filter_bundle_instances_info($entity_type, $bundle) {
   return $instances;
 }
 
-  /**
-    if ($items['0']['value']){
-      $element[0] = array(
-        '#tree' => TRUE,
-      );
-      
-      $element[0][0] = array(
-        '#type' => 'select',
-        '#title'  => t('Select a file'),
-        '#options'  => $items['0']['value'],
-        '#prefix' => '<div id="select_one_vcf_file">',
-        '#suffix' => '</div>'
-      );
-      
-      
-      //link
-      $element[0][1] = array(
-        '#type' => 'markup',
-        '#ajax' => array(
-          'callback' => 'ajax_vcf_filter_url_to_one_file_callback',
-          'wrapper' => 'select_one_vcf_file',
-          'method' => 'replace',
-          'effect' => 'fade',
-        )
-      );
-    }
-  */
-
-
 /**
  * AJAX-enabled form for [field local__stock_quick_filter_formatter].
+ * $select should include:
+ *  1. schema:url
+ *  2. stock(germplasm) name
+ *  3. an array including availalbe(include this stock + user can access) vcf files from vcf_filter 
  */
 function tripal_stock_quick_filter_selector_form($form, &$form_state, $select){
-  $selected_array_key = 0;
+
+  $select_vcf = $select['related_vcf_file'];
+  $selected_array_key = $select_vcf[0]['id'];
   $availalbe_file_names = array();
-  foreach($select as $key => $value){
+  foreach($select_vcf as $key => $value){
     array_push($availalbe_file_names, $value['name']);
   }
+  
+  // add css file, so link to vcf_filter can be a button
+  $module_path = drupal_get_path('module', 'vcf_filter');
+  $form['#attached']['css'][] = $module_path . '/includes/TripalFields/local__stock_quick_filter/theme/local__stock_quick_filter.css';
   
   $form['selecte_a_vcf_file'] = [
     '#type' => 'fieldset',
@@ -175,7 +156,6 @@ function tripal_stock_quick_filter_selector_form($form, &$form_state, $select){
   $form['selecte_a_vcf_file']['vcf_4_select'] = [
     '#type' => 'select',
     '#options'  => $availalbe_file_names,
-
     '#ajax' => array(
       'callback' => 'ajax_vcf_filter_url_to_one_file_callback',
       'wrapper' => 'select_one_vcf_file',
@@ -184,22 +164,35 @@ function tripal_stock_quick_filter_selector_form($form, &$form_state, $select){
     )
   ];
   
-  if (isset($form_state['selecte_a_vcf_file']['vcf_4_select'])) {
-    $selected_file_name = $form_state['selecte_a_vcf_file']['vcf_4_select'];
-  }
-  
   $form['selecte_a_vcf_file']['vcf_filter_link'] = [
     '#type' => 'markup',
-    '#prefix' => '<div class="nd-button">',
-    //'#markup' => l(
-    //  $settings['button_text'],
-    //  $select[$selected_array_key]['url'],
-    //  array('query' => $items[0]['qparams'])
-    //),
-    '#suffix' => '</div>',
-    
+    '#prefix' => '<div class="vf-button">',
+    '#markup' => l(
+      t('Filter'),
+      $select['schema:url'],
+      array('query' => array(
+        'one_germplasm' => $select['stock_name'],
+        'vcf_file_id' => $selected_array_key
+        )
+      )
+    ),
+    '#suffix' => '</div>'
   ];
-  dpm($form, 'form after ajax');
+
+  // if a file is slected, update vcf_file_id of url to vcf_filter
+  if (isset($form_state['values']['selecte_a_vcf_file'])) {
+    $selected_array_key = $select_vcf[ $form_state['values']['selecte_a_vcf_file']['vcf_4_select'] ]['id'];
+
+    $form['selecte_a_vcf_file']['vcf_filter_link']['#markup'] = l(
+      t('Filter'),
+      $select['schema:url'],
+      array('query' => array(
+        'one_germplasm' => $select['stock_name'],
+        'vcf_file_id' => $selected_array_key
+        )
+      )
+    );
+  }
   return $form;
 }
  

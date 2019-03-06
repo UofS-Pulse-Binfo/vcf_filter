@@ -37,20 +37,17 @@ class local__stock_quick_filter_formatter extends ChadoFieldFormatter {
 
     // Get the settings
     $settings = $display['settings'];
-    //@test dpm($entity);
-    //@test dpm($items);
-    dpm($settings, 'settings from formatter');
+    
     if (isset($items['0']['value'])) {
-      $select_vcf = $items['0']['value'];
-      $form = drupal_get_form('tripal_stock_quick_filter_selector_form', $select_vcf);
-      dpm($form, 'form in formatter');
+      
+      $form = drupal_get_form('tripal_stock_quick_filter_selector_form', $items['0']['value']);
+
       $content = drupal_render($form);
       
       $element[] = [
         '#type' => 'markup',
         '#markup' => $content,
       ];
-      
     }
     return $element;
   }
