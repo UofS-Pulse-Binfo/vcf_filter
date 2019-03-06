@@ -37,7 +37,7 @@ function vcf_filter_bundle_fields_info($entity_type, $bundle) {
   // Because we are expecting data housed in Chado we can use the 'data_table'
   // property of the bundle to determine if this bundle is really the one
   // we want the field to be associated with.
-  if (isset($bundle->data_table) AND ($bundle->data_table == $my_data_table)) {
+  if (isset($bundle->data_table) AND ($bundle->data_table == 'stock')) {
     // First add my term.
     tripal_insert_cvterm(array(
       'id' => 'local:stock_quick_filter',
@@ -88,7 +88,7 @@ function vcf_filter_bundle_fields_info($entity_type, $bundle) {
 function vcf_filter_bundle_instances_info($entity_type, $bundle) {
   $instances = array();
 
-  if (isset($bundle->data_table) AND ($bundle->data_table == $my_data_table)) {
+  if (isset($bundle->data_table) AND ($bundle->data_table == 'stock')) {
     $field_name = 'local__stock_quick_filter';
     $field_type = 'local__stock_quick_filter';
     $instances[$field_name] =  array(
@@ -123,4 +123,92 @@ function vcf_filter_bundle_instances_info($entity_type, $bundle) {
   }
 
   return $instances;
+}
+
+  /**
+    if ($items['0']['value']){
+      $element[0] = array(
+        '#tree' => TRUE,
+      );
+      
+      $element[0][0] = array(
+        '#type' => 'select',
+        '#title'  => t('Select a file'),
+        '#options'  => $items['0']['value'],
+        '#prefix' => '<div id="select_one_vcf_file">',
+        '#suffix' => '</div>'
+      );
+      
+      
+      //link
+      $element[0][1] = array(
+        '#type' => 'markup',
+        '#ajax' => array(
+          'callback' => 'ajax_vcf_filter_url_to_one_file_callback',
+          'wrapper' => 'select_one_vcf_file',
+          'method' => 'replace',
+          'effect' => 'fade',
+        )
+      );
+    }
+  */
+
+
+/**
+ * AJAX-enabled form for [field local__stock_quick_filter_formatter].
+ */
+function tripal_stock_quick_filter_selector_form($form, &$form_state, $select){
+  $selected_array_key = 0;
+  $availalbe_file_names = array();
+  foreach($select as $key => $value){
+    array_push($availalbe_file_names, $value['name']);
+  }
+  
+  $form['selecte_a_vcf_file'] = [
+    '#type' => 'fieldset',
+    '#title' => 'Specify a VCF file for filtering',
+    '#tree' => TRUE,
+    '#prefix' => '<div id="select_one_vcf_file">',
+    '#suffix' => '</div>',
+  ];
+  
+  $form['selecte_a_vcf_file']['vcf_4_select'] = [
+    '#type' => 'select',
+    '#options'  => $availalbe_file_names,
+
+    '#ajax' => array(
+      'callback' => 'ajax_vcf_filter_url_to_one_file_callback',
+      'wrapper' => 'select_one_vcf_file',
+      'method' => 'replace',
+      'effect' => 'fade',
+    )
+  ];
+  
+  if (isset($form_state['selecte_a_vcf_file']['vcf_4_select'])) {
+    $selected_file_name = $form_state['selecte_a_vcf_file']['vcf_4_select'];
+  }
+  
+  $form['selecte_a_vcf_file']['vcf_filter_link'] = [
+    '#type' => 'markup',
+    '#prefix' => '<div class="nd-button">',
+    //'#markup' => l(
+    //  $settings['button_text'],
+    //  $select[$selected_array_key]['url'],
+    //  array('query' => $items[0]['qparams'])
+    //),
+    '#suffix' => '</div>',
+    
+  ];
+  dpm($form, 'form after ajax');
+  return $form;
+}
+ 
+ 
+/**
+ * The callback will return the part of the form you want to re-draw.
+ */
+ 
+function ajax_vcf_filter_url_to_one_file_callback($form, &$form_state) {
+
+  return $form['selecte_a_vcf_file'];
 }

@@ -6,6 +6,7 @@
 
 require_once('api/vcf_filter.api.inc');
 require_once('includes/vcf_filter.trpdownload.inc');
+require_once('includes/vcf_filter.fields.inc');
 
 /**
  * Implements hook_menu().

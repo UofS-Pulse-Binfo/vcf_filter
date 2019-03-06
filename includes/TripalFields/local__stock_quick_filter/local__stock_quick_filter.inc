@@ -111,6 +111,58 @@ class local__stock_quick_filter extends ChadoField {
     // need to implement this function. However, if you need to add any
     // additional data to be used in the display, you should add it here.
     parent::load($entity);
+    
+    $record = $entity->chado_record;
+    //@test dpm($record);
+    
+    $settings = $this->instance['settings'];
+    $field_table = $this->instance['settings']['chado_table'];
+    $field_column = $this->instance['settings']['chado_column'];
+    
+    //@test dpm($settings);
+    
+    $field_name = $this->field['field_name'];
+    $field_type = $this->field['type'];
+    
+    // Need to find all vcf files available for this user
+    // find germplasm list and compare it with stock name
+    // record name of vcf files which match
+
+    $available_files = vcf_filter_get_vcf_files();
+    //@test dpm($available_files);
+    
+    $value = array();
+    $value['related_vcf_file']=array();
+    
+    if($record){
+      $stock_name = $record->name;
+      
+      foreach($available_files as $vcf_file_id => $file_detail){
+        
+        $germplasm_list = $file_detail['specific_germplasm'];
+        
+        if (empty($germplasm_list)){
+          continue;
+        }
+        else{
+          if(preg_match("/{$stock_name}/i", $germplasm_list)){
+            array_push($value['related_vcf_file'], array('name' => $file_detail['name'], 'id' => $vcf_file_id, 'url' => '/chado/filter_vcf?one_germplasm=' . $stock_name));
+            
+            //$value['related_vcf_file'][$vcf_file_id]['name'] = $file_detail['name'];
+            //$value['related_vcf_file'][$vcf_file_id]['id'] = $vcf_file_id;
+            //$value['related_vcf_file'][$vcf_file_id]['url'] = '/chado/filter_vcf?one_germplasm=' . $stock_name;
+          }
+        }
+        
+      }
+    }
+  //@test dpm($value);
+    if (!empty($value['related_vcf_file'])){
+      //$value['schema:url'] = '/chado/filter_vcf/' . $value['related_vcf_file']['url'];
+      $entity->{$field_name}['und'][0]['value'] = $value['related_vcf_file'];
+      //$entity->{$field_name}['und'][0]['qparams'] = $value['related_vcf_file']['vcf_file_id'];
+    }
+  
   }
 
 
