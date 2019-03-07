@@ -119,8 +119,6 @@ class local__stock_quick_filter extends ChadoField {
     $field_table = $this->instance['settings']['chado_table'];
     $field_column = $this->instance['settings']['chado_column'];
     
-    //@test dpm($settings);
-    
     $field_name = $this->field['field_name'];
     $field_type = $this->field['type'];
     
@@ -129,13 +127,18 @@ class local__stock_quick_filter extends ChadoField {
     // record name of vcf files which match
 
     $available_files = vcf_filter_get_vcf_files();
-    //@test dpm($available_files);
     
     $value = array();
     $value['related_vcf_file']=array();
     
+    //$stock_name needs to be reformatted for three possibilities:
+    //  separated by space, '-'' or '_'
+    //  if match found in one file, update the stock_name and pass it to formatter
     if($record){
       $stock_name = $record->name;
+      $stock_name_diff_formats = array($stock_name);
+      $stock_name_exp = explode(" ", $stock_name);
+      array_push($stock_name_diff_formats, join('-', $stock_name_exp), join('_', $stock_name_exp));
       
       foreach($available_files as $vcf_file_id => $file_detail){
         
@@ -145,12 +148,14 @@ class local__stock_quick_filter extends ChadoField {
           continue;
         }
         else{
-          if(preg_match("/{$stock_name}/i", $germplasm_list)){
-            array_push($value['related_vcf_file'], array('name' => $file_detail['name'], 'id' => $vcf_file_id, 'url' => '/chado/filter_vcf?one_germplasm=' . $stock_name));
-            
+          foreach($stock_name_diff_formats as $stock_name_one_format){
+            if(preg_match("/{$stock_name_one_format}/i", $germplasm_list)){
+              array_push($value['related_vcf_file'], array('name' => $file_detail['name'], 'id' => $vcf_file_id, 'url' => '/chado/filter_vcf?one_germplasm=' . $stock_name));
+              $stock_name = $stock_name_one_format;
+              break;
+            }
           }
         }
-        
       }
     }
     
@@ -159,7 +164,6 @@ class local__stock_quick_filter extends ChadoField {
       $value['schema:url'] = '/filter_vcf/';
       $value['stock_name'] = $stock_name;
       $entity->{$field_name}['und'][0]['value'] = $value;
-      //$entity->{$field_name}['und'][0]['qparams'] = $value['related_vcf_file']['vcf_file_id'];
     }
   
   }
