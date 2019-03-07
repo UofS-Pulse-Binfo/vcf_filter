@@ -130,7 +130,6 @@ class local__stock_quick_filter extends ChadoField {
     
     $value = array();
     $value['related_vcf_file']=array();
-    
     //$stock_name needs to be reformatted for three possibilities:
     //  separated by space, '-'' or '_'
     //  if match found in one file, update the stock_name and pass it to formatter
@@ -138,28 +137,30 @@ class local__stock_quick_filter extends ChadoField {
       $stock_name = $record->name;
       $stock_name_diff_formats = array($stock_name);
       $stock_name_exp = explode(" ", $stock_name);
-      array_push($stock_name_diff_formats, join('-', $stock_name_exp), join('_', $stock_name_exp));
-      
+      if (sizeof($stock_name_exp) > 1){
+        array_push($stock_name_diff_formats, join('-', $stock_name_exp), join('_', $stock_name_exp));
+      }
       foreach($available_files as $vcf_file_id => $file_detail){
         
         $germplasm_list = $file_detail['specific_germplasm'];
-        
+        $germplasm_list_exp = explode("\n", $germplasm_list);
         if (empty($germplasm_list)){
           continue;
         }
         else{
-          foreach($stock_name_diff_formats as $stock_name_one_format){
-            if(preg_match("/{$stock_name_one_format}/i", $germplasm_list)){
-              array_push($value['related_vcf_file'], array('name' => $file_detail['name'], 'id' => $vcf_file_id, 'url' => '/chado/filter_vcf?one_germplasm=' . $stock_name));
-              $stock_name = $stock_name_one_format;
-              break;
+          foreach ($germplasm_list_exp as $one_germ_name){
+            $one_germ_name = trim($one_germ_name);
+            foreach($stock_name_diff_formats as $stock_name_one_format){
+              if($stock_name_one_format == $one_germ_name){
+                array_push($value['related_vcf_file'], array('name' => $file_detail['name'], 'id' => $vcf_file_id, 'url' => '/chado/filter_vcf?one_germplasm=' . $stock_name));
+                $stock_name = $stock_name_one_format;
+                break;
+              }
             }
           }
         }
       }
     }
-    
-  //@test dpm($value);
     if (!empty($value['related_vcf_file'])){
       $value['schema:url'] = '/filter_vcf/';
       $value['stock_name'] = $stock_name;
