@@ -72,6 +72,7 @@ function vcf_filter_form($form, &$form_state) {
       'effect' => 'fade',
     ),
   );
+  
   if (isset($_GET['vcf_file_id']) AND is_numeric($_GET['vcf_file_id'])) {
     $form['s1']['vcf_file_id']['#default_value'] = $_GET['vcf_file_id'];
   }
@@ -148,7 +149,7 @@ function vcf_filter_form($form, &$form_state) {
     );
 
   //update $form['s2']['restrict_dataset']
-  if (isset($form_state['values']['vcf_file_id'])) {
+  if ((isset($form_state['values']['vcf_file_id'])) or (isset($_GET['vcf_file_id']) AND is_numeric($_GET['vcf_file_id']) )) {
     $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
     $form['s2']['restrict_dataset']['germplasm_available']['#rows'] = 5;
     $form['s2']['restrict_dataset']['germplasm_available']['#disabled'] = FALSE;
@@ -165,6 +166,12 @@ function vcf_filter_form($form, &$form_state) {
     else{
       $form['s2']['restrict_dataset']['germplasm_available']['#value'] = trim(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']));
     }
+  }
+  
+  if (isset($_GET['one_germplasm'])) {
+    $form['s2']['restrict_dataset']['germplasm_select']['#value'] = $_GET['one_germplasm'];
+    $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
+    $form['s2']['restrict_dataset']['germplasm_select']['#rows'] = 2;
   }
 
   $form['s2']['bi-allelic'] = array(
