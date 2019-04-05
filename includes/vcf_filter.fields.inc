@@ -104,7 +104,7 @@ function vcf_filter_bundle_instances_info($entity_type, $bundle) {
         'term_accession' => 'stock_quick_filter',
         'auto_attach' => FALSE,
         'chado_table' => $bundle->data_table,
-        'chado_column' => 'organism_id',
+        'chado_column' => NULL,
         'base_table' => $bundle->data_table,
       ),
       'widget' => array(
@@ -130,7 +130,7 @@ function vcf_filter_bundle_instances_info($entity_type, $bundle) {
  * $select should include:
  *  1. schema:url
  *  2. stock(germplasm) name
- *  3. an array including availalbe(include this stock + user can access) vcf files from vcf_filter 
+ *  3. an array including availalbe(include this stock + user can access) vcf files from vcf_filter
  */
 function tripal_stock_quick_filter_selector_form($form, &$form_state, $select){
 
@@ -140,11 +140,11 @@ function tripal_stock_quick_filter_selector_form($form, &$form_state, $select){
   foreach($select_vcf as $key => $value){
     array_push($availalbe_file_names, $value['name']);
   }
-  
+
   // add css file, so link to vcf_filter can be a button
   $module_path = drupal_get_path('module', 'vcf_filter');
   $form['#attached']['css'][] = $module_path . '/includes/TripalFields/local__stock_quick_filter/theme/local__stock_quick_filter.css';
-  
+
   $form['selecte_a_vcf_file'] = [
     '#type' => 'fieldset',
     '#title' => 'Specify a VCF file for filtering',
@@ -152,7 +152,7 @@ function tripal_stock_quick_filter_selector_form($form, &$form_state, $select){
     '#prefix' => '<div id="select_one_vcf_file">',
     '#suffix' => '</div>',
   ];
-  
+
   $form['selecte_a_vcf_file']['vcf_4_select'] = [
     '#type' => 'select',
     '#options'  => $availalbe_file_names,
@@ -163,7 +163,7 @@ function tripal_stock_quick_filter_selector_form($form, &$form_state, $select){
       'effect' => 'fade',
     )
   ];
-  
+
   $form['selecte_a_vcf_file']['vcf_filter_link'] = [
     '#type' => 'markup',
     '#prefix' => '<div class="vf-button">',
@@ -195,12 +195,12 @@ function tripal_stock_quick_filter_selector_form($form, &$form_state, $select){
   }
   return $form;
 }
- 
- 
+
+
 /**
  * The callback will return the part of the form you want to re-draw.
  */
- 
+
 function ajax_vcf_filter_url_to_one_file_callback($form, &$form_state) {
 
   return $form['selecte_a_vcf_file'];
