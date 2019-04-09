@@ -104,7 +104,7 @@ function vcf_filter_bundle_instances_info($entity_type, $bundle) {
         'term_accession' => 'stock_quick_filter',
         'auto_attach' => FALSE,
         'chado_table' => $bundle->data_table,
-        'chado_column' => NULL,
+        'chado_column' => 'stock_id',
         'base_table' => $bundle->data_table,
       ),
       'widget' => array(

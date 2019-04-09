@@ -80,11 +80,11 @@ class local__stock_quick_filter extends ChadoField {
     // attached asynchronously.
     'auto_attach' => FALSE,
     // The table in Chado that the instance maps to.
-    'chado_table' => '',
+    'chado_table' => 'stock',
     // The column of the table in Chado where the value of the field comes from.
-    'chado_column' => '',
+    'chado_column' => 'stock_id',
     // The base table.
-    'base_table' => '',
+    'base_table' => 'stock',
   );
 
   // A boolean specifying that users should not be allowed to create
