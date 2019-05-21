@@ -32,10 +32,10 @@ function vcf_filter_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['filter_vcf/SNP-Matrix'] = array(
-    'title' => 'Download Filtered VCF: SNP Matrix Format',
+  $items['filter_vcf/Genotype-Matrix'] = array(
+    'title' => 'Download Filtered VCF: Genotype Matrix Format',
     'page callback' => 'trpdownload_download_page',
-    'page arguments' => array('vcf_filter_matrix'),
+    'page arguments' => array('vcf_filter_genotype_matrix'),
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );

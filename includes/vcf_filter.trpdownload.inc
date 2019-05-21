@@ -7,8 +7,8 @@
 // Generate File functions have been moved into their own files:
 // A/B Biparental Format.
 require_once('vcf_filter.trpdownload.abh.inc');
-// SNP Matrix.
-require_once('vcf_filter.trpdownload.matrix.inc');
+// Genotype Matrix.
+require_once('vcf_filter.trpdownload.genotype_matrix.inc');
 // Quality Matrix.
 require_once('vcf_filter.trpdownload.qual_matrix.inc');
 // Basic VCF.
@@ -32,14 +32,6 @@ function vcf_filter_register_trpdownload_type() {
     ),
   );
 
-  $types['vcf_filter_matrix'] = array(
-    'type_name' => 'VCF Filter',
-    'format' => 'SNP Matrix Format',
-    'functions' => array(
-      'generate_file' => 'vcf_filter_matrix_generate_file',
-    ),
-  );
-
   $types['vcf_filter_qual_matrix'] = array(
     'type_name' => 'VCF Filter',
     'format' => 'Quality Matrix Format',
@@ -56,11 +48,19 @@ function vcf_filter_register_trpdownload_type() {
     ),
   );
 
-    $types['vcf_filter_hapmap'] = array(
+  $types['vcf_filter_hapmap'] = array(
     'type_name' => 'VCF Filter',
     'format' => 'Hapmap Format',
     'functions' => array(
       'generate_file' => 'vcf_filter_hapmap_generate_file',
+    ),
+  );
+
+  $types['vcf_filter_genotype_matrix'] = array(
+    'type_name' => 'VCF Filter',
+    'format' => 'Genotype Matrix Format',
+    'functions' => array(
+      'generate_file' => 'vcf_filter_genotype_matrix_generate_file',
     ),
   );
 

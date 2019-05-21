@@ -72,7 +72,7 @@ function vcf_filter_form($form, &$form_state) {
       'effect' => 'fade',
     ),
   );
-  
+
   if (isset($_GET['vcf_file_id']) AND is_numeric($_GET['vcf_file_id'])) {
     $form['s1']['vcf_file_id']['#default_value'] = $_GET['vcf_file_id'];
   }
@@ -167,7 +167,7 @@ function vcf_filter_form($form, &$form_state) {
       $form['s2']['restrict_dataset']['germplasm_available']['#value'] = trim(user_chart_germplasm_names_file($form_state['values']['vcf_file_id']));
     }
   }
-  
+
   if (isset($_GET['one_germplasm'])) {
     $form['s2']['restrict_dataset']['germplasm_select']['#value'] = $_GET['one_germplasm'];
     $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
@@ -242,13 +242,11 @@ function vcf_filter_form($form, &$form_state) {
       'has_quality' => 'No',
       'description' => 'Alleles are coded as A if they match the maternal parent, B based on the paternal parent, whereas H represents a heterozygous call and "-" as missing. <br><strong>NOTE:</strong> This format is only suitable for biparental crosses and any SNPs in which the parents are missing, heterozygous, or the same genotypic call will be <strong>excluded</strong>!',
     ),
-    /*
-    'matrix' => array(
-      'name' => 'SNP Matrix',
+    'genotype_matrix' => array(
+      'name' => 'Genotype Matrix',
       'has_quality' => 'No',
-      'description' => 'Variant by Germplasm matrix of SNP calls.',
+      'description' => 'Genotype by Germplasm matrix.',
     ),
-    */
     'qual_matrix' => array(
       'name' => 'Quality Matrix',
       'has_quality' => 'Yes',
@@ -362,6 +360,7 @@ function vcf_filter_form_submit($form, &$form_state) {
     'qual_matrix' => '/filter_vcf/Quality-Matrix',
     'bgzipped' => '/filter_vcf/Bgzipped',
     'hapmap' => '/filter_vcf/Hapmap',
+    'genotype_matrix' => '/filter_vcf/Genotype-Matrix'
     'vcf' => '/filter_vcf/VCF'
   );
   $form_state['redirect'] = array(
