@@ -356,7 +356,6 @@ function vcf_filter_form_submit($form, &$form_state) {
   // Use format to determine redirect:
   $url = array(
     'abh' => '/filter_vcf/ABH',
-    'matrix' => '/filter_vcf/SNP-Matrix',
     'qual_matrix' => '/filter_vcf/Quality-Matrix',
     'bgzipped' => '/filter_vcf/Bgzipped',
     'hapmap' => '/filter_vcf/Hapmap',

@@ -1,11 +1,11 @@
 <?php
 /**
  * @file
- * Handles download of VCF files in SNP Matrix Format.
+ * Handles download of VCF files in Genotype Matrix Format.
  */
 
 /**
- * Generate SNP Matrix File from VCF.
+ * Generate Genotype Matrix File from VCF.
  *
  * @param $variables
  *   An associative array of parameters including:
@@ -67,7 +67,7 @@ function vcf_filter_genotype_matrix_generate_file($variables, $job_id = NULL) {
   //------------------------------------------------------------------
   // new script starts here, above codes are copied from old script with minor changes
   // the extension of GenotypeMatrix format filename can to be '.matrix.tsv'
-  print "\nConversion from VCF to genotype Matrix Format.\n";
+  print "\nConversion from VCF to Genotype Matrix Format.\n";
   $format_tmp = $variables['fullpath'] . uniqid();
 
   $outfile = $format_tmp . '.matrix.tsv';
@@ -79,10 +79,10 @@ function vcf_filter_genotype_matrix_generate_file($variables, $job_id = NULL) {
 
   if (!file_exists($outfile)) {
     if ($drush_use_limited === false){
-      drush_set_error("ERROR: Unable to convert VCF file to genotype Matrix format.");
+      drush_set_error("ERROR: Unable to convert VCF file to Genotype Matrix format.");
       exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
     }else{
-      print "ERROR: Unable to convert VCF file to genotype Matrix format.\n";
+      print "ERROR: Unable to convert VCF file to Genotype Matrix format.\n";
       exit(5);
     }
   }
@@ -193,12 +193,11 @@ function vcf_filter_convert_VCF_to_GenotypeMatrix($in_vcf_filename, $out_Genotyp
         }
 
         for ($n=0; $n < count($gt_print); $n++) {
-          if (($n != 0) AND ($slash_required = TRUE)){
+          if (($n != 0) && ($slash_required == TRUE)){
             fwrite($handle_out, '/');
           }
           fwrite($handle_out, $gt_print[$n]);
         }
-
       }
       fwrite($handle_out, ("\n"));
     }
