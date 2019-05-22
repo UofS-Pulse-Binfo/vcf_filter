@@ -51,11 +51,19 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL, $drush_use_
   if (!$filtered_vcf) {
     exit(3);
   }
+
+  // need to remove indels from vcf file since Hapmap fortmat support SNPs only
+  print "\nFiltering VCF file for SNPs only\n";
+  $filtered_SNPonly_vcf = vcf_filter_remove_indels_file($filtered_vcf, $drush_use_limited);
+  if (!$filtered_SNPonly_vcf) {
+    exit(4);
+  }
+
   // Sort filtered vcf file for use in Tassel
   print "\nSorting the filtered VCF\n";
-  $filtered_sorted_vcf = vcf_filter_sort_filtered_file($filtered_vcf, $drush_use_limited);
-  if (!$filtered_sorted_vcf) {
-    exit(4);
+  $filtered_SNPonly_sorted_vcf = vcf_filter_sort_filtered_file($filtered_SNPonly_vcf, $drush_use_limited);
+  if (!$filtered_SNPonly_sorted_vcf) {
+    exit(5);
   }
 
   // Half way point...
@@ -66,6 +74,7 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL, $drush_use_
 
   //------------------------------------------------------------------
   // new script starts here, above codes are copied from old script with minor changes
+
   // the extension of hapmap format filename can to be '.hmp'
   print "\nConversion from VCF to Hapmap Format.\n";
   $format_tmp = $variables['fullpath'] . uniqid();
@@ -75,15 +84,15 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL, $drush_use_
   print str_repeat('-', 60)."\n";
 
   //use function converting filter vcf filt to hapmap format
-  vcf_filter_convert_VCF_to_Hapmap($filtered_sorted_vcf, $outfile, $drush_use_limited);
+  vcf_filter_convert_VCF_to_Hapmap($filtered_SNPonly_sorted_vcf, $outfile, $drush_use_limited);
 
   if (!file_exists($outfile)) {
     if ($drush_use_limited === false){
       drush_set_error("ERROR: Unable to convert VCF file to hapmap format.");
-      exit(5); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+      exit(6); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
     }else{
       print "ERROR: Unable to convert VCF file to hapmap format.\n";
-      exit(5);
+      exit(6);
     }
   }
 
@@ -95,10 +104,10 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL, $drush_use_
   if (!file_exists($filepath)) {
     if ($drush_use_limited === false){
       drush_set_error("ERROR: Unable to move hapmap file into expected file director: $filepath");
-      exit(6); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
+      exit(7); // We use exit to trigger a Tripal job error b/c Tripal doesn't check the return code :-(.
     }else{
       print "ERROR: Unable to move hapmap file into expected file director: $filepath\n";
-      exit(6);
+      exit(7);
     }
   }
 
@@ -142,7 +151,7 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
     if ((!preg_match('/^#/', $line)) && (!empty($line))) {
       $splitline = explode("\t", $line);
 
-      fwrite($handle_out, ($splitline[0] . 'p' . $splitline[1]."\t". $splitline[3]. '/'. $splitline[4]));
+      fwrite($handle_out, ($splitline[0] . 'p' . $splitline[1]."\t". $splitline[3]. '/'. join("/", explode(',',$splitline[4]))));
 
       fwrite($handle_out, ("\t". $splitline[0]. "\t". $splitline[1]. "\tNA\tNA\tNA\tNA\tNA\tNA\tNA"));
 
