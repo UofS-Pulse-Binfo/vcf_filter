@@ -53,7 +53,7 @@ function vcf_filter_hapmap_generate_file($variables, $job_id = NULL, $drush_use_
   }
 
   // need to remove indels from vcf file since Hapmap fortmat support SNPs only
-  print "\nFiltering VCF file for SNPs only\n";
+  print "\nFiltering VCF file to remove indel sites\n";
   $filtered_SNPonly_vcf = vcf_filter_remove_indels_file($filtered_vcf, $drush_use_limited);
   if (!$filtered_SNPonly_vcf) {
     exit(4);

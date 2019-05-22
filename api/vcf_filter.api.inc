@@ -245,20 +245,20 @@ function vcf_filter_remove_indels_file($vcf_file_w_indel, $drush_use_limited = f
   $new_file = variable_get('file_temporary_path') . '/' . uniqid();
   $new_file = $new_file . '.filtered.SNPs_only';
 
-  // execute the command
-  // to count number of lines of header (lines start with #)
+  // give vcftools command to remove indels
   $command = 'vcftools --vcf '. $vcf_file_w_indel .' --remove-indels --recode --recode-INFO-all --out '.$new_file;
 
   // execute the command
   //-----------------------------
-  print 'After remove indel site, vcf file will be in: '.$new_file."\n";
+  print 'After remove indel sites, vcf file will be in: '.$new_file."\n";
   shell_exec($command);
 
-  //remove unsorted file
+  //  remove old vcf file
   unlink($vcf_file_w_indel);
 
   $new_file = $new_file . '.recode.vcf';
 
+  //  remove log file genrated by vcftools
   $new_file_log = $new_file . '.log';
   if (file_exists($new_file_log)){
     unlink($new_file_log);
