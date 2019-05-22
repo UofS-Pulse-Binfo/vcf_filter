@@ -22,19 +22,12 @@
  *   are drush function limited
  */
 function vcf_filter_vcf_generate_file($variables, $job_id = NULL, $drush_use_limited = false) {
-
-  // @debug print "Varialbes in vcf_filter_vcf_generate_file():\n" . print_r($variables, TRUE)."\n";
-
   // Create the file and ready it for writting to.
   $filepath = $variables['fullpath'] . $variables['filename'];
   print "File: ".$filepath."\n";
-
   // Get the VCF file details.
   $vcf_file = vcf_filter_get_vcf_file($variables['q']['vcf_file_id']);
   print "\nVCF File (".$vcf_file->name."): ".$vcf_file->file_path."\n";
-
-  // @debug "File name form vcf_filter_get_vcf_file():\n" . print_r($vcf_file)."\n";
-
   // Check the input file still exists.
   if (!file_exists($vcf_file->file_path)) {
     if ($drush_use_limited === false){

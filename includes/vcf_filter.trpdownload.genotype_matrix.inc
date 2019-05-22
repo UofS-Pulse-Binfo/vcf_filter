@@ -21,7 +21,7 @@
  * @param $drush_use_limited
  *   are drush function limited
  */
-function vcf_filter_genotype_matrix_generate_file($variables, $job_id = NULL) {
+function vcf_filter_genotype_matrix_generate_file($variables, $job_id = NULL, $drush_use_limited = false) {
   // Create the file and ready it for writting to.
   $filepath = $variables['fullpath'] . $variables['filename'];
   print "File: ".$filepath."\n";
@@ -193,14 +193,18 @@ function vcf_filter_convert_VCF_to_GenotypeMatrix($in_vcf_filename, $out_Genotyp
         }
 
         for ($n=0; $n < count($gt_print); $n++) {
-          if (($n != 0) && ($slash_required == TRUE)){
+          if ( ($n != 0) && ($slash_required == TRUE) ){
             fwrite($handle_out, '/');
           }
           fwrite($handle_out, $gt_print[$n]);
         }
+
+      // end for loop through germplasm
       }
+
       fwrite($handle_out, ("\n"));
     }
+
   }
   fclose($handle_out);
   unlink($in_vcf_filename);
