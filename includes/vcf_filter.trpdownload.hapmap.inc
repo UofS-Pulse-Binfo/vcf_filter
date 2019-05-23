@@ -176,7 +176,7 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
         }
       }
       elseif(($splitline[8]) == 'GT'){
-        $gt_position = FALSE;
+        $gt_position = -1;
       }
       else{
         die ("ERROR: invalid genotype call format at 8th column: $splitline[8].\n");
@@ -190,7 +190,7 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
       for ($m = 9; $m < count($headerline); $m++) {
 
         // get genotype call using variable $gt_position from last step
-        if ($gt_position == FALSE){
+        if ($gt_position == -1){
           $call_gt = explode('/', str_replace("|","/",$splitline[$m]));
         }
         else{
