@@ -134,7 +134,7 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
 
   // read vcf file by lines
   foreach (new SplFileObject($in_vcf_filename) as $line) {
-    trim ($line);
+    $line = trim($line);
     // if one line starts with '#CHROM' => header
     // if one line doesn't start with '#' and not empty => one SNP line
     if (preg_match('/^#CHROM/', $line)) {
@@ -164,7 +164,7 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
       //   GT:GQ:DP:HQ (VCF specification can be found in https://samtools.github.io/hts-specs/VCFv4.2.pdf)
       // normally, GT should be the first element, but it not alway the case, but GT not exist is not considered possible here
       // there is possibiliby of ONLY GT available
-      trim($splitline[8]);
+
       // set default GT position to be 0, the first one
       $gt_position = 0;
       if (strlen($splitline[8]) > 2){
@@ -217,7 +217,7 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
             fwrite($handle_out, $gt_ref_min[$call_gt[$n]]);
           }
           else {
-            die ("ERROR: invalid genotype call at marker position ". $splitline[0]. " ". $splitline[1]. "\n");
+            die ("ERROR: invalid genotype call at marker position ". $splitline[0]. " ". $splitline[1]. " ". $call_gt[$n]. "\n");
           }
         }
       }
