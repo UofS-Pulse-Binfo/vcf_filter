@@ -191,7 +191,7 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
 
         // get genotype call using variable $gt_position from last step
         if ($gt_position == FALSE){
-          $call_gt = $splitline[$m];
+          $call_gt = explode('/', str_replace("|","/",$splitline[$m]));
         }
         else{
           $call = explode(":", $splitline[$m]);
