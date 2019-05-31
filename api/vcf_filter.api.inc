@@ -197,7 +197,9 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
 function vcf_filter_sort_filtered_file($vcf_file_unsorted, $drush_use_limited = false) {
   $new_file = variable_get('file_temporary_path') . '/' . uniqid();
   $new_file = $new_file . '.filtered.sorted.vcf';
-
+  // error encountered bacause space of /tmp/ is limited, which is default directory for sort to save files
+  // command sort can not write file into it: "sort: write failed: /tmp/****: No space left on device"
+  $file_path_4_sort =  variable_get('file_temporary_path') . '/';
   // execute the command
   // to count number of lines of header (lines start with #)
   $command = 'grep "#" '.$vcf_file_unsorted.' | wc -l';
@@ -207,7 +209,7 @@ function vcf_filter_sort_filtered_file($vcf_file_unsorted, $drush_use_limited = 
   // second, sort the rest first by snp name, then by numerical order of position
   $command = 'head -' . intval($number_line_header) . ' ' . $vcf_file_unsorted . ' > ' . $new_file;
   $command .= ' | tail -n+$((' . intval($number_line_header) . '+1)) ' . $vcf_file_unsorted;
-  $command .= ' | sort -k1,1 -k2,2n >> ' . $new_file;
+  $command .= ' | sort -T ' . $file_path_4_sort . ' -k1,1 -k2,2n >> ' . $new_file;
 
   // execute the command
   //-----------------------------

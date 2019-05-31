@@ -33,7 +33,8 @@ function vcf_filter_genotype_matrix_generate_file($variables, $job_id = NULL, $d
     if ($drush_use_limited === false){
       drush_set_error("ERROR: Original VCF file not found!");
       exit(2);
-    }else{
+    }
+    else{
       print "ERROR: Original VCF file not found!\n";
       exit(2);
     }

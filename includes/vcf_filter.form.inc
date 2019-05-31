@@ -260,7 +260,7 @@ function vcf_filter_form($form, &$form_state) {
     'hapmap' => array(
       'name' => 'Haplotype Map (Hapmap)',
       'has_quality' => 'No',
-      'description' => 'A Hapmap file is a tab-separated values(TSV) format for storing genotypic data. Hapmap format is easier to edit and handle but less informative than VCF format.<br><strong>NOTE:</strong> This format is only suitable for <strong>SNPs</strong>.',
+      'description' => 'A Hapmap file is a tab-separated values(TSV) format for storing genotypic data. Hapmap format is easier to edit and handle but less informative than VCF format.<br><strong>NOTE:</strong> This format is only suitable for <strong>SNPs</strong> and any <strong>INDELS will be removed</strong>.',
     ),
     'bgzipped' => array(
       'name' => 'Bgzipped VCF',
