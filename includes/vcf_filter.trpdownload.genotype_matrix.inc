@@ -160,9 +160,9 @@ function vcf_filter_convert_VCF_to_GenotypeMatrix($in_vcf_filename, $out_Genotyp
       // set default GT position to be 0, the first element
       $gt_position = 0;
       if (strlen($splitline[8]) > 2){
-        $cvf_8c_format = explode(":", $splitline[8]);
-        for ($i = 0; $i < count($cvf_8c_format); $i++){
-          if ($cvf_8c_format[$i] == 'GT'){
+        $vcf_8c_format = explode(":", $splitline[8]);
+        for ($i = 0; $i < count($vcf_8c_format); $i++){
+          if ($vcf_8c_format[$i] == 'GT'){
             $gt_position = $i;
           }
         }
