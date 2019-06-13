@@ -244,37 +244,31 @@ function vcf_filter_form($form, &$form_state) {
       'name' => 'ABH Format',
       'has_quality' => 'No',
       'description' => 'Alleles are coded as A if they match the maternal parent, B based on the paternal parent, whereas H represents a heterozygous call and "-" as missing. <br><strong>NOTE:</strong> This format is only suitable for biparental crosses and any SNPs in which the parents are missing, heterozygous, or the same genotypic call will be <strong>excluded</strong>!',
-      'weight' => '0',
     ),
     'genotype_matrix' => array(
       'name' => 'Genotype Matrix',
       'has_quality' => 'No',
       'description' => 'Variant by Germplasm matrix of Genotype per call in a tab-separated values(TSV) format.',
-      'weight' => '1',
     ),
     'qual_matrix' => array(
       'name' => 'Quality Matrix',
       'has_quality' => 'Yes',
       'description' => 'Variant by Germplasm matrix of Read Depth per call.',
-      'weight' => '2',
     ),
     'vcf' => array(
       'name' => 'Variant Call Format (VCF)',
       'has_quality' => 'Yes',
       'description' => 'A variant by germplasm matrix with each cell containing a combination of SNP call and quality information. See the '.l('Specification', 'http://samtools.github.io/hts-specs/VCFv4.2.pdf').' for more information.',
-      'weight' => '3',
     ),
     'hapmap' => array(
       'name' => 'Haplotype Map (Hapmap)',
       'has_quality' => 'No',
       'description' => 'A Hapmap file is a tab-separated values(TSV) format for storing genotypic data. Hapmap format is easier to edit and handle but less informative than VCF format.<br><strong>NOTE:</strong> This format is only suitable for <strong>SNPs</strong> and any <strong>INDELS will be removed</strong>.',
-      'weight' => '4',
     ),
     'bgzipped' => array(
       'name' => 'Bgzipped VCF',
       'has_quality' => 'Yes',
       'description' => 'An archive containing a bgzipped VCF file and a Tabix file. This combination is required by various programs such as the R package VariantAnnotation. See the '.l('tabix manual','http://www.htslib.org/doc/tabix.html').' for more information.',
-      'weight' => '5',
     ),
   );
   $form['s3']['format'] = array(
@@ -283,11 +277,12 @@ function vcf_filter_form($form, &$form_state) {
     '#options' => $options,
     '#multiple' => FALSE,
   );
-  // update available formats
+  // update available formats, disable formats not suitable for this vcf file
   if ((isset($form_state['values']['vcf_file_id'])) or (isset($_GET['vcf_file_id']) AND is_numeric($_GET['vcf_file_id']) )) {
     foreach($array_export_format_selection as $key => $value){
 
       if ($value == '0'){
+        // other options for this job, keep it since it's not ideal now
         //$form['s3']['format'][$key]['#attributes']['readonly'] = 'readonly';
         //$form['s3']['format'][$key]['#disable'] = true;
         $form['s3']['format'][$key]['#weight'] = '99';
