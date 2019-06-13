@@ -286,14 +286,15 @@ function vcf_filter_form($form, &$form_state) {
   // update available formats
   if ((isset($form_state['values']['vcf_file_id'])) or (isset($_GET['vcf_file_id']) AND is_numeric($_GET['vcf_file_id']) )) {
     foreach($array_export_format_selection as $key => $value){
+
       if ($value == '0'){
-        $form['s3']['format'][$key]['#disable'] = true;
+        //$form['s3']['format'][$key]['#attributes']['readonly'] = 'readonly';
+        //$form['s3']['format'][$key]['#disable'] = true;
+        $form['s3']['format'][$key]['#weight'] = '99';
         //@TO-DO add weight to each option so it stays in original order
-        //$form['s3']['format'][$key]['#weight'] = $form_state['s3']['format']['#options'][$key]['weight'];
       }
     }
   }
-
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Filter',
