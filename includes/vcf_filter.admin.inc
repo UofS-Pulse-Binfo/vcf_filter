@@ -143,6 +143,7 @@ function vcf_filter_admin_vcf_file_form($form, &$form_state) {
   $format_options = array(
     'abh' => 'ABH Format',
     'genotype_matrix' => 'Genotype Matrix',
+    'qual_matrix' => 'Quality Matrix',
     'vcf' => 'Variant Call Format (VCF)',
     'hapmap' => 'Haplotype Map (Hapmap)',
     'bgzipped' => 'Bgzipped VCF'
@@ -152,8 +153,8 @@ function vcf_filter_admin_vcf_file_form($form, &$form_state) {
     '#type' => 'checkboxes',
     '#title' => t('Available export formats for this file'),
     '#options' => $format_options,
-    '#description' => 'test',
-    '#default_value' => (isset($obj->export_format_selection)) ? $obj->export_format_selection : '',
+    '#description' => 'Please select suitable export formts for this vcf file.',
+    '#default_value' => (isset($obj->export_format_selection)) ? json_decode($obj->export_format_selection) : '',
   );
 
   $op = ucwords($form_state['build_info']['args'][0]);
@@ -195,7 +196,7 @@ function vcf_filter_admin_vcf_file_form_submit($form, &$form_state) {
       'description' => $form_state['values']['description'],
       'specific_germplasm' => $form_state['values']['specific_germplasm'],
       'chromosome_format' => $form_state['values']['chromosome_format'],
-      'export_format_selection' => $form_state['values']['export_format_selection'],
+      'export_format_selection' => json_encode($form_state['values']['export_format_selection']),
     );
 
     if ($form_state['values']['op'] == 'Add') {
