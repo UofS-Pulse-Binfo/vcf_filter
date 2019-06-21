@@ -10,7 +10,7 @@
 function vcf_filter_position_search_form($form, &$form_state) {
 
   dpm($form_state, '$form_state');
-
+  dpm($file, '$file');
   $form['#attached']['css'][] = array(
     'data' => '
       .form-type-checkbox label {
@@ -36,6 +36,7 @@ function vcf_filter_position_search_form($form, &$form_state) {
     '#type' => 'item',
     '#markup' => 'This form provides filtering of existing VCF files and export into common formats. Most of the filter criteria and many of the formats are provided by <a href="https://vcftools.github.io" target="_blank">VCFtools</a><sup>+</sup>.',
   );
+  $files = vcf_filter_get_vcf_files();
 
   $form['s1'] = array(
     '#type' => 'fieldset',
@@ -49,12 +50,14 @@ function vcf_filter_position_search_form($form, &$form_state) {
     '#title' => 'Marker Name',
     '#default_value' => '',
   );
+  /*
   $form['s1']['Backbone'] = array(
     '#type' => 'textfield',
     '#title' => 'Backbone Name',
     '#default_value' => '',
   );
-  $form['s1']['Position'] = array(
+  */
+  $form['s1']['position'] = array(
     '#type' => 'textfield',
     '#title' => 'Position',
     '#default_value' => '',
@@ -72,23 +75,35 @@ function vcf_filter_position_search_form($form, &$form_state) {
     display results using form #type markup. use theme_table to create a table.
   */
   if ($form_state['values']){
+    $marker_4vcftools = $form_state['values']['marker_name'] . ':'. $form_state['values']['position'];
 
-    $files = vcf_filter_get_vcf_files();
+    $available_files = position_check_use_bcftools($marker_4vcftools, $files);
 
-    $available_files = position_check_use_bcftools($position, $files);
-    dpm($file, '$file');
-    /*
-  $list_of_files = array();
+    if (!empty($available_files)){
+      // list all files and provide url if there is at least one file available
+      $title = t('Search Results');
+      $type = 'ul';
+      $items = array();
+      foreach($available_files as $one_vcf_id => $one_vcf_info ){
 
-  $form['s2'] = array(
-    '#type' => 'markup',
-    '#title' => 'Search Results',
-    '#markup' => $list_of_files,
-    '#description' => 'All files containing this site.',
-  );
-  */
 
+
+      }
+      /*
+      $form['s2'] = array(
+        '#type' => 'markup',
+        '#title' => 'Search Results',
+        '#markup' => $list,
+      );
+      */
+    }
+    else{
+      // no file available, print warning messages
+
+    }
   }
+
+
 
   return $form;
 }
@@ -116,10 +131,19 @@ function vcf_filter_position_search_form_submit($form, &$form_state) {
  *  bgzip -c file_name.vcf > file_name.vcf.gz
  *  tabix -p file_name.vcf.gz
  */
-function position_check_use_bcftools($position, $filepath){
+function position_check_use_bcftools($position, $all_vcf_files){
+  $vcf_file_w_marker = $all_vcf_files;
+  foreach($all_vcf_files as $file_id => $file_info){
+    $command = 'bcftools view --no-header -r ';
+    $command .= $position . ' ' . $file_info['file_path'];
+    $output = shell_exec($command);
 
+    if (empty($output)){
+      unset($vcf_file_w_marker[$file_id]);
+    }
 
-
+  }
+  return $vcf_file_w_marker;
 }
 
 
