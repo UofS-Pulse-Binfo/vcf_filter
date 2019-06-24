@@ -73,21 +73,21 @@ function vcf_filter_position_search_form($form, &$form_state) {
     display results using form #type markup. use theme_table to create a table.
   */
   if (isset($form_state['values'])){
-    $marker_4vcftools = $form_state['values']['marker_name'] . ':' . $form_state['values']['position'] . '..' . $form_state['values']['position'];
+    //$marker_4vcftools = $form_state['values']['marker_name'] . ':' . $form_state['values']['position'] . '..' . $form_state['values']['position'];
     $current_url = url('filter_vcf', array('absolute' => TRUE));
 
     if (!empty($form_state['values']['marker_name'])){
       $marker_4search = trim($form_state['values']['marker_name']);
       $marker_4search_exp = explode('p', $marker_4search);
       $marker_4search = $marker_4search_exp[0] . ':' . $marker_4search_exp[1];
-      $available_files = position_check_use_bcftools($marker_4vcftools, $files);
+      $available_files = position_check_use_bcftools($marker_4search, $files);
       $marker_4search = $marker_4search . '..' . $marker_4search_exp[1];
     }
     else{
       $marker_4search_bb = trim($form_state['values']['backbone']);
       $marker_4search_p = trim($form_state['values']['position']);
       $marker_4search = $marker_4search_bb . ':' . $marker_4search_p;
-      $available_files = position_check_use_bcftools($marker_4vcftools, $files);
+      $available_files = position_check_use_bcftools($marker_4search, $files);
       $marker_4search = $marker_4search . '..' . $marker_4search_p;
     }
     dpm($available_files, '$available_files');
@@ -168,12 +168,11 @@ function vcf_filter_position_search_form_submit($form, &$form_state) {
  *  tabix -p file_name.vcf.gz
  */
 function position_check_use_bcftools($position, $all_vcf_files){
-  $vcf_file_w_marker = $all_vcf_files;
+    $vcf_file_w_marker = $all_vcf_files;
   foreach($all_vcf_files as $file_id => $file_info){
     $command = 'bcftools view --no-header -r ';
-    $command .= $position . ' ' . $file_info['file_path'];
+    $command .= $position . ' ' . $file_info['file_path'] . '.gz';
     $output = shell_exec($command);
-
     if (empty($output)){
       unset($vcf_file_w_marker[$file_id]);
     }
