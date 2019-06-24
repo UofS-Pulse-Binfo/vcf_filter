@@ -10,23 +10,13 @@
 function vcf_filter_position_search_form($form, &$form_state) {
 
   dpm($form_state, '$form_state');
-  
+
   $form['#attached']['css'][] = array(
     'data' => '
-      .form-type-checkbox label {
-        font-weight: bold;
-        position: relative;
-        top: 2px;
-      }
-      table caption {
+      .position_search_option {
         font-weight: bold;
         margin-top: 5px;
         padding-top: 15px;
-        border-top: 1px solid #d0d0d0;
-      }
-      .citation {
-        font-size: 0.8em;
-        font-style: italic;
       }
     ',
     'type' => 'inline',
@@ -34,35 +24,41 @@ function vcf_filter_position_search_form($form, &$form_state) {
 
   $form['intro'] = array(
     '#type' => 'item',
-    '#markup' => 'This form provides filtering of existing VCF files and export into common formats. Most of the filter criteria and many of the formats are provided by <a href="https://vcftools.github.io" target="_blank">VCFtools</a><sup>+</sup>.',
+    '#markup' => 'VCF Position Search is part of modeule VCF Bulk Export and it supplies function of searching marker/site cross all of our VCF files.',
   );
 
   $files = vcf_filter_get_vcf_files();
-  //dpm($files, 'VCF files:');
 
   $form['s1'] = array(
     '#type' => 'fieldset',
     '#title' => 'Search Criteria',
-    '#description' => 'The following table contains all the available VCF Files. Choose the one you would like to filter and export by selecting the circle at the beginning of the appropriate row.',
-    //'#prefix' => '<div id="all-vcf-options">',
-    //'#suffix' => '</div>',
+    '#description' => 'Please fill in search criteria. You search by marker name or backbone name plus postion.',
+
   );
   $form['s1']['marker_name'] = array(
     '#type' => 'textfield',
     '#title' => 'Marker Name',
-    '#default_value' => '',
+    '#attributes' =>array('placeholder' => 'Chr1p123456789'),
+    '#prefix' => '<div class="position_search_option">',
+    '#suffix' => '</div>',
   );
-  /*
-  $form['s1']['Backbone'] = array(
+
+  $form['s1']['or'] = array(
+    '#type' => 'markup',
+    '#markup' => '<div style="color: #314355; font-weight: bold">OR</div>',
+  );
+
+  $form['s1']['backbone'] = array(
     '#type' => 'textfield',
     '#title' => 'Backbone Name',
-    '#default_value' => '',
+    '#attributes' =>array('placeholder' => 'Chr1'),
+    '#prefix' => '<div class="position_search_option">',
   );
-  */
   $form['s1']['position'] = array(
     '#type' => 'textfield',
     '#title' => 'Position',
-    '#default_value' => '',
+    '#attributes' =>array('placeholder' => '123456789'),
+    '#suffix' => '</div>',
   );
 
   $form['submit'] = array(
@@ -77,43 +73,73 @@ function vcf_filter_position_search_form($form, &$form_state) {
     display results using form #type markup. use theme_table to create a table.
   */
   if (isset($form_state['values'])){
-    $marker_4vcftools = $form_state['values']['marker_name'] . ':'. $form_state['values']['position'];
+    $marker_4vcftools = $form_state['values']['marker_name'] . ':' . $form_state['values']['position'] . '..' . $form_state['values']['position'];
+    $current_url = url('filter_vcf', array('absolute' => TRUE));
 
+    if (!empty($form_state['values']['marker_name'])){
+      $marker_4search = trim($form_state['values']['marker_name']);
+      $marker_4search_exp = explode('p', $marker_4search);
+      $marker_4search = $marker_4search_exp[0] . ':' . $marker_4search_exp[1];
+      $available_files = position_check_use_bcftools($marker_4vcftools, $files);
+      $marker_4search = $marker_4search . '..' . $marker_4search_exp[1];
+    }
+    else{
+      $marker_4search_bb = trim($form_state['values']['backbone']);
+      $marker_4search_p = trim($form_state['values']['position']);
+      $marker_4search = $marker_4search_bb . ':' . $marker_4search_p;
+      $available_files = position_check_use_bcftools($marker_4vcftools, $files);
+      $marker_4search = $marker_4search . '..' . $marker_4search_p;
+    }
+    dpm($available_files, '$available_files');
     //$available_files = position_check_use_bcftools($marker_4vcftools, $files);
     //@test list all files
-    $available_files = $files;
+    //$available_files = $files;
     if (!empty($available_files)){
 	    // list all files and provide url if there is at least one file available
 	    // list file name also link to vcf_file page by url
 	    $item_files = array(
 	    	'items' => array(),
-		'title' => 'Search Results',
-		'type' => 'ul',
-		'attributes' => array(),
+		    'title' => '',
+		    'type' => 'ul',
+		    'attributes' => array(),
 	    );
 
       foreach($available_files as $one_vcf_id => $one_vcf_info ){
         //$list .= theme_item_list('items'=> $one_vcf_info['name'], 'title' => NULL, 'type' => 'ul', 'attributes' => );
-        $item_files['items'][$one_vcf_id] = $one_vcf_info['name'];        
-
+        $item_files['items'][$one_vcf_id]['data'] = l($one_vcf_info['name'],
+          $current_url,
+          array('query' => array(
+            'vcf_file_id' => $one_vcf_id,
+            'one_region'=> $marker_4search
+            )
+          )
+        );
       }
-	    dpm($item_files, 'file for theme');
 	    $list = theme_item_list( $item_files);
-	    dpm($list, 'markup list:');
       $form['s2'] = array(
-        '#type' => 'markup',
+        '#type' => 'fieldset',
         '#title' => 'Search Results',
+        '#description' => 'List of VCF files which include this postion.',
+      );
+      $form['s2']['list'] = array(
+        '#type' => 'markup',
         '#markup' => $list,
       );
-      
+
     }
     else{
       // no file available, print warning messages
-
+      $form['s2'] = array(
+        '#type' => 'fieldset',
+        '#title' => 'Search Results',
+        '#description' => '',
+      );
+      $form['s2']['list'] = array(
+        '#type' => 'markup',
+        '#markup' => 'No serach result. This marker/site can not be found in any file.',
+      );
     }
   }
-
-
 
   return $form;
 }
