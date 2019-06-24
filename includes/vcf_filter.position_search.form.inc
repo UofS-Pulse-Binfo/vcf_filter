@@ -10,7 +10,7 @@
 function vcf_filter_position_search_form($form, &$form_state) {
 
   dpm($form_state, '$form_state');
-  dpm($file, '$file');
+  
   $form['#attached']['css'][] = array(
     'data' => '
       .form-type-checkbox label {
@@ -36,7 +36,9 @@ function vcf_filter_position_search_form($form, &$form_state) {
     '#type' => 'item',
     '#markup' => 'This form provides filtering of existing VCF files and export into common formats. Most of the filter criteria and many of the formats are provided by <a href="https://vcftools.github.io" target="_blank">VCFtools</a><sup>+</sup>.',
   );
+
   $files = vcf_filter_get_vcf_files();
+  //dpm($files, 'VCF files:');
 
   $form['s1'] = array(
     '#type' => 'fieldset',
@@ -74,28 +76,36 @@ function vcf_filter_position_search_form($form, &$form_state) {
 
     display results using form #type markup. use theme_table to create a table.
   */
-  if ($form_state['values']){
+  if (isset($form_state['values'])){
     $marker_4vcftools = $form_state['values']['marker_name'] . ':'. $form_state['values']['position'];
 
-    $available_files = position_check_use_bcftools($marker_4vcftools, $files);
-
+    //$available_files = position_check_use_bcftools($marker_4vcftools, $files);
+    //@test list all files
+    $available_files = $files;
     if (!empty($available_files)){
-      // list all files and provide url if there is at least one file available
-      $title = t('Search Results');
-      $type = 'ul';
-      $items = array();
+	    // list all files and provide url if there is at least one file available
+	    // list file name also link to vcf_file page by url
+	    $item_files = array(
+	    	'items' => array(),
+		'title' => 'Search Results',
+		'type' => 'ul',
+		'attributes' => array(),
+	    );
+
       foreach($available_files as $one_vcf_id => $one_vcf_info ){
-
-
+        //$list .= theme_item_list('items'=> $one_vcf_info['name'], 'title' => NULL, 'type' => 'ul', 'attributes' => );
+        $item_files['items'][$one_vcf_id] = $one_vcf_info['name'];        
 
       }
-      /*
+	    dpm($item_files, 'file for theme');
+	    $list = theme_item_list( $item_files);
+	    dpm($list, 'markup list:');
       $form['s2'] = array(
         '#type' => 'markup',
         '#title' => 'Search Results',
         '#markup' => $list,
       );
-      */
+      
     }
     else{
       // no file available, print warning messages
