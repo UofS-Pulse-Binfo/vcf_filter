@@ -122,7 +122,7 @@ function vcf_filter_position_search_form($form, &$form_state) {
       $form['s2'] = array(
         '#type' => 'fieldset',
         '#title' => 'Search Results',
-        '#description' => 'List of VCF files which include this postion.<br>Each file name is linked to VCF Bulk Export with file selected and position filled.',
+        '#description' => 'List of VCF files which include this variant.<br>Each file name is linked to VCF Bulk Export with file selected and position filled.',
       );
       $form['s2']['list'] = array(
         '#type' => 'markup',
@@ -139,7 +139,7 @@ function vcf_filter_position_search_form($form, &$form_state) {
       );
       $form['s2']['list'] = array(
         '#type' => 'markup',
-        '#markup' => 'No matched variant found in VCF files.',
+        '#markup' => 'No matched variant in VCF files.',
       );
     }
   }
