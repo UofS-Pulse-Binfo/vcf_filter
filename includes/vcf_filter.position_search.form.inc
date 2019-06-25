@@ -149,6 +149,28 @@ function vcf_filter_position_search_form($form, &$form_state) {
  */
 function vcf_filter_position_search_form_validate($form, &$form_state) {
 
+  // CHECK: Marker name or backbone+position
+  if (empty($form_state['values']['marker_name'])) {
+
+    if (empty($form_state['values']['backbone']) && empty($form_state['values']['position'])){
+      form_set_error('S1', 'Please provide search criteria.');
+    }
+    elseif(empty($form_state['values']['backbone'])){
+      form_set_error('backbone', 'Backbone is required if search by backbone and position is expected.');
+    }
+    elseif(empty($form_state['values']['position'])){
+      form_set_error('position', 'Position is required if search by backbone and position is expected.');
+    }
+  }
+  elseif(!empty($form_state['values']['backbone']) && !empty($form_state['values']['position'])){
+    $bb_and_ps = $form_state['values']['backbone'] . 'p' . $form_state['values']['position'];
+    $bb_and_ps = trim($bb_and_ps);
+    $form_state['values']['marker_name'] = trim($form_state['values']['marker_name']);
+    if ($bb_and_ps != $form_state['values']['marker_name']){
+      form_set_error('position', 'Both Marker Name and Backbone/Position are provided but don\'t match, please specifiy only one.');
+    }
+  }
+
 }
 
 /**
@@ -179,37 +201,4 @@ function position_check_use_bcftools($position, $all_vcf_files){
 
   }
   return $vcf_file_w_marker;
-}
-
-
-/**
-  * Grap data in a file to use in Specifiy_fileter_criterria:Germplasm
-  * provide a exampel file from directory: example_data
-*/
-function user_example_germplasm_names_file(){
-  $file = drupal_get_path('module', 'vcf_filter') . '/example_data/Example_Germplasm_names.csv';
-
-  return file_get_contents(drupal_realpath($file));
-}
-
-/**
-  * Grap data in a file to use in Specifiy_fileter_criterria:Germplasm
-  * grep germplasm names from vcf file
-  * steps:
-  *   1. use command to obtain header line, convert from string to array
-  *   2. remove first 9 elements, and keep all germplasm names
-  *   3. convert from array to string and return
-*/
-function user_chart_germplasm_names_file($one_file_id){
-  $vcf_file = vcf_filter_get_vcf_file($one_file_id);
-  $command_get_germplasm = 'grep "#CHROM" ' . $vcf_file->file_path;
-  $header = shell_exec($command_get_germplasm);
-  $temp_file = variable_get('file_temporary_path') . '/' .  'germplasm_name_all'. uniqid();
-  $header = explode("\t", $header);
-  for ($i=0;$i<9;$i++){
-    array_shift($header);
-
-  }
-  $header = implode("\n", $header);
-  return $header;
 }
