@@ -153,7 +153,7 @@ function vcf_filter_admin_vcf_file_form($form, &$form_state) {
     '#type' => 'checkboxes',
     '#title' => t('Available export formats for this file'),
     '#options' => $format_options,
-    '#description' => 'Please select suitable export formts for this vcf file.',
+    '#description' => 'Please select suitable export formats for this vcf file.',
     '#default_value' => (isset($obj->export_format_selection)) ? json_decode($obj->export_format_selection) : '',
   );
 
