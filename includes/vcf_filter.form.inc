@@ -124,7 +124,6 @@ function vcf_filter_form($form, &$form_state) {
     '#title' => 'Specify filter criteria.',
     '#tree' => TRUE,
     '#prefix' => '<span class="stages stage2">2</span>',
-    '#suffix' => '</div>',
   );
 
   $form['s2']['restrict_dataset'] = array(
@@ -161,7 +160,9 @@ function vcf_filter_form($form, &$form_state) {
       $value_4_attributes_placeholder = trim($curr_file['chromosome_format'] . ':111111..222222');
       $value_4_attributes_placeholder = array('placeholder' => $value_4_attributes_placeholder);
     }
-
+    if (!empty($curr_file['export_format_selection'])){
+      $array_export_format_selection = json_decode($curr_file['export_format_selection']);
+    }
   }
 
     $form['s2']['restrict_dataset']['help'] = array(
@@ -257,6 +258,7 @@ function vcf_filter_form($form, &$form_state) {
     '#type' => 'fieldset',
     '#title' => 'Pick your Export format.',
     '#description' => 'Select one of the formats listed below and the filtered VCF will be converted accordingly. <strong>Keep in mind that if you choose a format with no quality information, you should have been stringent with your filtering criteria to ensure you are working with good data.</strong>',
+    '#suffix' => '</div>',
     '#prefix' => '<span class="stages stage3">3</span>',
   );
 
@@ -303,7 +305,19 @@ function vcf_filter_form($form, &$form_state) {
     '#options' => $options,
     '#multiple' => FALSE,
   );
+  // update available formats, disable formats not suitable for this vcf file
+  if ((isset($form_state['values']['vcf_file_id'])) or (isset($_GET['vcf_file_id']) AND is_numeric($_GET['vcf_file_id']) )) {
+    foreach($array_export_format_selection as $key => $value){
 
+      if ($value == '0'){
+        // other options for this job, keep it since it's not ideal now
+        //$form['s3']['format'][$key]['#attributes']['readonly'] = 'readonly';
+        //$form['s3']['format'][$key]['#disable'] = true;
+        $form['s3']['format'][$key]['#weight'] = '99';
+        //@TO-DO add weight to each option so it stays in original order
+      }
+    }
+  }
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Filter',
@@ -315,7 +329,6 @@ function vcf_filter_form($form, &$form_state) {
     '#suffix' => '</div>',
     '#markup' => '<sup>+</sup> <a href="https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btr330">The Variant Call Format and VCFtools</a>, Petr Danecek, Adam Auton, Goncalo Abecasis, Cornelis A. Albers, Eric Banks, Mark A. DePristo, Robert Handsaker, Gerton Lunter, Gabor Marth, Stephen T. Sherry, Gilean McVean, Richard Durbin and 1000 Genomes Project Analysis Group, Bioinformatics, 2011.',
   );
-
   return $form;
 }
 
@@ -425,7 +438,7 @@ function vcf_filter_form_submit($form, &$form_state) {
  * AJAX Callback: Update the description of the VCF file.
  */
 function ajax_vcf_filter_show_description_callback($form, $form_state) {
-  return array($form['s1'], $form['s2']);
+  return array($form['s1'], $form['s2'], $form['s3']);
 }
 
 
