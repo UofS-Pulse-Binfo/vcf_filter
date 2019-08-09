@@ -126,7 +126,7 @@ function vcf_filter_convert_VCF_to_GenotypeMatrix($in_vcf_filename, $out_Genotyp
 
   // read vcf file by lines
   foreach (new SplFileObject($in_vcf_filename) as $line) {
-    trim ($line);
+    $line = trim($line);
     // if one line starts with '#CHROM' => header
     // if one line doesn't start with '#' and not empty => one SNP line
     if (preg_match('/^#CHROM/', $line)) {
@@ -152,17 +152,43 @@ function vcf_filter_convert_VCF_to_GenotypeMatrix($in_vcf_filename, $out_Genotyp
       // corresponding $gt_ref_min[0] for reference gt, $gt_ref_min[1] for first alternate and so on
       $gt_ref_min = array_merge(array("$splitline[3]"), explode(',',$splitline[4]));
 
+      // need to check 8th column to determine the postiion of GT
+      // the format in 8th column should look like:
+      //   GT:GQ:DP:HQ (VCF specification can be found in https://samtools.github.io/hts-specs/VCFv4.2.pdf)
+      // normally, GT should be the first element, but it not alway the case, but GT not exist is not considered possible here
+      // there is possibiliby of ONLY GT available
+      // set default GT position to be 0, the first element
+      $gt_position = 0;
+      if (strlen($splitline[8]) > 2){
+        $vcf_8c_format = explode(":", $splitline[8]);
+        for ($i = 0; $i < count($vcf_8c_format); $i++){
+          if ($vcf_8c_format[$i] == 'GT'){
+            $gt_position = $i;
+          }
+        }
+      }
+      elseif(($splitline[8]) == 'GT'){
+        $gt_position = -1;
+      }
+      else{
+        die ("ERROR: invalid genotype call format at 8th column: $splitline[8].\n");
+      }
+
       // 2 loops: first by samples (9th column to end)
       // second by number of GT(genotype)(e.g.:0/0) in FORMAT(e.g.: 0/0:0,36,89:51:5:40) of vcf file
       // at first explod 0/0:0,36,89:51:5:40 into array("0/0","0,36,89",...,"40") then explode first element into new array("0", "0")
       // then match "0" for reference gt, "1" for first alternate and so on
 
       for ($m = 9; $m < count($headerline); $m++) {
-        $call = explode(":", $splitline[$m]);
-
-        // should explode both by '/' and '|' for both unpashed and pahsed
-        $call_gt = explode('/', str_replace("|","/",$call[0]));
-
+        // get genotype call using variable $gt_position from last step
+        if ($gt_position == -1){
+          $call_gt = explode('/', str_replace("|","/",$splitline[$m]));
+        }
+        else{
+          $call = explode(":", $splitline[$m]);
+          // should explode both by '/' and '|' for both unpashed and pahsed
+          $call_gt = explode('/', str_replace("|","/",$call[$gt_position]));
+        }
         fwrite($handle_out, "\t");
 
         /*check the number of genotypes exits
