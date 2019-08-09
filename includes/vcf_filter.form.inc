@@ -74,7 +74,6 @@ function vcf_filter_form($form, &$form_state) {
   foreach ($files as $vcf_file_id => $d) {
     $files[$vcf_file_id]['num_snps'] = number_format($d['num_snps']);
     if ($prev_assembly != $d['backbone']) {
-      dpm($d, 'add to this row');
       $files[$vcf_file_id]['#attributes'] = array('class' => array('new-assembly'));
       $prev_assembly = $d['backbone'];
     }
