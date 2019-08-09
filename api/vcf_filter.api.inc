@@ -22,7 +22,8 @@ function vcf_filter_get_vcf_files() {
     SELECT f.*
     FROM {vcf_files_perm} perm
     LEFT JOIN {vcf_files} f ON f.vcf_file_id=perm.vcf_file_id
-    WHERE perm.uid=:uid OR perm.rid IN (:rids)',
+    WHERE perm.uid=:uid OR perm.rid IN (:rids)
+    ORDER BY backbone DESC, name ASC',
     array(':uid' => $uid, ':rids' => $rids))->fetchAllAssoc('vcf_file_id', PDO::FETCH_ASSOC);
 
   return $files;

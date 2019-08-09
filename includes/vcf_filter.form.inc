@@ -26,6 +26,25 @@ function vcf_filter_form($form, &$form_state) {
         font-size: 0.8em;
         font-style: italic;
       }
+      tr.new-assembly {
+        border-top: 2px solid #e8e8e8;
+      }
+      /* Fieldset Styling */
+      span.stages {
+        width: 45px;
+        float: left;
+        position: relative;
+        top: -5px;
+        padding-right: 5px;
+        font-size: 32px;
+        line-height: 1;
+        font-weight: bold;
+        text-align: right;
+        color: #314355;
+      }
+      #edit-submit {
+        margin-left: 45px;
+      }
     ',
     'type' => 'inline',
   );
@@ -39,7 +58,7 @@ function vcf_filter_form($form, &$form_state) {
     '#type' => 'fieldset',
     '#title' => 'Choose your VCF File.',
     '#description' => 'The following table contains all the available VCF Files. Choose the one you would like to filter and export by selecting the circle at the beginning of the appropriate row.',
-    '#prefix' => '<div id="all-vcf-options">'
+    '#prefix' => '<div id="all-vcf-options"><span class="stages stage1">1</span>',
   );
 
   // Get the list of files keyed by vcf_file_id.
@@ -50,8 +69,16 @@ function vcf_filter_form($form, &$form_state) {
     '#serialized' => TRUE,
   );
 
-  // Add number formatting to number of SNPs
-  foreach ($files as $vcf_file_id => $d) { $files[$vcf_file_id]['num_snps'] = number_format($d['num_snps']); }
+  // Add number formatting to number of SNPs and add class to divide assemblies.
+  $prev_assembly = '';
+  foreach ($files as $vcf_file_id => $d) {
+    $files[$vcf_file_id]['num_snps'] = number_format($d['num_snps']);
+    if ($prev_assembly != $d['backbone']) {
+      dpm($d, 'add to this row');
+      $files[$vcf_file_id]['#attributes'] = array('class' => array('new-assembly'));
+      $prev_assembly = $d['backbone'];
+    }
+  }
 
   // Create a table of VCF file options.
   $header = array(
@@ -96,7 +123,7 @@ function vcf_filter_form($form, &$form_state) {
     '#type' => 'fieldset',
     '#title' => 'Specify filter criteria.',
     '#tree' => TRUE,
-    //'#suffix' => '</div>',
+    '#prefix' => '<span class="stages stage2">2</span>',
   );
 
   $form['s2']['restrict_dataset'] = array(
@@ -232,6 +259,7 @@ function vcf_filter_form($form, &$form_state) {
     '#title' => 'Pick your Export format.',
     '#description' => 'Select one of the formats listed below and the filtered VCF will be converted accordingly. <strong>Keep in mind that if you choose a format with no quality information, you should have been stringent with your filtering criteria to ensure you are working with good data.</strong>',
     '#suffix' => '</div>',
+    '#prefix' => '<span class="stages stage3">3</span>',
   );
 
   $header = array(
@@ -317,6 +345,28 @@ function vcf_filter_form_validate($form, &$form_state) {
   // CHECK: Format required.
   if (empty($form_state['values']['format'])) {
     form_set_error('format', 'You must choose a format to export your filtered VCF file in.');
+  }
+
+  // CHECK: Must provide SOME filtering.
+  $includes_filtering = FALSE;
+  foreach ($form_state['values']['s2'] as $key => $value) {
+    if (!is_array($value) AND ($value != '') AND ($key != 'bi-allelic')) {
+      $includes_filtering = TRUE;
+      break;
+    }
+    if ($key == 'restrict_dataset') {
+      if ($form_state['values']['s2']['restrict_dataset']['regions'] != '') {
+        $includes_filtering = TRUE;
+        break;
+      }
+      if ($form_state['values']['s2']['restrict_dataset']['germplasm_select'] != '') {
+        $includes_filtering = TRUE;
+        break;
+      }
+    }
+  }
+  if (($includes_filtering !== TRUE) AND ($form_state['triggering_element']['#type'] == 'submit')) {
+    form_set_error('', 'Due to the size of many files provided by this tool, you are required to filter some of the criteria available in step 2. Downloading of extremely large datasets may take hours, so please filter robustly or be patient.');
   }
 
   // CHECK: Minimum SNP Call Read Depth should be an integer.
