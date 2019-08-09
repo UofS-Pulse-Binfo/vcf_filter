@@ -271,13 +271,11 @@ function vcf_filter_form($form, &$form_state) {
       'has_quality' => 'No',
       'description' => 'Alleles are coded as A if they match the maternal parent, B based on the paternal parent, whereas H represents a heterozygous call and "-" as missing. <br><strong>NOTE:</strong> This format is only suitable for biparental crosses and any SNPs in which the parents are missing, heterozygous, or the same genotypic call will be <strong>excluded</strong>!',
     ),
-    /*
-    'matrix' => array(
-      'name' => 'SNP Matrix',
+    'genotype_matrix' => array(
+      'name' => 'Genotype Matrix',
       'has_quality' => 'No',
-      'description' => 'Variant by Germplasm matrix of SNP calls.',
+      'description' => 'Variant by Germplasm matrix of Genotype per call in a tab-separated values(TSV) format.',
     ),
-    */
     'qual_matrix' => array(
       'name' => 'Quality Matrix',
       'has_quality' => 'Yes',
@@ -291,7 +289,7 @@ function vcf_filter_form($form, &$form_state) {
     'hapmap' => array(
       'name' => 'Haplotype Map (Hapmap)',
       'has_quality' => 'No',
-      'description' => 'A Hapmap file is a tab-separated values(TSV) format for storing genotypic data. Hapmap format is easier to edit and handle but less informative than VCF format.',
+      'description' => 'A Hapmap file is a tab-separated values(TSV) format for storing genotypic data. Hapmap format is easier to edit and handle but less informative than VCF format.<br><strong>NOTE:</strong> This format is only suitable for <strong>SNPs</strong> and any <strong>INDELS will be removed</strong>.',
     ),
     'bgzipped' => array(
       'name' => 'Bgzipped VCF',
@@ -409,10 +407,10 @@ function vcf_filter_form_submit($form, &$form_state) {
   // Use format to determine redirect:
   $url = array(
     'abh' => '/filter_vcf/ABH',
-    'matrix' => '/filter_vcf/SNP-Matrix',
     'qual_matrix' => '/filter_vcf/Quality-Matrix',
     'bgzipped' => '/filter_vcf/Bgzipped',
     'hapmap' => '/filter_vcf/Hapmap',
+    'genotype_matrix' => '/filter_vcf/Genotype-Matrix',
     'vcf' => '/filter_vcf/VCF'
   );
   $form_state['redirect'] = array(
