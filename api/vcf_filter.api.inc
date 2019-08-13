@@ -132,7 +132,10 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
 
   // Maximum Missing Count:
   if (!empty($filter_criteria['max_missing_count'])) {
-    $command .= ' --max-missing-count ' . escapeshellarg($filter_criteria['max_missing_count']);
+    // Multiply the user’s value by 2 because vcftools counts individual alleles rather than the combined diploid genotype call
+    // @ASSUMPTION: This module only deals with diploid organisms
+    $max_missing_count = $filter_criteria['max_missing_count'] * 2;
+    $command .= ' --max-missing-count ' . escapeshellarg($max_missing_count);
   }
 
   // Maximum Missing Count:
