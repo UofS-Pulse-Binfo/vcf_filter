@@ -131,6 +131,7 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
 
   // create output file
   $handle_out = fopen($out_hapmap_filename,'w') or die ("\nCannot create file: $out_hapmap_filename .\n");
+  $read_header = TRUE;
 
   // read vcf file by lines
   foreach (new SplFileObject($in_vcf_filename) as $line) {
@@ -149,38 +150,25 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
     }
 
     if ((!preg_match('/^#/', $line)) && (!empty($line))) {
-      $splitline = explode("\t", $line);
 
-      fwrite($handle_out, ($splitline[0] . 'p' . $splitline[1]."\t". $splitline[3]. '/'. join("/", explode(',',$splitline[4]))));
+      // Once we are done reading the header line, we need to start a new lines
+      // in the output file.
+      if ($read_header == TRUE) {
+        $read_header = FALSE;
+        fwrite($handle_out, "\n");
+      }
 
-      fwrite($handle_out, ("\t". $splitline[0]. "\t". $splitline[1]. "\tNA\tNA\tNA\tNA\tNA\tNA\tNA"));
+      // Retrieve the information from the line.
+      $marker = vcf_filter_read_VCF_into_array($headerline, $line);
+
+      $marker_name = $marker['#CHROM'] . 'p' . $marker['POS'];
+      fwrite($handle_out, ($marker_name . "\t" . $marker['REF']. '/'. join("/", explode(',',$marker['ALT']))));
+
+      fwrite($handle_out, ("\t". $marker['#CHROM']. "\t". $marker['POS']. "\tNA\tNA\tNA\tNA\tNA\tNA\tNA"));
 
       // merge the reference and alternates(1-3) genotypes into one array $gt_ref_min
       // corresponding $gt_ref_min[0] for reference gt, $gt_ref_min[1] for first alternate and so on
-      $gt_ref_min = array_merge(array("$splitline[3]"), explode(',',$splitline[4]));
-
-      // need to check 8th column to determine the postiion of GT
-      // the format in 8th column should look like:
-      //   GT:GQ:DP:HQ (VCF specification can be found in https://samtools.github.io/hts-specs/VCFv4.2.pdf)
-      // normally, GT should be the first element, but it not alway the case, but GT not exist is not considered possible here
-      // there is possibiliby of ONLY GT available
-
-      // set default GT position to be 0, the first one
-      $gt_position = 0;
-      if (strlen($splitline[8]) > 2){
-        $cvf_8c_format = explode(":", $splitline[8]);
-        for ($i = 0; $i < count($cvf_8c_format); $i++){
-          if ($cvf_8c_format[$i] == 'GT'){
-            $gt_position = $i;
-          }
-        }
-      }
-      elseif(($splitline[8]) == 'GT'){
-        $gt_position = -1;
-      }
-      else{
-        die ("ERROR: invalid genotype call format at 8th column: $splitline[8].\n");
-      }
+      $gt_ref_min = array_merge(array($marker['REF']), explode(',',$marker['ALT']));
 
       // 2 loops: first by samples (9th column to end)
       // second by number of GT(genotype)(e.g.:0/0) in FORMAT(e.g.: 0/0:0,36,89:51:5:40) of vcf file
@@ -188,16 +176,10 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
       // then match "0" for reference gt, "1" for first alternate and so on
 
       for ($m = 9; $m < count($headerline); $m++) {
+        $current_sample = $headerline[$m];
 
-        // get genotype call using variable $gt_position from last step
-        if ($gt_position == -1){
-          $call_gt = explode('/', str_replace("|","/",$splitline[$m]));
-        }
-        else{
-          $call = explode(":", $splitline[$m]);
-          // should explode both by '/' and '|' for both unpashed and pahsed
-          $call_gt = explode('/', str_replace("|","/",$call[$gt_position]));
-        }
+        // should explode both by '/' and '|' for both unpashed and pahsed
+        $call_gt = explode('/', str_replace("|","/",$marker[$current_sample]['GT']));
         fwrite($handle_out, "\t");
 
         /*check the number of genotypes exits
@@ -217,7 +199,7 @@ function vcf_filter_convert_VCF_to_Hapmap($in_vcf_filename, $out_hapmap_filename
             fwrite($handle_out, $gt_ref_min[$call_gt[$n]]);
           }
           else {
-            die ("ERROR: invalid genotype call at marker position ". $splitline[0]. " ". $splitline[1]. " ". $call_gt[$n]. "\n");
+            die ("ERROR: invalid genotype call at marker position ". $marker['#CHROM']. " ". $marker['POS']. " ". $call_gt[$n]. "\n");
           }
         }
       }
