@@ -123,6 +123,7 @@ function vcf_filter_convert_VCF_to_GenotypeMatrix($in_vcf_filename, $out_Genotyp
 
   // create output file
   $handle_out = fopen($out_GenotypeMatrix_filename,'w') or die ("\nCannot create file: $out_GenotypeMatrix_filename .\n");
+  $read_header = TRUE;
 
   // read vcf file by lines
   foreach (new SplFileObject($in_vcf_filename) as $line) {
@@ -141,6 +142,13 @@ function vcf_filter_convert_VCF_to_GenotypeMatrix($in_vcf_filename, $out_Genotyp
     }
 
     if ((!preg_match('/^#/', $line)) && (!empty($line))) {
+
+      // Once we are done reading the header line, we need to start a new lines
+      // in the output file.
+      if ($read_header == TRUE) {
+        $read_header = FALSE;
+        fwrite($handle_out, "\n");
+      }
       $marker = vcf_filter_read_VCF_into_array($headerline, $line);
 
       //  GenotypeMatrix format: Name Backbone Position (Germplasm name)
