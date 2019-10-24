@@ -1,10 +1,12 @@
 [![Build Status](https://travis-ci.org/UofS-Pulse-Binfo/vcf_filter.svg?branch=master)](https://travis-ci.org/UofS-Pulse-Binfo/vcf_filter)
 
+# VCF Filter
+
 This module provides a form interface so users can custom filter existing VCF files and export in a variety of formats. The form simply provides an interface to VCFtools and uses the Tripal Download API to provide the filtered file to the user.
 
 ## Dependencies
 - Tripal Core (utilizes the Tripal API)
-- Tripal Donwload API
+- Tripal Download API
 
 **NOTE: Compatible with both Tripal 2.x and 3.x.**
 
