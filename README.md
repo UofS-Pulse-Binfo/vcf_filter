@@ -6,7 +6,7 @@ This module provides a form interface so users can custom filter existing VCF fi
 
 ## Dependencies
 - Tripal Core (utilizes the Tripal API)
-- Tripal Download API
+- [Tripal Download API](https://github.com/tripal/trpdownload_api)
 
 **NOTE: Compatible with both Tripal 2.x and 3.x.**
 
