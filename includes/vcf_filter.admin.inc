@@ -73,7 +73,8 @@ function vcf_filter_admin_vcf_file_form($form, &$form_state) {
         .theme('table', $table)
         .'<p><strong>Description:</strong> '.$obj->description.'</p>'
         .'<p><strong>Germplasm From Header:</strong> '.$obj->specific_germplasm.'</p>'
-        .'<p><strong>Chromosome format:</strong> '.$obj->chromosome_format.'</p>',
+        .'<p><strong>Chromosome format:</strong> '.$obj->chromosome_format.'</p>'
+        .'<p><strong>Formats Selection:</strong> '.$obj->export_format_selection.'</p>',
     );
 
     $form['name'] = array(
@@ -124,22 +125,38 @@ function vcf_filter_admin_vcf_file_form($form, &$form_state) {
     '#description' => 'This should include the method used to generate the file and any filtering that has already been done. It may also be helpful to include some stats about the file such as average read depth to give users some context when filtering.',
     '#default_value' => (isset($obj->description)) ? $obj->description : '',
   );
-  
+
   $form['specific_germplasm'] = array(
     '#type' => 'textarea',
     '#title' => 'Germplasm From Header',
     '#description' => 'This should include all names of germplasm (individuals) from the header of VCF file. If this textarea is not filled, shell command will be used to find the header and extract all germplasm names but it may slow down this module a lot.',
     '#default_value' => (isset($obj->specific_germplasm)) ? $obj->specific_germplasm : '',
   );
-  
+
   $form['chromosome_format'] = array(
     '#type' => 'textarea',
     '#title' => 'Chromosome format',
     '#description' => 'This should indicate how chromosome names are formatted in this VCF file. For example, Chr1, chr1, Chr01 or name with a prefix like Lc, Ca, Gm, Pv or Mt.',
     '#default_value' => (isset($obj->chromosome_format)) ? $obj->chromosome_format : '',
   );
-  
-  
+
+  $format_options = array(
+    'abh' => 'ABH Format',
+    'genotype_matrix' => 'Genotype Matrix',
+    'qual_matrix' => 'Quality Matrix',
+    'vcf' => 'Variant Call Format (VCF)',
+    'hapmap' => 'Haplotype Map (Hapmap)',
+    'bgzipped' => 'Bgzipped VCF'
+  );
+
+  $form['export_format_selection'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Available export formats for this file'),
+    '#options' => $format_options,
+    '#description' => 'Please select suitable export formats for this vcf file.',
+    '#default_value' => (isset($obj->export_format_selection)) ? json_decode($obj->export_format_selection) : '',
+  );
+
   $op = ucwords($form_state['build_info']['args'][0]);
   $form['submit'] = array(
     '#type' => 'submit',
@@ -179,6 +196,7 @@ function vcf_filter_admin_vcf_file_form_submit($form, &$form_state) {
       'description' => $form_state['values']['description'],
       'specific_germplasm' => $form_state['values']['specific_germplasm'],
       'chromosome_format' => $form_state['values']['chromosome_format'],
+      'export_format_selection' => json_encode($form_state['values']['export_format_selection']),
     );
 
     if ($form_state['values']['op'] == 'Add') {
@@ -245,6 +263,7 @@ function vcf_filter_admin_vcf_file_perm_form($form, &$form_state) {
       array(array('data' => 'Description', 'header' => TRUE), $obj->description),
       array(array('data' => 'Germplasm From Header', 'header' => TRUE), $obj->specific_germplasm),
       array(array('data' => 'Chromosome format', 'header' => TRUE), $obj->chromosome_format),
+      array(array('data' => 'Formats Selection', 'header' => TRUE), $obj->export_format_selection),
     ),
   );
 

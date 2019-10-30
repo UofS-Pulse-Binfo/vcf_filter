@@ -123,10 +123,11 @@ function vcf_filter_convert_VCF_to_GenotypeMatrix($in_vcf_filename, $out_Genotyp
 
   // create output file
   $handle_out = fopen($out_GenotypeMatrix_filename,'w') or die ("\nCannot create file: $out_GenotypeMatrix_filename .\n");
+  $read_header = TRUE;
 
   // read vcf file by lines
   foreach (new SplFileObject($in_vcf_filename) as $line) {
-    trim ($line);
+    $line = trim($line);
     // if one line starts with '#CHROM' => header
     // if one line doesn't start with '#' and not empty => one SNP line
     if (preg_match('/^#CHROM/', $line)) {
@@ -141,16 +142,22 @@ function vcf_filter_convert_VCF_to_GenotypeMatrix($in_vcf_filename, $out_Genotyp
     }
 
     if ((!preg_match('/^#/', $line)) && (!empty($line))) {
-      $splitline = explode("\t", $line);
 
-      //  GenotypeMatrix format: Name Backbone Position (Germplasm name)n
-      fwrite($handle_out, ($splitline[0] . 'p' . $splitline[1]));
+      // Once we are done reading the header line, we need to start a new lines
+      // in the output file.
+      if ($read_header == TRUE) {
+        $read_header = FALSE;
+        fwrite($handle_out, "\n");
+      }
+      $marker = vcf_filter_read_VCF_into_array($headerline, $line);
 
-      fwrite($handle_out, ("\t". $splitline[0]. "\t". $splitline[1]));
+      //  GenotypeMatrix format: Name Backbone Position (Germplasm name)
+      $marker_name = $marker['#CHROM'] . 'p' . $marker['POS'];
+      fwrite($handle_out, ($marker_name . "\t" . $marker['#CHROM']. "\t" . $marker['POS']));
 
       // merge the reference and alternates(1-3) genotypes into one array $gt_ref_min
       // corresponding $gt_ref_min[0] for reference gt, $gt_ref_min[1] for first alternate and so on
-      $gt_ref_min = array_merge(array("$splitline[3]"), explode(',',$splitline[4]));
+      $gt_ref_min = array_merge(array($marker['REF']), explode(',',$marker['ALT']));
 
       // 2 loops: first by samples (9th column to end)
       // second by number of GT(genotype)(e.g.:0/0) in FORMAT(e.g.: 0/0:0,36,89:51:5:40) of vcf file
@@ -158,22 +165,21 @@ function vcf_filter_convert_VCF_to_GenotypeMatrix($in_vcf_filename, $out_Genotyp
       // then match "0" for reference gt, "1" for first alternate and so on
 
       for ($m = 9; $m < count($headerline); $m++) {
-        $call = explode(":", $splitline[$m]);
+        $current_sample = $headerline[$m];
 
         // should explode both by '/' and '|' for both unpashed and pahsed
-        $call_gt = explode('/', str_replace("|","/",$call[0]));
-
+        $call_gt = explode('/', str_replace("|","/",$marker[$current_sample]['GT']));
         fwrite($handle_out, "\t");
 
-        /*check the number of genotypes exits
-        * for genotypes:  .|. or 0|. or 1|. vcftools will convert it to . ; 0; 1 after filtering
-        * even the gt should not exist, but it could happen accidently
-        * it'll be the best to check this, so we can be alerted when it actually happen
-        */
+        // check the number of genotypes exits
+        // for genotypes:  .|. or 0|. or 1|. vcftools will convert it to . ; 0; 1 after filtering
+        // even the gt should not exist, but it could happen accidently
+        // it'll be the best to check this, so we can be alerted when it actually happen
         if (count($call_gt) <= 1){
           $germ_w_error = $m-9;
           print "ERROR: Only one genotype showed, might be caused by vcftools processing improper phased genotypes for "."$germ_w_error"."th  germplasm in line:"."\n"."$line.\n";
         }
+
         $gt_print;
         $slash_required = FALSE;
         for ($n=0; $n < count($call_gt); $n++) {
@@ -189,7 +195,7 @@ function vcf_filter_convert_VCF_to_GenotypeMatrix($in_vcf_filename, $out_Genotyp
             }
           }
           else {
-            die ("ERROR: invalid genotype call at marker position ". $splitline[0]. " ". $splitline[1]. "\n");
+            die ("ERROR: invalid genotype call at marker position ". $marker['#CHROM']. " ". $marker['POS']. "\n");
           }
         }
 

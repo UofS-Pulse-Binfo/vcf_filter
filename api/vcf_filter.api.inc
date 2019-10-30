@@ -22,7 +22,8 @@ function vcf_filter_get_vcf_files() {
     SELECT f.*
     FROM {vcf_files_perm} perm
     LEFT JOIN {vcf_files} f ON f.vcf_file_id=perm.vcf_file_id
-    WHERE perm.uid=:uid OR perm.rid IN (:rids)',
+    WHERE perm.uid=:uid OR perm.rid IN (:rids)
+    ORDER BY backbone DESC, name ASC',
     array(':uid' => $uid, ':rids' => $rids))->fetchAllAssoc('vcf_file_id', PDO::FETCH_ASSOC);
 
   return $files;
@@ -131,7 +132,10 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
 
   // Maximum Missing Count:
   if (!empty($filter_criteria['max_missing_count'])) {
-    $command .= ' --max-missing-count ' . escapeshellarg($filter_criteria['max_missing_count']);
+    // Multiply the user’s value by 2 because vcftools counts individual alleles rather than the combined diploid genotype call
+    // @ASSUMPTION: This module only deals with diploid organisms
+    $max_missing_count = $filter_criteria['max_missing_count'] * 2;
+    $command .= ' --max-missing-count ' . escapeshellarg($max_missing_count);
   }
 
   // Maximum Missing Count:
