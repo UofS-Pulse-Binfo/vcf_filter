@@ -43,7 +43,7 @@ function vcf_filter_position_search_form($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => 'Variant Name',
     '#attributes' =>array('placeholder' => 'Chr1p123456789'),
-    '#description' => '<span class="description">The name of the variant (e.g. LcC00002p390, LcChr6p161100389)</span>',
+    '#description' => '<span class="description">The name of the variant (e.g. LcChr6p161100389, Lcu.2RBY.Chr6p407560335)</span>',
     '#prefix' => '<div class="position_search_option">',
     '#suffix' => '</div>',
   );
@@ -56,14 +56,14 @@ function vcf_filter_position_search_form($form, &$form_state) {
   $form['s1']['backbone'] = array(
     '#type' => 'textfield',
     '#title' => 'Backbone Name',
-    '#description' => '<span class="description">The backbone of the variant (e.g. LcC00002, LcChr6)</span>',
+    '#description' => '<span class="description">The backbone of the variant (e.g. LcChr6, Lcu.2RBY.Chr6)</span>',
     '#attributes' =>array('placeholder' => 'Chr1'),
     '#prefix' => '<div class="position_search_option">',
   );
   $form['s1']['position'] = array(
     '#type' => 'textfield',
     '#title' => 'Position',
-    '#description' => '<span class="description">The position of the variant (e.g. 390, 161100389)</span>',
+    '#description' => '<span class="description">The position of the variant (e.g. 161100389, 407560335)</span>',
     '#attributes' =>array('placeholder' => '123456789'),
     '#suffix' => '</div>',
   );
