@@ -101,6 +101,7 @@ function vcf_filter_position_search_form($form, &$form_state) {
     if (!empty($available_files)){
 	    // list all files and provide url if there is at least one file available
 	    // list file name also link to vcf_file page by url
+      dpm($available_files, '$available_files');
 	    $item_files = array(
 	    	'items' => array(),
 		    'title' => '',
@@ -109,7 +110,7 @@ function vcf_filter_position_search_form($form, &$form_state) {
 	    );
 
       foreach($available_files as $one_vcf_id => $one_vcf_info ){
-        $item_files['items'][$one_vcf_id]['data'] = l($one_vcf_info['name'],
+        $item_files['items'][$one_vcf_id]['data'] = l($one_vcf_info['name'].'--Assumbly:'.$one_vcf_info['name'],
           $current_url,
           array('query' => array(
             'vcf_file_id' => $one_vcf_id,
@@ -117,8 +118,28 @@ function vcf_filter_position_search_form($form, &$form_state) {
             )
           )
         );
+        $item_files('attributes') = 'Assumbly:'.$one_vcf_info['name'];
       }
-	    $list = theme_item_list( $item_files);
+/*
+      $searched_vcf_file_table = array(
+        'caption' => 'List of Files:',
+        'header' => array('File Name', 'Assembly'),
+        'rows' => array(),
+      );
+
+      foreach($available_files as $one_vcf_id => $one_vcf_info ){
+        array_push($searched_vcf_file_table['rows'], array(l($one_vcf_info['name'], $current_url,
+          array('query' => array(
+            'vcf_file_id' => $one_vcf_id,
+            'one_region'=> $marker_4search
+            )
+          )
+         ), $one_vcf_info['name']) );
+      }
+      dpm($searched_vcf_file_table, '$searched_vcf_file_table');
+*/
+	    $list = theme_item_list($item_files);
+      //$list = theme('table', $searched_vcf_file_table);
       $form['s2'] = array(
         '#type' => 'fieldset',
         '#title' => 'Search Results',
