@@ -101,28 +101,9 @@ function vcf_filter_position_search_form($form, &$form_state) {
     if (!empty($available_files)){
 	    // list all files and provide url if there is at least one file available
 	    // list file name also link to vcf_file page by url
-      dpm($available_files, '$available_files');
-	    $item_files = array(
-	    	'items' => array(),
-		    'title' => '',
-		    'type' => 'ul',
-		    'attributes' => array(),
-	    );
 
-      foreach($available_files as $one_vcf_id => $one_vcf_info ){
-        $item_files['items'][$one_vcf_id]['data'] = l($one_vcf_info['name'].'--Assumbly:'.$one_vcf_info['name'],
-          $current_url,
-          array('query' => array(
-            'vcf_file_id' => $one_vcf_id,
-            'one_region'=> $marker_4search
-            )
-          )
-        );
-        $item_files('attributes') = 'Assumbly:'.$one_vcf_info['name'];
-      }
-/*
       $searched_vcf_file_table = array(
-        'caption' => 'List of Files:',
+        'caption' => 'VCF files containing this variant. Each file name is linked to VCF Bulk Export with file selected and position filled.',
         'header' => array('File Name', 'Assembly'),
         'rows' => array(),
       );
@@ -131,23 +112,18 @@ function vcf_filter_position_search_form($form, &$form_state) {
         array_push($searched_vcf_file_table['rows'], array(l($one_vcf_info['name'], $current_url,
           array('query' => array(
             'vcf_file_id' => $one_vcf_id,
-            'one_region'=> $marker_4search
-            )
-          )
-         ), $one_vcf_info['name']) );
+            'one_region'=> $marker_4search))), $one_vcf_info['backbone']) );
       }
-      dpm($searched_vcf_file_table, '$searched_vcf_file_table');
-*/
-	    $list = theme_item_list($item_files);
-      //$list = theme('table', $searched_vcf_file_table);
+
+      $available_file_table = theme('table', $searched_vcf_file_table);
       $form['s2'] = array(
         '#type' => 'fieldset',
         '#title' => 'Search Results',
-        '#description' => 'List of VCF files which include this variant.<br>Each file name is linked to VCF Bulk Export with file selected and position filled.',
+        '#description' => '',
       );
       $form['s2']['list'] = array(
         '#type' => 'markup',
-        '#markup' => $list,
+        '#markup' => $available_file_table,
       );
 
     }
