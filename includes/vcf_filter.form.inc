@@ -196,6 +196,11 @@ function vcf_filter_form($form, &$form_state) {
     }
   }
 
+  if (isset($_GET['one_region'])) {
+    $form['s2']['restrict_dataset']['regions']['#value'] = $_GET['one_region'];
+    $form['s2']['restrict_dataset']['#collapsed'] = FALSE;
+  }
+
   if (isset($_GET['one_germplasm'])) {
     $form['s2']['restrict_dataset']['germplasm_select']['#value'] = $_GET['one_germplasm'];
     $form['s2']['restrict_dataset']['#collapsed'] = FALSE;

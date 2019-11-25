@@ -23,6 +23,15 @@ function vcf_filter_menu() {
     'file' => 'includes/vcf_filter.form.inc',
   );
 
+  $items['filter_vcf/Position_search'] = array(
+    'title' => 'VCF Position Search',
+    'description' => 'Search sites from current available vcf files.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('vcf_filter_position_search_form'),
+    'access callback' => TRUE,
+    'file' => 'includes/vcf_filter.position_search.form.inc',
+  );
+
   // TRIPAL DOWNLOAD PAGES.
   $items['filter_vcf/ABH'] = array(
     'title' => 'Download Filtered VCF: A/B Biparental Format',
