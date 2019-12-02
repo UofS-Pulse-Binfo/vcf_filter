@@ -28,7 +28,7 @@ function vcf_filter_position_search_form($form, &$form_state) {
 
   $form['intro'] = array(
     '#type' => 'item',
-    '#markup' => 'VCF Position Search is part of modeule VCF Bulk Export and it supplies function of searching variant cross all of our VCF files.',
+    '#markup' => 'VCF Position Search is a companion tool to VCF Bulk Export and allows searching for variants across all available VCF files.',
   );
 
   $files = vcf_filter_get_vcf_files();
