@@ -164,7 +164,7 @@ function vcf_filter_form($form, &$form_state) {
     }
   }
 
-    $form['s2']['restrict_dataset']['help'] = array(
+  $form['s2']['restrict_dataset']['help'] = array(
     '#type' => 'markup',
     '#markup' => '<div class="messages warning">You must <strong>copy</strong> the germplasm you want to keep into the <strong>Keep these Germplasm</strong> or your file will contain all germplasm.</div>'
   );
@@ -172,9 +172,25 @@ function vcf_filter_form($form, &$form_state) {
   $form['s2']['restrict_dataset']['germplasm_select'] = array(
     '#type' => 'textarea',
     '#title' => 'Keep these Germplasm',
-    '#description' => 'Only include these germplasm (individuals) in export file. Each germplasm name should be on it\'s own line and must match exactly the names in the file chosen (names are shown above).',
+    '#description' => 'Only include these germplasm (individuals) in export file. Each germplasm name should be on it\'s own line and must match exactly the names in the file chosen (names are shown above).<br>For <strong>more than 10 germplasm</strong>, please save these germplasm in one file and upload under.',
     '#rows' => 2,
     );
+
+  $form['s2']['restrict_dataset']['germplasm_select_upload'] = array(
+    '#title' => 'Or upload a file of germplasm',
+    '#type' => 'managed_file',
+    '#description' => t('The file should be a plain-text (.txt, .csv, .tsv) file with one germplasm each line. File upload must be smaller than %max_file_size in size.<br><strong>Uploaded file will be used only if text box above is not filled.</strong>' ,
+      array(
+        '%max_file_size' => round(file_upload_max_size() / 1024 / 1024,1) . 'MB'
+      )
+    ),
+    '#upload_location' => file_directory_temp(),
+    '#upload_validator' => array(
+      'file_validate_extensions' => array('txt tsv csv'),
+      'file_validate_size' => array(file_upload_max_size()),
+    ),
+  );
+
 
   //update $form['s2']['restrict_dataset']
   if ((isset($form_state['values']['vcf_file_id'])) or (isset($_GET['vcf_file_id']) AND is_numeric($_GET['vcf_file_id']) )) {
@@ -322,6 +338,7 @@ function vcf_filter_form($form, &$form_state) {
       }
     }
   }
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Filter',
@@ -340,7 +357,7 @@ function vcf_filter_form($form, &$form_state) {
  * VCF Filter Form: Validation.
  */
 function vcf_filter_form_validate($form, &$form_state) {
-
+  dpm($form_state, '$form_state in validation');
   // CHECK: VCF File Required.
   if (empty($form_state['values']['vcf_file_id'])) {
     form_set_error('vcf_file_id', 'You must choose a VCF file to filter.');
@@ -349,6 +366,22 @@ function vcf_filter_form_validate($form, &$form_state) {
   // CHECK: Format required.
   if (empty($form_state['values']['format'])) {
     form_set_error('format', 'You must choose a format to export your filtered VCF file in.');
+  }
+  // Validate file upload for germplasm
+  // if it is file, save the path; if it is input, save it to file in temp directory, then save path
+  $germplasm_file = null;
+  if(isset( $form_state['values']['s2']['restrict_dataset']['germplasm_select_upload'] )){
+    $germplasm_file = file_load($form_state['values']['s2']['restrict_dataset']['germplasm_select_upload']);
+  }
+  if (is_object($germplasm_file)){
+    $form_state['values']['s2']['restrict_dataset']['path_germplasm_select'] = drupal_realpath($germplasm_file->uri);
+  }
+  elseif(!empty($form_state['values']['s2']['restrict_dataset']['germplasm_select'])){
+    // save content to a temp file, update path to $form_state
+    dpm($form_state['values']['s2']['restrict_dataset']['germplasm_select']);
+    if (count(json_decode($form_state['values']['s2']['restrict_dataset']['germplasm_select'])) > 10){
+      form_set_error('s2][restrict_dataset][germplasm_select', 'Please upload a file for filtering more than 10 germplasm.');
+    }
   }
 
   // CHECK: Must provide SOME filtering.
@@ -420,6 +453,9 @@ function vcf_filter_form_submit($form, &$form_state) {
   // Then grab the VCF file to be filtered.
   $q['vcf_file_id'] = $form_state['values']['vcf_file_id'];
   // No need to grab the format b/c that is determined by the tripal download page redirected to.
+  // mv the file to temp directory, or save to file in temp if its germplasm in textarea
+
+
 
   // Use format to determine redirect:
   $url = array(

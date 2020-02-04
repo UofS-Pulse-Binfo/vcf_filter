@@ -76,7 +76,10 @@ function vcf_filter_filter_file($file_path, $filter_criteria, $drush_use_limited
 
   $filter_criteria_germplasm_temp = variable_get('file_temporary_path') . '/' . 'germplasm.' . uniqid() . '.txt';
 
-  if (!empty($filter_criteria['restrict_dataset']['germplasm_select'])){
+  if (!empty($filter_criteria['restrict_dataset']['germplasm_select_upload'])){
+    $command .= ' --keep ' .  $filter_criteria['restrict_dataset']['germplasm_select_upload'];
+  }
+  elseif (!empty($filter_criteria['restrict_dataset']['germplasm_select'])){
 
     $handle_out = fopen($filter_criteria_germplasm_temp,'w') or die ("\nCannot create file: $filter_criteria_germplasm_temp .\n");
     fwrite($handle_out, $filter_criteria['restrict_dataset']['germplasm_select']);
