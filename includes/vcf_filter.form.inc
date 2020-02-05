@@ -357,7 +357,7 @@ function vcf_filter_form($form, &$form_state) {
  * VCF Filter Form: Validation.
  */
 function vcf_filter_form_validate($form, &$form_state) {
-  dpm($form_state, '$form_state in validation');
+  //dpm($form_state, '$form_state in validation');
   // CHECK: VCF File Required.
   if (empty($form_state['values']['vcf_file_id'])) {
     form_set_error('vcf_file_id', 'You must choose a VCF file to filter.');
@@ -378,7 +378,7 @@ function vcf_filter_form_validate($form, &$form_state) {
   }
   elseif(!empty($form_state['values']['s2']['restrict_dataset']['germplasm_select'])){
     // save content to a temp file, update path to $form_state
-    dpm($form_state['values']['s2']['restrict_dataset']['germplasm_select']);
+    //dpm($form_state['values']['s2']['restrict_dataset']['germplasm_select']);
     if (count(json_decode($form_state['values']['s2']['restrict_dataset']['germplasm_select'])) > 10){
       form_set_error('s2][restrict_dataset][germplasm_select', 'Please upload a file for filtering more than 10 germplasm.');
     }
