@@ -1,11 +1,11 @@
 Troubleshoot
 ============
 
-If you have problem using VCF Position Search, please check:
+If VCF Position Search is not working as expected, please check:
 
-- if Samtools works
+- if bcftools works properly
 
-- if files can be downloaded properly in VCF Bulk Loader
+- if vcf files can be downloaded properly in VCF Bulk Loader
 
 - if compressed vcf file (your_file.vcf.gz) and index file (your_file.vcf.gz.tbi or your_file.vcf.gz.csi) are provided in right directory
 
@@ -25,4 +25,4 @@ If you have problem using VCF Position Search, please check:
 
 .. note::
 
-  If you have questions or suggestions, please contacts us at knowpulse@usask.ca
+  If you have any questions or suggestions, please contacts us at knowpulse@usask.ca.

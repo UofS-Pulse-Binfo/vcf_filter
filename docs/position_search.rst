@@ -1,6 +1,6 @@
 Position Search
 ===============
-VCF Position Search is a companion tool for VCF Bulk Loader. It allows users to search variants cross all vcf files provided and provides links back to Bulk Loader for variant specific filter.
+VCF Position Search is a companion tool for VCF Bulk Loader. It allows users to search variants cross all available vcf files and provides links back to Bulk Loader for variant specific filter.
 
 
 .. toctree::
