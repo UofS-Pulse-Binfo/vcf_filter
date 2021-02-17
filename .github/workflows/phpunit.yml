@@ -83,6 +83,7 @@ jobs:
         DRUSH: ${{ steps.tripalsetup.outputs.drush_path }}
         DRUPAL_ROOT: ${{ steps.tripalsetup.outputs.drupal_root }}
       run: |
+        sudo apt-get install -y vcftools 
         mkdir -p $DRUPAL_ROOT/sites/all/modules/vcf_filter
         cp -R * $DRUPAL_ROOT/sites/all/modules/vcf_filter
         cd $DRUPAL_ROOT
