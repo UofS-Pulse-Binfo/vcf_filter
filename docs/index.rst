@@ -11,3 +11,4 @@ This modules provides a form interface so users can custom filter existing VCF f
    features
    install
    configuration
+   position_search

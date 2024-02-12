@@ -22,7 +22,7 @@ Germplasm From Header
 The names of all germplasm (individuals) in this vcf file. The germplasm list must be new line separated without any header or empty lines.
 
 .. note::
-  If this textarea is not filled, the module is able to find the list from selected VCF fiels. However, waiting time of extracting germplasm list from a selected file can be sifnificant for large VCF files.
+  If this textarea is not filled, the module is able to find the list from selected VCF files. However, waiting time of extracting germplasm list from a selected file can be sifnificant for large VCF files.
   ``Loading time for a 10G VCF file will be about 3 seconds.``
 
   Since the germplasm list can be generated, it's not necessary to generate such a list for configuration otherwise. We can leave this section blank, select this file and copy generated list back to configuration.
